@@ -58,8 +58,13 @@ export type ChatMessage = {
   interactableID?: string;
 };
 
+export type BoothItem = 'Blue Hat' | 'Red Hat' | 'Gold Hat';
+
 export interface ConversationArea extends Interactable {
   topic?: string;
+};
+export interface TicketBoothArea extends Interactable {
+  itemPrices: [BoothItem, number][];
 };
 export interface BoundingBox {
   x: number;

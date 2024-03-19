@@ -9,6 +9,7 @@ import { isViewingArea } from '../TestUtils';
 import {
   ChatMessage,
   ConversationArea as ConversationAreaModel,
+  TicketBoothArea as TicketBoothAreaModel,
   CoveyTownSocket,
   Interactable,
   InteractableCommand,
@@ -22,6 +23,7 @@ import { logError } from '../Utils';
 import ConversationArea from './ConversationArea';
 import GameAreaFactory from './games/GameAreaFactory';
 import InteractableArea from './InteractableArea';
+import TicketBoothArea from './TicketBoothArea';
 import ViewingArea from './ViewingArea';
 
 /**
@@ -311,6 +313,29 @@ export default class Town {
     return true;
   }
 
+  /** Creates a new ticket booth area in this town if there is not currently an active ticket booth with the same ID. The ticket booth area ID must match the name of a ticket booth area that exists in this town's map, and the ticket booth area must not already have item prices set. If successful creating the ticket booth area, this method: Adds any players who are in the region defined by the ticket booth area to it Notifies all players in the town that the ticket booth area has been updated by emitting an interactableUpdate event
+   *
+   * If successful creating the ticket booth area, this method:
+   *   Adds any players who are in the region defined by the ticket booth area to it
+   *   Notifies all players in the town that the ticket booth area has been updated by
+   *
+   * @param ticketBoothArea Information describing the ticket booth area to create. Ignores any occupantsById that are set on the ticket booth area that is passed to this method.
+   *
+   * @returns True if the ticket booth is successfully created, or false if there is no known ticket booth area with the specified ID or if there is already an active ticket booth area with the specified ID
+   */
+  public addTicketBoothArea(ticketBoothArea: TicketBoothAreaModel): boolean {
+    const area = this._interactables.find(
+      eachArea => eachArea.id === ticketBoothArea.id,
+    ) as TicketBoothArea;
+    if (!area || !ticketBoothArea.itemPrices || area.itemPrices) {
+      return false;
+    }
+    area.itemPrices = ticketBoothArea.itemPrices;
+    area.addPlayersWithinBounds(this._players);
+    this._broadcastEmitter.emit('interactableUpdate', area.toModel());
+    return true;
+  }
+
   /**
    * Creates a new viewing area in this town if there is not currently an active
    * viewing area with the same ID. The viewing area ID must match the name of a
@@ -418,6 +443,12 @@ export default class Town {
         ConversationArea.fromMapObject(eachConvAreaObj, this._broadcastEmitter),
       );
 
+    const ticketBoothAreas = objectLayer.objects
+      .filter(eachObject => eachObject.type === 'TicketBoothArea')
+      .map(eachTicketBoothAreaObj =>
+        TicketBoothArea.fromMapObject(eachTicketBoothAreaObj, this._broadcastEmitter),
+      );
+
     const gameAreas = objectLayer.objects
       .filter(eachObject => eachObject.type === 'GameArea')
       .map(eachGameAreaObj => GameAreaFactory(eachGameAreaObj, this._broadcastEmitter));
@@ -425,7 +456,8 @@ export default class Town {
     this._interactables = this._interactables
       .concat(viewingAreas)
       .concat(conversationAreas)
-      .concat(gameAreas);
+      .concat(gameAreas)
+      .concat(ticketBoothAreas);
     this._validateInteractables();
   }
 
