@@ -6,6 +6,7 @@ import { useInteractableAreaController } from '../../../../classes/TownControlle
 import useTownController from '../../../../hooks/useTownController';
 import { GameStatus, InteractableID } from '../../../../types/CoveyTownSocket';
 import ConnectFourBoard from '../ConnectFour/ConnectFourBoard';
+import { PongGame } from '../../../../classes/PongGame';
 
 /**
  * The ConnectFourArea component renders the Connect Four game area.
@@ -49,22 +50,10 @@ export default function PongArea({
 }: {
   interactableID: InteractableID;
 }): JSX.Element {
-    useEffect(() => {
-        const script = document.createElement('script');
-      
-        script.src = "../../../../classes/PongGame.js";
-        script.async = true;
-      
-        document.body.appendChild(script);
-      
-        return () => {
-          document.body.removeChild(script);
-        }
-      }, []);
     return (
         <div>
             <h1>Pong</h1>
-            <div id='phaser-example'></div>
+            <PongGame />
         </div>
     )
     /*

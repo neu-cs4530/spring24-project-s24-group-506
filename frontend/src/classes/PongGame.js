@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+
 const config = {
     type: Phaser.AUTO,
     parent: "phaser-example",
@@ -21,7 +23,6 @@ const config = {
     }
 };
 
-const game = new Phaser.Game(config);
 let ball;
 
 function preload() {
@@ -33,4 +34,14 @@ function create() {
 }
 
 function update() {
+}
+
+export function PongGame() {
+    useEffect(() => {
+        const game = new Phaser.Game(config);
+    }, []);
+
+    return (
+        <div id="phaser-example"></div>
+    );
 }
