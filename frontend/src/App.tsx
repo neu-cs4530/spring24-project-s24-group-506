@@ -19,6 +19,7 @@ import LoginControllerContext from './contexts/LoginControllerContext';
 import { TownsServiceClient } from './generated/client';
 import { nanoid } from 'nanoid';
 import ToggleChatButton from './components/VideoCall/VideoFrontend/components/Buttons/ToggleChatButton/ToggleChatButton';
+import PongArea from './components/Town/interactables/Pong/PongArea';
 
 function App() {
   const [townController, setTownController] = useState<TownController | null>(null);
@@ -118,13 +119,20 @@ function DebugApp(): JSX.Element {
   }
 }
 
+function MyDebugApp(): JSX.Element {
+  return (
+    <PongArea interactableID='1'/>
+  );
+}
+
 function AppOrDebugApp(): JSX.Element {
-  const debugTown = process.env.NEXT_PUBLIC_TOWN_DEV_MODE;
-  if (debugTown && debugTown.toLowerCase() === 'true') {
-    return <DebugApp />;
-  } else {
-    return <App />;
-  }
+  return <MyDebugApp />;
+  // const debugTown = process.env.NEXT_PUBLIC_TOWN_DEV_MODE;
+  // if (debugTown && debugTown.toLowerCase() === 'true') {
+  //   return <DebugApp />;
+  // } else {
+  //   return <App />;
+  // }
 }
 
 export default function AppStateWrapper(): JSX.Element {
