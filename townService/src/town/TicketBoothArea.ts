@@ -13,7 +13,7 @@ import InvalidParametersError from '../lib/InvalidParametersError';
 
 export default class TicketBoothArea extends InteractableArea {
   /* The number of items in the ticket booth */
-  public itemPrices: [BoothItem, number][];
+  public itemPrices: [BoothItem, number, number][];
 
   /** The ticket booth area is "active" when there are players inside of it  */
   public get isActive(): boolean {
