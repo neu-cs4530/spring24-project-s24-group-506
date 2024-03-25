@@ -64,7 +64,7 @@ export interface ConversationArea extends Interactable {
   topic?: string;
 };
 export interface TicketBoothArea extends Interactable {
-  itemPrices: [BoothItem, number][];
+  itemPrices: [BoothItem, number, number][];
 };
 export interface BoundingBox {
   x: number;

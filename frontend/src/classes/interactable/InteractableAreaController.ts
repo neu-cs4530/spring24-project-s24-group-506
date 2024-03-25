@@ -21,7 +21,7 @@ export type GenericInteractableAreaController = InteractableAreaController<
 export const CONVERSATION_AREA_TYPE = 'Conversation Area';
 export const VIEWING_AREA_TYPE = 'Viewing Area';
 export const GAME_AREA_TYPE = 'Game Area';
-export const TICKET_BOOTH_AREA_TYPE = 'Ticket Booth Area';
+export const TICKET_BOOTH_AREA_TYPE = 'TicketBoothArea';
 /**
  * A InteractableAreaController manages the local behavior of a interactable area in the frontend,
  * implementing the logic to bridge between the townService's interpretation of interactable areas and the

@@ -1,3 +1,6 @@
+import TicketBoothAreaController, {
+  TicketBoothAreaEvents,
+} from '../../../classes/interactable/TicketBoothAreaController';
 import { BoundingBox } from '../../../types/CoveyTownSocket';
 import Interactable, { KnownInteractableTypes } from '../Interactable';
 
@@ -7,9 +10,9 @@ export default class TicketBoothArea extends Interactable {
 
   private _ticketBoothInfo?: Phaser.GameObjects.Text;
 
-  private _ticketBooth?: TicketBoothController;
+  private _ticketBooth?: TicketBoothAreaController;
 
-  private _changeListener?: TicketBoothEvents['ticketBoothChange'];
+  private _changeListener?: TicketBoothAreaEvents['ticketBoothChange'];
 
   getType(): KnownInteractableTypes {
     return 'TicketBoothArea';

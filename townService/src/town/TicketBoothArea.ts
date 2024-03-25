@@ -65,9 +65,9 @@ export default class TicketBoothArea extends InteractableArea {
   }
 
   /**
-   * Creates a new ConversationArea object that will represent a Conversation Area object in the town map.
-   * @param mapObject An ITiledMapObject that represents a rectangle in which this conversation area exists
-   * @param broadcastEmitter An emitter that can be used by this conversation area to broadcast updates
+   * Creates a new TicketBoothArea object that will represent a TicketBooth Area object in the town map.
+   * @param mapObject An ITiledMapObject that represents a rectangle in which this TicketBooth area exists
+   * @param broadcastEmitter An emitter that can be used by this TicketBooth area to broadcast updates
    * @returns
    */
   public static fromMapObject(
