@@ -16,7 +16,7 @@ import VideoOverlay from './components/VideoCall/VideoOverlay/VideoOverlay';
 import TownMap from './components/Town/TownMap';
 import TownControllerContext from './contexts/TownControllerContext';
 import LoginControllerContext from './contexts/LoginControllerContext';
-import { TownsServiceClient } from './generated/client';
+import { TownsServiceClient } from './generated/client.ts';
 import { nanoid } from 'nanoid';
 import ToggleChatButton from './components/VideoCall/VideoFrontend/components/Buttons/ToggleChatButton/ToggleChatButton';
 
