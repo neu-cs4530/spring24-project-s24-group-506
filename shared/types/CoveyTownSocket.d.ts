@@ -1,3 +1,4 @@
+
 export type TownJoinResponse = {
   /** Unique ID that represents this player * */
   userID: string;
@@ -161,6 +162,37 @@ export type ConnectFourColIndex = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
 export type ConnectFourColor = 'Red' | 'Yellow';
 
+export type PongPlayer = 'Left' | 'Right';
+
+export type PongDirection = 'Up' | 'Down';
+
+export type PongMove = {
+  gamePiece: PongPlayer;
+  direction: PongDirection;
+}
+
+/**
+ * Type for the state of a Pong game
+ */
+export interface PongGameState extends WinnableGameState {
+  ballPosition?: XY;
+  ballVelocity?: XY;
+
+  leftPaddle?: XY;
+  leftPaddleVelocity?: number;
+  rightPaddle?: XY;
+  rightPaddleVelocity?: number;
+
+  leftScore?: number;
+  rightScore?: number;
+
+  leftPlayer?: PlayerID;
+  rightPlayer?: PlayerID;
+
+  leftPlayerReady?: boolean;
+  rightPlayerReady?: boolean;
+}
+
 export type InteractableID = string;
 export type GameInstanceID = string;
 
@@ -216,7 +248,7 @@ interface InteractableCommandBase {
   type: string;
 }
 
-export type InteractableCommand =  ViewingAreaUpdateCommand | JoinGameCommand | GameMoveCommand<TicTacToeMove> | GameMoveCommand<ConnectFourMove> | StartGameCommand | LeaveGameCommand;
+export type InteractableCommand =  ViewingAreaUpdateCommand | JoinGameCommand | GameMoveCommand<TicTacToeMove> | GameMoveCommand<ConnectFourMove> | GameMoveCommand<PongMove> | StartGameCommand | LeaveGameCommand;
 export interface ViewingAreaUpdateCommand  {
   type: 'ViewingAreaUpdate';
   update: ViewingArea;
@@ -240,7 +272,7 @@ export interface GameMoveCommand<MoveType> {
 export type InteractableCommandReturnType<CommandType extends InteractableCommand> = 
   CommandType extends JoinGameCommand ? { gameID: string}:
   CommandType extends ViewingAreaUpdateCommand ? undefined :
-  CommandType extends GameMoveCommand<TicTacToeMove> ? undefined :
+  CommandType extends GameMoveCommand<GameMove> ? undefined :
   CommandType extends LeaveGameCommand ? undefined :
   never;
 
