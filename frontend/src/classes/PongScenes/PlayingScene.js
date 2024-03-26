@@ -128,19 +128,19 @@ export class PlayingScene extends Phaser.Scene {
       }
 
       if (this.cursors.up.isDown) {
-        this.player1.setVelocityY(-350);
+        this.player2.setVelocityY(-350);
       } else if (this.cursors.down.isDown) {
-        this.player1.setVelocityY(350);
+        this.player2.setVelocityY(350);
       } else {
-        this.player1.setVelocityY(0);
+        this.player2.setVelocityY(0);
       }
 
       if (this.keys.w.isDown) {
-        this.player2.setVelocityY(-300);
+        this.player1.setVelocityY(-300);
       } else if (this.keys.s.isDown) {
-        this.player2.setVelocityY(300);
+        this.player1.setVelocityY(300);
       } else {
-        this.player2.setVelocityY(0);
+        this.player1.setVelocityY(0);
       }
     }
   }
@@ -163,11 +163,8 @@ export class PlayingScene extends Phaser.Scene {
       this.p2VictoryText.setVisible(true);
     }
 
-    this.time.delayedCall(2900, () => {
-        this.resetValues();
-    }, [], this);
-
     this.time.delayedCall(3000, () => {
+        this.resetValues();
         this.scene.start('StartingScene');
     }, [], this);
   }

@@ -261,7 +261,7 @@ function getOtherPlayerSide(side: PongPlayer): PongPlayer {
           }
         }
         if (newState.rightPaddle) {
-          newState.rightPaddle.y += newState.rightPaddleVelocity;
+          newState.rightPaddle.y += newState.rightPaddleVelocity??0;
           if (newState.rightPaddle.y < 0) {
             newState.rightPaddle.y = 0;
             newState.rightPaddleVelocity = 0;

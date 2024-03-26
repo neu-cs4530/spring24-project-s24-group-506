@@ -5,6 +5,7 @@
  * @see ConnectFourGame
  * @see GameArea
  */
+/*
 export default class ConnectFourGameArea extends GameArea<PongGame> {
     protected getType(): InteractableType {
       return 'ConnectFourArea';
@@ -33,6 +34,7 @@ export default class ConnectFourGameArea extends GameArea<PongGame> {
       }
       this._emitAreaChanged();
     }
+
   
     /**
      * Handle a command from a player in this game area.
@@ -56,7 +58,7 @@ export default class ConnectFourGameArea extends GameArea<PongGame> {
      * Invalid commands:
      * - GameMove, StartGame and LeaveGame: if the game is not in progress (GAME_NOT_IN_PROGRESS_MESSAGE) or if the game ID does not match the game in progress (GAME_ID_MISSMATCH_MESSAGE)
      * - Any command besides JoinGame, GameMove, StartGame and LeaveGame: INVALID_COMMAND_MESSAGE
-     */
+     
     public handleCommand<CommandType extends InteractableCommand>(
       command: CommandType,
       player: Player,
@@ -118,4 +120,4 @@ export default class ConnectFourGameArea extends GameArea<PongGame> {
       throw new InvalidParametersError(INVALID_COMMAND_MESSAGE);
     }
   }
-  
+  */
