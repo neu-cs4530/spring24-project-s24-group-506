@@ -136,6 +136,11 @@ export default class TownGameScene extends Phaser.Scene {
       this._resourcePathPrefix + '/assets/atlas/atlas.png',
       this._resourcePathPrefix + '/assets/atlas/atlas.json',
     );
+    this.load.atlas(
+      'TicketBoothGuy',
+      this._resourcePathPrefix + '/assets/atlas/TicketBoothGuy.png',
+      this._resourcePathPrefix + '/assets/atlas/TicketBoothGuy.json',
+    );
   }
 
   updatePlayers(players: PlayerController[]) {
@@ -334,6 +339,7 @@ export default class TownGameScene extends Phaser.Scene {
       '13_Conference_Hall_32x32',
       '14_Basement_32x32',
       '16_Grocery_store_32x32',
+      'TicketBoothGuy',
     ].map(v => {
       const ret = this.map.addTilesetImage(v);
       assert(ret);
