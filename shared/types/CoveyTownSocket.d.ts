@@ -191,6 +191,8 @@ export interface PongGameState extends WinnableGameState {
 
   leftPlayerReady?: boolean;
   rightPlayerReady?: boolean;
+
+  
 }
 
 export type InteractableID = string;
