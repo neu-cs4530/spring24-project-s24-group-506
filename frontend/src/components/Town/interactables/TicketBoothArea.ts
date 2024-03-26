@@ -12,7 +12,7 @@ export default class TicketBoothArea extends Interactable {
 
   private _ticketBooth?: TicketBoothAreaController;
 
-  private _changeListener?: TicketBoothAreaEvents['ticketBoothChange'];
+  private _changeListener?: TicketBoothAreaEvents['itemPurchased'];
 
   getType(): KnownInteractableTypes {
     return 'TicketBoothArea';
