@@ -11,7 +11,7 @@ import InteractableAreaController, {
  * are only ever emitted to local components (not to the townService).
  */
 export type TicketBoothAreaEvents = BaseInteractableEventMap & {
-  itemPurchased: (itemName: BoothItem | undefined) => void;
+  itemPurchased: (newItemPrices: [BoothItem, number, number][] | undefined) => void;
 };
 
 // The special string that will be displayed when a conversation area does not have a topic set
@@ -93,17 +93,13 @@ export default class TicketBoothAreaController extends InteractableAreaControlle
    * Purchase an item from the ticket booth area.
    * @param itemName The name of the item to purchase
    */
-  public purchaseItem(itemName: BoothItem): void {
-    if (this.itemPrices) {
-      const price = this.itemPrices.find(([item]) => item === itemName)?.[1];
-      if (price !== undefined) {
-        this.emit('itemPurchased', itemName);
-        // add one to the third element of the tuple to indicate that the item has been purchased and update itemPrices
-        this._itemPrices = this.itemPrices.map(([item, itemPrice, purchased]) =>
-          item === itemName ? [item, price, purchased + 1] : [item, itemPrice, purchased],
-        );
-      }
+  public purchaseItem(newItemPrices: [BoothItem, number, number][]): void {
+    if (this._itemPrices !== newItemPrices) {
+      this.emit('itemPurchased', newItemPrices);
+      if (newItemPrices !== undefined) this.emit('friendlyNameChange', newItemPrices[0][0]);
+      else this.emit('friendlyNameChange', NO_ITEM_STRING);
     }
+    this._itemPrices = newItemPrices;
   }
 }
 /**
@@ -122,5 +118,5 @@ export function useTicketBoothAreaItemPrices(
       area.removeListener('itemPurchased', setItemPrices);
     };
   }, [area]);
-  return itemPrices ?? ([] || NO_ITEM_STRING);
+  return itemPrices ?? [];
 }
