@@ -2,6 +2,12 @@ import { useEffect } from 'react';
 import { PlayingScene } from './PongScenes/PlayingScene';
 import { StartingScene } from './PongScenes/StartingScene';
 
+export const SCREEN_WIDTH = 800;
+export const SCREEN_HEIGHT = 640;
+export const BALL_SIZE = 32;
+export const PADDLE_WIDTH = 32;
+export const PADDLE_HEIGHT = 128;
+
 const config = {
   type: Phaser.AUTO,
   parent: 'phaser-example',

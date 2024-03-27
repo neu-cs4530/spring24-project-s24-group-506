@@ -1,4 +1,5 @@
 
+import { screen } from '@testing-library/react';
 export type TownJoinResponse = {
   /** Unique ID that represents this player * */
   userID: string;
@@ -18,7 +19,7 @@ export type TownJoinResponse = {
   interactables: TypedInteractable[];
 }
 
-export type InteractableType = 'ConversationArea' | 'ViewingArea' | 'TicTacToeArea' | 'ConnectFourArea';
+export type InteractableType = 'ConversationArea' | 'ViewingArea' | 'TicTacToeArea' | 'ConnectFourArea' | 'PongArea';
 export interface Interactable {
   type: InteractableType;
   id: InteractableID;
@@ -62,6 +63,7 @@ export type ChatMessage = {
 export interface ConversationArea extends Interactable {
   topic?: string;
 };
+
 export interface BoundingBox {
   x: number;
   y: number;
@@ -192,7 +194,12 @@ export interface PongGameState extends WinnableGameState {
   leftPlayerReady?: boolean;
   rightPlayerReady?: boolean;
 
-  
+  screenWidth: number;
+  screenHeight: number;
+
+  ballRadius: number;
+  paddleWidth: number;
+  paddleHeight: number;
 }
 
 export type InteractableID = string;

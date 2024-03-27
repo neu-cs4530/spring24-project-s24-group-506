@@ -1,32 +1,47 @@
+import InvalidParametersError, {
+  GAME_ID_MISSMATCH_MESSAGE,
+  GAME_NOT_IN_PROGRESS_MESSAGE,
+  INVALID_COMMAND_MESSAGE,
+} from '../../lib/InvalidParametersError';
+import Player from '../../lib/Player';
+import {
+  GameInstance,
+  InteractableCommand,
+  InteractableCommandReturnType,
+  InteractableType,
+  PongGameState,
+} from '../../types/CoveyTownSocket';
+import GameArea from './GameArea';
+import PongGame from './PongGame';
+
 /**
  * The ConnectFourGameArea class is responsible for managing the state of a single game area for Connect Four.
  * Responsibilty for managing the state of the game itself is delegated to the ConnectFourGame class.
  *
- * @see ConnectFourGame
+ * @see PongGame
  * @see GameArea
  */
-/*
-export default class ConnectFourGameArea extends GameArea<PongGame> {
+export default class PongGameArea extends GameArea<PongGame> {
     protected getType(): InteractableType {
-      return 'ConnectFourArea';
+      return 'PongArea';
     }
   
-    private _stateUpdated(updatedState: GameInstance<ConnectFourGameState>) {
+    private _stateUpdated(updatedState: GameInstance<PongGameState>) {
       if (updatedState.state.status === 'OVER') {
         // If we haven't yet recorded the outcome, do so now.
         const gameID = this._game?.id;
         if (gameID && !this._history.find(eachResult => eachResult.gameID === gameID)) {
-          const { red, yellow } = updatedState.state;
-          if (red && yellow) {
-            const redName =
-              this._occupants.find(eachPlayer => eachPlayer.id === red)?.userName || red;
-            const yellowName =
-              this._occupants.find(eachPlayer => eachPlayer.id === yellow)?.userName || yellow;
+          const { leftPlayer, rightPlayer } = updatedState.state;
+          if (leftPlayer && rightPlayer) {
+            const leftPlayerName =
+              this._occupants.find(eachPlayer => eachPlayer.id === leftPlayer)?.userName || leftPlayer;
+            const rightPlayerName =
+              this._occupants.find(eachPlayer => eachPlayer.id === rightPlayer)?.userName || rightPlayer;
             this._history.push({
               gameID,
               scores: {
-                [redName]: updatedState.state.winner === red ? 1 : 0,
-                [yellowName]: updatedState.state.winner === yellow ? 1 : 0,
+                [leftPlayerName]: updatedState.state.winner === leftPlayer ? 1 : 0,
+                [rightPlayerName]: updatedState.state.winner === rightPlayer ? 1 : 0,
               },
             });
           }
@@ -58,6 +73,7 @@ export default class ConnectFourGameArea extends GameArea<PongGame> {
      * Invalid commands:
      * - GameMove, StartGame and LeaveGame: if the game is not in progress (GAME_NOT_IN_PROGRESS_MESSAGE) or if the game ID does not match the game in progress (GAME_ID_MISSMATCH_MESSAGE)
      * - Any command besides JoinGame, GameMove, StartGame and LeaveGame: INVALID_COMMAND_MESSAGE
+     */
      
     public handleCommand<CommandType extends InteractableCommand>(
       command: CommandType,
@@ -71,7 +87,7 @@ export default class ConnectFourGameArea extends GameArea<PongGame> {
         if (this._game?.id !== command.gameID) {
           throw new InvalidParametersError(GAME_ID_MISSMATCH_MESSAGE);
         }
-        if (command.move.gamePiece !== 'Red' && command.move.gamePiece !== 'Yellow') {
+        if (command.move.gamePiece !== 'Left' && command.move.gamePiece !== 'Right') {
           throw new InvalidParametersError('Invalid game piece');
         }
         game.applyMove({
@@ -86,7 +102,7 @@ export default class ConnectFourGameArea extends GameArea<PongGame> {
         let game = this._game;
         if (!game || game.state.status === 'OVER') {
           // No game in progress, make a new one
-          game = new ConnectFourGame(this._game);
+          game = new PongGame(this._game);
           this._game = game;
         }
         game.join(player);
@@ -120,4 +136,3 @@ export default class ConnectFourGameArea extends GameArea<PongGame> {
       throw new InvalidParametersError(INVALID_COMMAND_MESSAGE);
     }
   }
-  */

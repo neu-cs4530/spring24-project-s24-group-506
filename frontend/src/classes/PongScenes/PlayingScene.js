@@ -29,6 +29,7 @@ export class PlayingScene extends Phaser.Scene {
     );
     this.ball.setCollideWorldBounds(true);
     this.ball.setBounce(1, 1);
+    console.log(this.ball.body.width, this.ball.body.height)
   }
 
   createPlayer1(x, y) {
@@ -36,6 +37,7 @@ export class PlayingScene extends Phaser.Scene {
     this.player1.setCollideWorldBounds(true);
     this.player1.setBounce(1, 1);
     this.player1.setImmovable(true);
+    console.log(this.player1.body.width, this.player1.body.height)
   }
 
   createPlayer2(x, y) {

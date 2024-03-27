@@ -7,6 +7,8 @@ import useTownController from '../../../../hooks/useTownController';
 import { GameStatus, InteractableID } from '../../../../types/CoveyTownSocket';
 import ConnectFourBoard from '../ConnectFour/ConnectFourBoard';
 import { PongGame } from '../../../../classes/PongGame';
+import PongAreaController from '../../../../classes/interactable/PongAreaController';
+import PongDisplay from './PongDisplay';
 
 /**
  * The ConnectFourArea component renders the Connect Four game area.
@@ -50,30 +52,22 @@ export default function PongArea({
 }: {
   interactableID: InteractableID;
 }): JSX.Element {
-    return (
-        <div>
-            <h1>Pong</h1>
-            <PongGame />
-        </div>
-    )
-    /*
   const gameAreaController =
-    useInteractableAreaController<ConnectFourAreaController>(interactableID);
+    useInteractableAreaController<PongAreaController>(interactableID);
   const townController = useTownController();
 
-  const [red, setRed] = useState<PlayerController | undefined>(gameAreaController.red);
-  const [yellow, setYellow] = useState<PlayerController | undefined>(gameAreaController.yellow);
+  const [leftPlayer, setLeftPlayer] = useState<PlayerController | undefined>(gameAreaController.leftPlayer);
+  const [rightPlayer, setRightPlayer] = useState<PlayerController | undefined>(gameAreaController.rightPlayer);
   const [joiningGame, setJoiningGame] = useState(false);
 
   const [gameStatus, setGameStatus] = useState<GameStatus>(gameAreaController.status);
-  const [moveCount, setMoveCount] = useState<number>(gameAreaController.moveCount);
   const toast = useToast();
+
   useEffect(() => {
     const updateGameState = () => {
-      setRed(gameAreaController.red);
-      setYellow(gameAreaController.yellow);
+      setLeftPlayer(gameAreaController.leftPlayer);
+      setRightPlayer(gameAreaController.rightPlayer);
       setGameStatus(gameAreaController.status || 'WAITING_TO_START');
-      setMoveCount(gameAreaController.moveCount || 0);
     };
     const onGameEnd = () => {
       const winner = gameAreaController.winner;
@@ -108,14 +102,10 @@ export default function PongArea({
   if (gameStatus === 'IN_PROGRESS') {
     gameStatusText = (
       <>
-        Game in progress, {moveCount} moves in, currently{' '}
-        {gameAreaController.whoseTurn === townController.ourPlayer
-          ? 'your'
-          : gameAreaController.whoseTurn?.userName + "'s"}{' '}
-        turn{' '}
-        {townController.ourPlayer === gameAreaController.yellow
-          ? "(You're yellow)"
-          : "(You're red)"}
+        Game in progress{' '}
+        {townController.ourPlayer === gameAreaController.rightPlayer
+          ? "(You're on the right)"
+          : "(You're on the left)"}
       </>
     );
   } else if (gameStatus == 'WAITING_TO_START') {
@@ -174,11 +164,10 @@ export default function PongArea({
     <>
       {gameStatusText}
       <List aria-label='list of players in the game'>
-        <ListItem>Red: {red?.userName || '(No player yet!)'}</ListItem>
-        <ListItem>Yellow: {yellow?.userName || '(No player yet!)'}</ListItem>
+        <ListItem>Red: {leftPlayer?.userName || '(No player yet!)'}</ListItem>
+        <ListItem>Yellow: {rightPlayer?.userName || '(No player yet!)'}</ListItem>
       </List>
-      <ConnectFourBoard gameAreaController={gameAreaController} />
+      <PongDisplay gameAreaController={gameAreaController} />
     </>
   );
-  */
 }
