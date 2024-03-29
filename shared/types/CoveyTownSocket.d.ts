@@ -64,6 +64,9 @@ export type ChatMessage = {
 export interface ConversationArea extends Interactable {
   topic?: string;
 };
+export interface TicketBoothArea extends Interactable {
+  items: [BoothItem, number, number][];
+};
 export interface BoundingBox {
   x: number;
   y: number;
