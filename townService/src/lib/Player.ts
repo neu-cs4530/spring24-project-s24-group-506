@@ -23,6 +23,9 @@ export default class Player {
   /** A special town emitter that will emit events to the entire town BUT NOT to this player */
   public readonly townEmitter: TownEmitter;
 
+  /** The number of game Tokens for this player */
+  private _gameTokens = 0;
+
   constructor(userName: string, townEmitter: TownEmitter) {
     this.location = {
       x: 0,
@@ -56,11 +59,16 @@ export default class Player {
     return this._sessionToken;
   }
 
+  get gameTokens(): number {
+    return this._gameTokens;
+  }
+
   toPlayerModel(): PlayerModel {
     return {
       id: this._id,
       location: this.location,
       userName: this._userName,
+      gameTokens: this._gameTokens,
     };
   }
 }
