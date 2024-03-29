@@ -8,11 +8,7 @@ import InteractableArea from './InteractableArea';
 
 export default class TicketBoothArea extends InteractableArea {
   public toModel(): Interactable {
-    return {
-      id: this.id,
-      occupants: this.occupantsByID,
-      type: 'TicketBoothArea',
-    };
+    throw new Error('Method not implemented.');
   }
 
   public handleCommand<CommandType extends InteractableCommand>(
