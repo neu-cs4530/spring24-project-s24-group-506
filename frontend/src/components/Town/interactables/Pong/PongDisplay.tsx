@@ -1,9 +1,10 @@
 import { Button, chakra, Container, useToast } from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react';
-import { ConnectFourColIndex, PongGameState } from '../../../../types/CoveyTownSocket';
+import { PongGameState } from '../../../../types/CoveyTownSocket';
 import PongAreaController from '../../../../classes/interactable/PongAreaController';
 import { StartingScene } from '../../../../classes/PongScenes/StartingScene';
 import { PlayingScene } from '../../../../classes/PongScenes/PlayingScene';
+import { PongGame } from '../../../../classes/PongGame';
 
 const config = {
     type: Phaser.AUTO,
@@ -66,13 +67,12 @@ const config = {
       };
     }, [gameAreaController]);
 
-    useEffect(() => {
-        const game = new Phaser.Game(config);
-      }, []);
+    // useEffect(() => {
+    //    const game = new Phaser.Game(config);
+    //  }, []);
 
     return (
-      <StyledPongGame aria-label='Connect Four Board' id='phaser-example'>
-      </StyledPongGame>
+        <div/>
     );
   }
   

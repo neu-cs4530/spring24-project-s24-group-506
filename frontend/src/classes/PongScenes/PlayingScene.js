@@ -2,17 +2,17 @@ export class PlayingScene extends Phaser.Scene {
 
   constructor() {
     super('PlayingScene');
-    this.ball = null;
-    this.player1 = null;
-    this.player2 = null;
-    this.cursors = null;
+    this.ball = undefined;
+    this.player1 = undefined;
+    this.player2 = undefined;
+    this.cursors = undefined;
     this.keys = {};
     this.p1Score = 0;
     this.p2Score = 0;
-    this.p1ScoreText = null;
-    this.p2ScoreText = null;
-    this.p1VictoryText = null;
-    this.p2VictoryText = null;
+    this.p1ScoreText = undefined;
+    this.p2ScoreText = undefined;
+    this.p1VictoryText = undefined;
+    this.p2VictoryText = undefined;
     this.winningScore = 5;
   }
 

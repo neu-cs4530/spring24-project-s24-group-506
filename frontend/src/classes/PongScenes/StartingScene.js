@@ -8,9 +8,9 @@ export class StartingScene extends Phaser.Scene {
       this.physics.world.bounds.width / 2,
       this.physics.world.bounds.height / 2,
       'Press SPACE to start',
-      { fontSize: '32px', fill: '#fff' },
+      { fontSize: '32px'},
     );
-    this.input.keyboard.on('keydown-SPACE', () => {
+    this.input.keyboard?.on('keydown-SPACE', () => {
       this.scene.start('PlayingScene');
     });
   }

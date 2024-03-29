@@ -133,7 +133,7 @@ function AppOrDebugApp(): JSX.Element {
   // } else {
   //   return <App />;
   // }
-  return <DebugApp />
+  return <MyDebugApp />
 }
 
 export default function AppStateWrapper(): JSX.Element {
