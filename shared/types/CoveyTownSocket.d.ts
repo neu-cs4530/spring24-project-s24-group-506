@@ -39,6 +39,8 @@ export interface Player {
   gameTokens: number;
 };
 
+export type BoothItem = 'Blue Hat' | 'Red Hat' | 'Gold Hat';
+
 export type XY = { x: number, y: number };
 
 export interface PlayerLocation {
