@@ -24,7 +24,7 @@ export default class Player {
   public readonly townEmitter: TownEmitter;
 
   /** The number of game Tokens for this player */
-  private _gameTokens = 0;
+  public _gameTokens = 0;
 
   constructor(userName: string, townEmitter: TownEmitter) {
     this.location = {
