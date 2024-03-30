@@ -9,6 +9,7 @@ import {
 } from '../types/CoveyTownSocket';
 import TicketBooth from './TicketBooth';
 import InteractableArea from './InteractableArea';
+import InvalidParametersError from '../lib/InvalidParametersError';
 
 export default class TicketBoothArea extends InteractableArea {
   protected _ticketBooth: TicketBooth | undefined;
@@ -44,6 +45,14 @@ export default class TicketBoothArea extends InteractableArea {
     command: CommandType,
     player: Player,
   ): InteractableCommandReturnType<CommandType> {
-    throw new Error('Method not implemented.');
+    if (command.type === 'HandlePurchase') {
+      if (this._ticketBooth) {
+        this._ticketBooth.handlePurchase(player, command.item);
+        this._emitAreaChanged();
+        return undefined as InteractableCommandReturnType<CommandType>;
+      }
+      throw new InvalidParametersError('TicketBooth not found');
+    }
+    throw new InvalidParametersError('Invalid command');
   }
 }
