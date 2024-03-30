@@ -2,7 +2,7 @@ import { BoothItem } from '../types/CoveyTownSocket';
 import Player from '../lib/Player';
 
 export default class TicketBooth {
-  private _itemsOnSale: [BoothItem, number, number][];
+  public _itemsOnSale: [BoothItem, number, number][];
 
   public constructor(itemsOnSale: [BoothItem, number, number][]) {
     this._itemsOnSale = itemsOnSale;
@@ -27,5 +27,12 @@ export default class TicketBooth {
     }
     player._gameTokens -= itemPrice;
     this._itemsOnSale[itemIndex][2] += 1;
+  }
+
+  /**
+   * changes items on sale to a new items on sale passed into it
+   */
+  public changeItemsOnSale(newItems: [BoothItem, number, number][]): void {
+    this._itemsOnSale = newItems;
   }
 }

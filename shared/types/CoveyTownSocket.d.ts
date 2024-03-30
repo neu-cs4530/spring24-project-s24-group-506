@@ -222,13 +222,17 @@ interface InteractableCommandBase {
   type: string;
 }
 
-export type InteractableCommand =  ViewingAreaUpdateCommand | JoinGameCommand | GameMoveCommand<TicTacToeMove> | GameMoveCommand<ConnectFourMove> | StartGameCommand | LeaveGameCommand;
+export type InteractableCommand =  ViewingAreaUpdateCommand | JoinGameCommand | GameMoveCommand<TicTacToeMove> | GameMoveCommand<ConnectFourMove> | StartGameCommand | LeaveGameCommand | HandlePurchaseCommand;
 export interface ViewingAreaUpdateCommand  {
   type: 'ViewingAreaUpdate';
   update: ViewingArea;
 }
 export interface JoinGameCommand {
   type: 'JoinGame';
+}
+export interface HandlePurchaseCommand {
+  type: 'HandlePurchase';
+  item: BoothItem;
 }
 export interface LeaveGameCommand {
   type: 'LeaveGame';
