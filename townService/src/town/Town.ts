@@ -342,6 +342,35 @@ export default class Town {
   }
 
   /**
+   * Creates a new ticket booth area in this town if there is not currently an active
+   * ticket booth area with the same ID. The ticket booth area ID must match the name of a
+   * ticket booth area that exists in this town's map.
+   *
+   * If successful creating the ticket booth area, this method:
+   *   Adds any players who are in the region defined by the ticket booth area to it
+   *  Notifies all players in the town that the ticket booth area has been updated by
+   *   emitting an interactableUpdate event
+   *
+   * @param ticketBoothArea Information describing the ticket booth area to create.
+   *
+   * @returns True if the ticket booth area was created or false if there is no known
+   * ticket booth area with the specified ID or if there is already an active ticket booth area
+   * with the specified ID
+   */
+  public addTicketBoothArea(ticketBoothArea: ViewingAreaModel): boolean {
+    const area = this._interactables.find(
+      eachArea => eachArea.id === ticketBoothArea.id,
+    ) as ViewingArea;
+    if (!area || area.video) {
+      return false;
+    }
+    area.updateModel(ticketBoothArea);
+    area.addPlayersWithinBounds(this._players);
+    this._broadcastEmitter.emit('interactableUpdate', area.toModel());
+    return true;
+  }
+
+  /**
    * Fetch a player's session based on the provided session token. Returns undefined if the
    * session token is not valid.
    *

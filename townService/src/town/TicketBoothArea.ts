@@ -1,7 +1,6 @@
 import Player from '../lib/Player';
 import {
   BoundingBox,
-  Interactable,
   InteractableCommand,
   InteractableCommandReturnType,
   TicketBoothArea as TicketBoothAreaModel,
