@@ -17,6 +17,14 @@ export type TicketBoothAreaEvents = BaseInteractableEventMap & {
 // The special string that will be displayed when a conversation area does not have a topic set
 export const NO_ITEM_STRING = '(No Items Available)';
 
+function createItemsInBooth(): [BoothItem, number, number][] {
+  return [
+    ['Blue Hat', 10, 0],
+    ['Red Hat', 20, 0],
+    ['Gold Hat', 30, 0],
+  ];
+}
+
 /**
  * A TicketBoothAreaController manages the local behavior of a ticket booth area in the frontend,
  * implementing the logic to bridge between the townService's interpretation of ticket booth areas and the
@@ -26,7 +34,7 @@ export default class TicketBoothAreaController extends InteractableAreaControlle
   TicketBoothAreaEvents,
   TicketBoothAreaModel
 > {
-  private _items?: [BoothItem, number, number][];
+  private _items?: [BoothItem, number, number][] = createItemsInBooth();
 
   /**
    * Create a new TicketBoothAreaController
