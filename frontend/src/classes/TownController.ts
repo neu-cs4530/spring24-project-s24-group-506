@@ -8,6 +8,7 @@ import { io } from 'socket.io-client';
 import TypedEmitter from 'typed-emitter';
 import Interactable from '../components/Town/Interactable';
 import ConversationArea from '../components/Town/interactables/ConversationArea';
+import TicketBoothArea from '../components/Town/interactables/TicketBoof/TicketBoothArea';
 import GameArea from '../components/Town/interactables/GameArea';
 import ViewingArea from '../components/Town/interactables/ViewingArea';
 import { LoginController } from '../contexts/LoginControllerContext';
@@ -32,6 +33,7 @@ import {
   isConversationArea,
   isTicTacToeArea,
   isViewingArea,
+  isTicketBoothArea,
 } from '../types/TypeUtils';
 import ConnectFourAreaController from './interactable/ConnectFourAreaController';
 import ConversationAreaController from './interactable/ConversationAreaController';
@@ -40,6 +42,7 @@ import InteractableAreaController, {
   BaseInteractableEventMap,
   GenericInteractableAreaController,
 } from './interactable/InteractableAreaController';
+import TicketBoothAreaController from './interactable/TicketBoothAreaController';
 import TicTacToeAreaController from './interactable/TicTacToeAreaController';
 import ViewingAreaController from './interactable/ViewingAreaController';
 import PlayerController from './PlayerController';
@@ -330,6 +333,13 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
       eachInteractable => eachInteractable instanceof ViewingAreaController,
     );
     return ret as ViewingAreaController[];
+  }
+
+  public get ticketBoothAreas() {
+    const ret = this._interactableControllers.filter(
+      eachInteractable => eachInteractable instanceof TicketBoothAreaController,
+    );
+    return ret as TicketBoothAreaController[];
   }
 
   public get gameAreas() {
@@ -631,6 +641,10 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
             this._interactableControllers.push(
               new ConnectFourAreaController(eachInteractable.id, eachInteractable, this),
             );
+          } else if (isTicketBoothArea(eachInteractable)) {
+            this._interactableControllers.push(
+              new TicketBoothAreaController(eachInteractable.id, eachInteractable.items),
+            );
           }
         });
         this._userID = initialData.userID;
@@ -671,6 +685,17 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
       return existingController;
     } else {
       throw new Error(`No such viewing area controller ${existingController}`);
+    }
+  }
+
+  public getTicketBoothAreaController(ticketBoothArea: TicketBoothArea): TicketBoothAreaController {
+    const existingController = this._interactableControllers.find(
+      eachExistingArea => eachExistingArea.id === ticketBoothArea.name,
+    );
+    if (existingController instanceof TicketBoothAreaController) {
+      return existingController;
+    } else {
+      throw new Error(`No such ticket booth area controller ${existingController}`);
     }
   }
 
