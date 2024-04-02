@@ -6,6 +6,7 @@ import React, { useEffect, useState } from 'react';
 import { ConnectFourColIndex, PongGameState, PongPlayer, PongScore, XY } from '../../../../types/CoveyTownSocket';
 import PongAreaController from '../../../../classes/interactable/PongAreaController';
 import { PongGame } from '../../../../classes/PongGame';
+import { set } from 'lodash';
 
 export type PongGameProps = {
   gameAreaController: PongAreaController;
@@ -57,25 +58,21 @@ const StyledConnectFourSquare = chakra(Button, {
 export default function PongDisplay({
   gameAreaController,
 }: PongGameProps): JSX.Element {
-  const [leftScore, setLeftScore] = useState<PongScore>(gameAreaController.leftScore);
-  const [leftPaddle, setLeftPaddle] = useState<XY>(gameAreaController.leftPaddle);
-  const [rightScore, setRightScore] = useState<PongScore>(gameAreaController.rightScore);
-  const [rightPaddle, setRightPaddle] = useState<XY>(gameAreaController.rightPaddle);
+  const [oppositeScore, setOppositeScore] = useState<PongScore>(gameAreaController.oppositeScore);
+  const [oppositePaddle, setOppositePaddle] = useState<XY>(gameAreaController.oppositePaddle);
+  const [ourScore, setOurScore] = useState<PongScore>(0);
+  const [ourPaddle, setOurPaddle] = useState<XY>({ x: 0, y: 0 });
   //const [ballPosition, setBallPosition] = useState<XY>(gameAreaController.ballPosition);
 
   const toast = useToast();
 
   useEffect(() => {
-    gameAreaController.addListener('leftScoreUpdated', setLeftScore);
-    gameAreaController.addListener('leftPaddleUpdated', setLeftPaddle);
-    gameAreaController.addListener('rightScoreUpdated', setRightScore);
-    gameAreaController.addListener('rightPaddleUpdated', setRightPaddle);
+    gameAreaController.addListener('oppositeScoreUpdated', setOppositeScore);
+    gameAreaController.addListener('oppositePaddleUpdated', setOppositePaddle);
     //gameAreaController.addListener('ballPositionUpdated', setBallPosition);
     return () => {
-      gameAreaController.removeListener('leftScoreUpdated', setLeftScore);
-      gameAreaController.removeListener('leftPaddleUpdated', setLeftPaddle);
-      gameAreaController.removeListener('rightScoreUpdated', setRightScore);
-      gameAreaController.removeListener('rightPaddleUpdated', setRightPaddle);
+      gameAreaController.removeListener('oppositeScoreUpdated', setOppositeScore);
+      gameAreaController.removeListener('oppositePaddleUpdated', setOppositePaddle);
       //gameAreaController.removeListener('ballPositionUpdated', setBallPosition);
     };
   }, [gameAreaController]);
@@ -202,8 +199,9 @@ export default function PongDisplay({
         this.physics.world.bounds.height / 2,
       );
       if (this.side === 'Left') {
+        setOurPaddle({ x: this.player1.body.x, y: this.player1.body.y });
         try {
-          gameAreaController.makeMove({ x: this.player1.body.x, y: this.player1.body.y });
+          await gameAreaController.makeMove({ x: this.player1.body.x, y: this.player1.body.y });
         }
         catch (e) {
           toast({
@@ -213,8 +211,9 @@ export default function PongDisplay({
           });
         }
       } else {
+        setOurPaddle({ x: this.player2.body.x, y: this.player2.body.y });
         try {
-          gameAreaController.makeMove({ x: this.player2.body.x, y: this.player2.body.y });
+          await gameAreaController.makeMove({ x: this.player2.body.x, y: this.player2.body.y });
         }
         catch (e) {
           toast({
@@ -225,9 +224,9 @@ export default function PongDisplay({
         }
       }
       if (this.side === 'Left') {
-        this.player2.setPosition(rightPaddle.x, rightPaddle.y);
+        this.player2.setPosition(oppositePaddle.x, oppositePaddle.y);
       } else {
-        this.player1.setPosition(leftPaddle.x, leftPaddle.y);
+        this.player1.setPosition(oppositePaddle.x, oppositePaddle.y);
       }
 
       this.physics.add.collider(this.ball, this.player1, this.ballCollision);
@@ -251,20 +250,22 @@ export default function PongDisplay({
       if (gameAreaController.status === 'WAITING_TO_START' || gameAreaController.status === 'WAITING_FOR_PLAYERS') {
         this.scene.start('startingScene');
       } else if (gameAreaController.status === 'IN_PROGRESS') {
-        this.p1ScoreText.setText(`Player 1: ${leftScore}`);
-        this.p2ScoreText.setText(`Player 2: ${rightScore}`);
+        if (this.side === 'Left') {
+          this.p1ScoreText.setText(`Player 1: ${ourScore}`);
+          this.p2ScoreText.setText(`Player 2: ${oppositeScore}`);
+        }
+        
 
-        if (leftScore >= 5 || rightScore >= 5) {
-          if (leftScore >= 5) {
-            this.endScene(1);
-          } else {
-            this.endScene(2);
-          }
+        if (ourScore >= 5) {
+          this.side === 'Left' ? this.endScene(1) : this.endScene(2);
+        } else if (oppositeScore >= 5) {
+          this.side === 'Left' ? this.endScene(2) : this.endScene(1);
         } else {
           if (this.ball.body.x < this.player1.body.x) {
             if (this.side === 'Right') {
+              setOurScore(ourScore + 1 as PongScore);
               try {
-                await gameAreaController.updateScore(rightScore + 1 as PongScore);
+                await gameAreaController.updateScore(ourScore as PongScore);
               }
               catch (e) {
                 toast({
@@ -278,8 +279,9 @@ export default function PongDisplay({
               return;
             } else if (this.ball.body.x > this.player2.body.x) {
               if (this.side === 'Left') {
+                setOurScore(ourScore + 1 as PongScore);
                 try {
-                  await gameAreaController.updateScore(leftScore + 1 as PongScore);
+                  await gameAreaController.updateScore(ourScore as PongScore);
                 }
                 catch (e) {
                   toast({
@@ -303,6 +305,7 @@ export default function PongDisplay({
             }
 
             if (this.side === 'Left') {
+              setOurPaddle({ x: this.player1.body.x, y: this.player1.body.y });
               try {
                 await gameAreaController.makeMove({ x: this.player1.body.x, y: this.player1.body.y });
               }
@@ -314,6 +317,7 @@ export default function PongDisplay({
                 });
               }
             } else {
+              setOurPaddle({ x: this.player2.body.x, y: this.player2.body.y });
               try {
                 await gameAreaController.makeMove({ x: this.player2.body.x, y: this.player2.body.y });
               }
@@ -326,9 +330,9 @@ export default function PongDisplay({
               }           
             }
             if (this.side === 'Left') {
-              this.player2.setPosition(rightPaddle.x, rightPaddle.y);
+              this.player2.setPosition(oppositePaddle.x, oppositePaddle.y);
             } else {
-              this.player1.setPosition(leftPaddle.x, leftPaddle.y);
+              this.player1.setPosition(oppositePaddle.x, oppositePaddle.y);
             }
 
             // if (this.side === 'Left') {
@@ -384,10 +388,10 @@ export default function PongDisplay({
   return (
     <div>
       <h1>pong</h1>
-      <h2>Left Score: {leftScore}</h2>
-      <h2>Right Score: {rightScore}</h2>
-      <h2>Left Paddle Position: {JSON.stringify(leftPaddle)}</h2>
-      <h2>Right Paddle Position: {JSON.stringify(rightPaddle)}</h2>
+      <h2>Our Score: {ourScore}</h2>
+      <h2>Opposite Score: {oppositeScore}</h2>
+      <h2>Our Paddle Position: {JSON.stringify(ourPaddle)}</h2>
+      <h2>Opp Paddle Position: {JSON.stringify(oppositePaddle)}</h2>
       <Button onClick={async () => {
         try {
           await gameAreaController.makeMove({ x: 0, y: 0 });
@@ -402,7 +406,7 @@ export default function PongDisplay({
       }}>Move</Button>
       <Button onClick={async () => {
         try {
-          await gameAreaController.updateScore(1);
+          await gameAreaController.updateScore(oppositeScore + 1 as PongScore);
         }
         catch (e) {
           toast({

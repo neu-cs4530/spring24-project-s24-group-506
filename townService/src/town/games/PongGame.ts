@@ -40,8 +40,8 @@ import InvalidParametersError, {
         status: 'WAITING_FOR_PLAYERS',
         leftScore: 0,
         rightScore: 0,
-        leftPaddle: { x: 17, y: 640/2 },
-        rightPaddle: { x: 800 - 17, y: 640/2 },
+        leftPaddle: { x: 9, y: 320/2 },
+        rightPaddle: { x: 400 - 9, y: 320/2 },
         //ballPosition: { x: 800/2, y: 640/2 },
       });
       this._preferredLeftPlayer = priorGame?.state.leftPlayer;

@@ -23,11 +23,8 @@ import GameAreaController, {
 } from './GameAreaController';
 
 export type PongEvents = GameEventTypes & {
-    leftScoreUpdated: (score: PongScore) => void;
-    rightScoreUpdated: (score: PongScore) => void;
-    leftPaddleUpdated: (location: XY) => void;
-    rightPaddleUpdated: (location: XY) => void;
-    ballPositionUpdated: (location: XY) => void;
+    oppositeScoreUpdated: (score: PongScore) => void;
+    oppositePaddleUpdated: (location: XY) => void;
 };
 
 /**
@@ -42,9 +39,18 @@ export default class PongAreaController extends GameAreaController<
     private _leftPaddle: XY = { x: 17, y: 640/2 };
     private _rightPaddle: XY = { x: 783, y: 640/2 };
     private _ballPosition: XY = { x: 400, y: 320 };
+    private _oppositeScore: PongScore = 0;
+    private _oppositePaddle: XY = { x: 0, y: 0 };
 
   get leftScore(): PongScore {
         return this._leftScore;
+    }
+    get oppositeScore(): PongScore {
+        return this._oppositeScore;
+    }
+
+    get oppositePaddle(): XY {
+        return this._oppositePaddle;
     }
 
     get rightScore(): PongScore {
@@ -159,30 +165,25 @@ export default class PongAreaController extends GameAreaController<
     super._updateFrom(newModel);
     const newGame = newModel.game;
     if (newGame) {
-        const newLeftScore = newGame.state.leftScore;
-        if (newLeftScore !== this._leftScore) {
-            this._leftScore = newLeftScore;
-            this.emit('leftScoreUpdated', this._leftScore);
+      if (this.gamePiece === 'Left') {
+        if (newGame.state.rightScore !== this._oppositeScore) {
+          this._oppositeScore = newGame.state.rightScore;
+          this.emit('oppositeScoreUpdated', this._oppositeScore);
         }
-        const newRightScore = newGame.state.rightScore;
-        if (newRightScore !== this._rightScore) {
-            this._rightScore = newRightScore;
-            this.emit('rightScoreUpdated', this._rightScore);
+        if (!_.isEqual(newGame.state.rightPaddle, this._oppositePaddle)) {
+          this._oppositePaddle = newGame.state.rightPaddle;
+          this.emit('oppositePaddleUpdated', this._oppositePaddle);
         }
-        const newPaddle = newGame.state.leftPaddle;
-        if (!_.isEqual(newPaddle, this._leftPaddle)) {
-            this._leftPaddle = newPaddle;
-            this.emit('leftPaddleUpdated', this._leftPaddle);
+      } else {
+        if (newGame.state.leftScore !== this._oppositeScore) {
+          this._oppositeScore = newGame.state.leftScore;
+          this.emit('oppositeScoreUpdated', this._oppositeScore);
         }
-        const newRightPaddle = newGame.state.rightPaddle;
-        if (!_.isEqual(newRightPaddle, this._rightPaddle)) {
-            this._rightPaddle = newRightPaddle;
-            this.emit('rightPaddleUpdated', this._rightPaddle);
+        if (!_.isEqual(newGame.state.leftPaddle, this._oppositePaddle)) {
+          this._oppositePaddle = newGame.state.leftPaddle;
+          this.emit('oppositePaddleUpdated', this._oppositePaddle);
         }
-        if  (!_.isEqual(newGame.state.ballPosition, this._ballPosition)) {
-            this._ballPosition = newGame.state.ballPosition;
-            this.emit('ballPositionUpdated', this._ballPosition);
-        }
+      }
     }
   }
 
