@@ -19,6 +19,7 @@ import LoginControllerContext from './contexts/LoginControllerContext';
 import { TownsServiceClient } from './generated/client';
 import { nanoid } from 'nanoid';
 import ToggleChatButton from './components/VideoCall/VideoFrontend/components/Buttons/ToggleChatButton/ToggleChatButton';
+import { TargetShooterGame } from './classes/TargetShooterGame';
 
 function App() {
   const [townController, setTownController] = useState<TownController | null>(null);
@@ -119,12 +120,13 @@ function DebugApp(): JSX.Element {
 }
 
 function AppOrDebugApp(): JSX.Element {
-  const debugTown = process.env.NEXT_PUBLIC_TOWN_DEV_MODE;
-  if (debugTown && debugTown.toLowerCase() === 'true') {
-    return <DebugApp />;
-  } else {
-    return <App />;
-  }
+  // const debugTown = process.env.NEXT_PUBLIC_TOWN_DEV_MODE;
+  // if (debugTown && debugTown.toLowerCase() === 'true') {
+  //   return <DebugApp />;
+  // } else {
+  //   return <App />;
+  // }
+  return <TargetShooterGame />;
 }
 
 export default function AppStateWrapper(): JSX.Element {
