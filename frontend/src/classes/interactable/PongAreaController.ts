@@ -36,8 +36,8 @@ export default class PongAreaController extends GameAreaController<
   PongGameState,
   PongEvents
 > {
-    private _ballPosition: XY = { x: 200, y: 120 };
-    private _oppositePaddle: XY = { x: 0, y: 0 };
+    private _ballPosition: XY = { x: 200-8, y: 160-8 };
+    private _oppositePaddle: XY = { x: 0, y: 160-32};
     private _leftScore: PongScore = 0;
     private _rightScore: PongScore = 0;
 

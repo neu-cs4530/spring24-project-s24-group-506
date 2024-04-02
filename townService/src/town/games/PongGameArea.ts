@@ -13,7 +13,6 @@ import InvalidParametersError, {
   } from '../../types/CoveyTownSocket';
   import PongGame from './PongGame';
   import GameArea from './GameArea';
-import { update } from 'ramda';
   
   /**
    * The PongGameArea class is responsible for managing the state of a single game area for Connect Four.

@@ -93,7 +93,7 @@ export default function PongDisplay({
   const [ballPosition, setBallPosition] = useState(gameAreaController.ballPosition);
   const [leftScore, setLeftScore] = useState<PongScore>(gameAreaController.leftScore);
   const [rightScore, setRightScore] = useState<PongScore>(gameAreaController.rightScore);
-  const [ourPaddle, setOurPaddle] = useState<XY>({ x: 0, y: 0 });
+  const [ourPaddle, setOurPaddle] = useState<XY>(gameAreaController.oppositePaddle.x === 0 ? { x: 400-16, y: 320/2 } : { x: 0, y: 320/2 });
 
   const toast = useToast();
 
@@ -127,8 +127,8 @@ export default function PongDisplay({
     if (I_KEYS.includes(String(key))) {
       console.log("I key pressed!");
       try {
-        await gameAreaController.makeMove({x: ourPaddle.x, y: ourPaddle.y - 1});
-        setOurPaddle(oldPaddle => ({ x: oldPaddle.x, y: oldPaddle.y - 1 }));
+        await gameAreaController.makeMove({x: gameAreaController.gamePiece === 'Left' ? 0 : 400-16, y: ourPaddle.y - 4});
+        setOurPaddle(oldPaddle => ({ x: gameAreaController.gamePiece === 'Left' ? 0 : 400-16, y: oldPaddle.y - 4 }));
       }
       catch (e) {
         toast({
@@ -141,8 +141,8 @@ export default function PongDisplay({
     else if (O_KEYS.includes(String(key))) {
       console.log("O key pressed!");
       try {
-        await gameAreaController.makeMove({x: ourPaddle.x, y: ourPaddle.y + 1});
-        setOurPaddle(oldPaddle => ({ x: oldPaddle.x, y: oldPaddle.y + 1 }));
+        await gameAreaController.makeMove({x: gameAreaController.gamePiece === 'Left' ? 0 : 400-16, y: ourPaddle.y + 4});
+        setOurPaddle(oldPaddle => ({ x: gameAreaController.gamePiece === 'Left' ? 0 : 400-16, y: oldPaddle.y + 4 }));
       }
       catch (e) {
         toast({

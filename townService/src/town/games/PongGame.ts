@@ -17,7 +17,6 @@ import InvalidParametersError, {
     XY,
   } from '../../types/CoveyTownSocket';
   import Game from './Game';
-  import { update } from 'ramda';
 
   /**
    * A PongGame is a Game that implements the rules of Connect Four.
@@ -40,10 +39,10 @@ import InvalidParametersError, {
         status: 'WAITING_FOR_PLAYERS',
         leftScore: 0,
         rightScore: 0,
-        leftPaddle: { x: 9, y: 320/2 },
-        rightPaddle: { x: 400 - 9, y: 320/2 },
-        ballPosition: { x: 400/2, y: 320/2 },
-        ballVelocity: { x: 1, y: 0 },
+        leftPaddle: { x: 0, y: 320/2 - 32},
+        rightPaddle: { x: 400 - 16, y: 320/2 - 32},
+        ballPosition: { x: 400/2-8, y: 320/2 - 8},
+        ballVelocity: { x: 2, y: 2 },
       });
       this._preferredLeftPlayer = priorGame?.state.leftPlayer;
       this._preferredRightPlayer = priorGame?.state.rightPlayer;
@@ -235,27 +234,37 @@ import InvalidParametersError, {
       newState.ballPosition.x += newState.ballVelocity.x;
       newState.ballPosition.y += newState.ballVelocity.y;
 
-      if (newState.ballPosition.y <= 0 || newState.ballPosition.y >= 320) {
+      if (newState.ballPosition.y <= 0 || newState.ballPosition.y >= 320-16) {
         newState.ballVelocity.y = -newState.ballVelocity.y;
       }
       if (newState.ballPosition.x <= 0) {
         newState.rightScore++;
-        newState.ballPosition.x = 400/2;
-        newState.ballPosition.y = 320/2;
-        newState.ballVelocity.x = -newState.ballVelocity.x;
+        if (newState.rightScore >= 5) {
+          newState.status = 'OVER';
+          newState.winner = newState.rightPlayer;
+        }
+        newState.ballPosition.x = 400/2 -16;
+        newState.ballPosition.y = 320/2 -16;
+        newState.ballVelocity.x = newState.ballVelocity.x>0 ? -2 : 2;
       }
       if (newState.ballPosition.x >= 400) {
         newState.leftScore++;
-        newState.ballPosition.x = 400/2;
-        newState.ballPosition.y = 320/2;
-        newState.ballVelocity.x = -newState.ballVelocity.x;
+        if (newState.leftScore >= 5) {
+          newState.status = 'OVER';
+          newState.winner = this.state.leftPlayer;
+        }
+        newState.ballPosition.x = 400/2 -16;
+        newState.ballPosition.y = 320/2 -16;
+        newState.ballVelocity.x = newState.ballVelocity.x>0 ? -2 : 2;
       }
 
-      if (newState.ballPosition.x <= 9 && newState.ballPosition.y >= newState.leftPaddle.y - 32 && newState.ballPosition.y <= newState.leftPaddle.y + 32) {
+      if (newState.ballPosition.x <= 16 && newState.ballPosition.y <= newState.leftPaddle.y + 64 && newState.ballPosition.y >= newState.leftPaddle.y) {
         newState.ballVelocity.x = -newState.ballVelocity.x;
+        newState.ballVelocity.x = newState.ballVelocity.x > 0 ? newState.ballVelocity.x + 1 : newState.ballVelocity.x - 1;
       }
-      if (newState.ballPosition.x >= 791 && newState.ballPosition.y >= newState.rightPaddle.y - 32 && newState.ballPosition.y <= newState.rightPaddle.y + 32) {
+      if (newState.ballPosition.x >= (400 - 32) && newState.ballPosition.y <= newState.rightPaddle.y + 64 && newState.ballPosition.y >= newState.rightPaddle.y) {
         newState.ballVelocity.x = -newState.ballVelocity.x;
+        newState.ballVelocity.x = newState.ballVelocity.x > 0 ? newState.ballVelocity.x + 1 : newState.ballVelocity.x - 1;
       }
 
       this.state = newState;
