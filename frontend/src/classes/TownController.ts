@@ -30,6 +30,7 @@ import {
 import {
   isConnectFourArea,
   isConversationArea,
+  isPongArea,
   isTicTacToeArea,
   isViewingArea,
 } from '../types/TypeUtils';
@@ -43,6 +44,7 @@ import InteractableAreaController, {
 import TicTacToeAreaController from './interactable/TicTacToeAreaController';
 import ViewingAreaController from './interactable/ViewingAreaController';
 import PlayerController from './PlayerController';
+import PongAreaController from './interactable/PongAreaController';
 
 const CALCULATE_NEARBY_PLAYERS_DELAY_MS = 300;
 const SOCKET_COMMAND_TIMEOUT_MS = 5000;
@@ -630,6 +632,10 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
           } else if (isConnectFourArea(eachInteractable)) {
             this._interactableControllers.push(
               new ConnectFourAreaController(eachInteractable.id, eachInteractable, this),
+            );
+          } else if (isPongArea(eachInteractable)) {
+            this._interactableControllers.push(
+              new PongAreaController(eachInteractable.id, eachInteractable, this),
             );
           }
         });

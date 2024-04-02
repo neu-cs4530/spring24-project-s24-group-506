@@ -1,49 +1,49 @@
-import { PongGameState, PongMove, PongPlayer } from "../../types/CoveyTownSocket";
 import InvalidParametersError, {
-    BOARD_POSITION_NOT_VALID_MESSAGE,
     GAME_FULL_MESSAGE,
     GAME_NOT_IN_PROGRESS_MESSAGE,
     GAME_NOT_STARTABLE_MESSAGE,
-    MOVE_NOT_YOUR_TURN_MESSAGE,
     PLAYER_ALREADY_IN_GAME_MESSAGE,
     PLAYER_NOT_IN_GAME_MESSAGE,
   } from '../../lib/InvalidParametersError';
   import Player from '../../lib/Player';
   import {
-    ConnectFourColor,
-    ConnectFourGameState,
-    ConnectFourMove,
+    PongGameState,
     GameMove,
     PlayerID,
+    PongPlayer,
+    PongMove,
+    GameStatus,
+    PongScoreUpdate,
   } from '../../types/CoveyTownSocket';
   import Game from './Game';
-
-function getOtherPlayerSide(side: PongPlayer): PongPlayer {
-    return side === 'Left' ? 'Right' : 'Left';
-}
   
   /**
-   * A ConnectFourGame is a Game that implements the rules of Connect Four.
+   * A PongGame is a Game that implements the rules of Connect Four.
    * @see https://en.wikipedia.org/wiki/Connect_Four
    */
   export default class PongGame extends Game<PongGameState, PongMove> {
-    private _preferredLeft?: PlayerID;
+    private _preferredLeftPlayer?: PlayerID;
   
-    private _preferredRight?: PlayerID;
+    private _preferredRightPlayer?: PlayerID;
   
     /**
-     * Creates a new ConnectFourGame.
+     * Creates a new PongGame.
      * @param priorGame If provided, the new game will be created such that if either player
      * from the prior game joins, they will be the same color. When the game begins, the default
-     * first player is red, but if either player from the prior game joins the new game
+     * first player is leftPlayer, but if either player from the prior game joins the new game
      * (and clicks "start"), the first player will be the other color.
      */
     public constructor(priorGame?: PongGame) {
       super({
         status: 'WAITING_FOR_PLAYERS',
+        leftScore: 0,
+        rightScore: 0,
+        leftPaddle: { x: 17, y: 640/2 },
+        rightPaddle: { x: 800 - 17, y: 640/2 },
+        
       });
-      this._preferredLeft = priorGame?.state.leftPlayer;
-      this._preferredRight = priorGame?.state.rightPlayer;
+      this._preferredLeftPlayer = priorGame?.state.leftPlayer;
+      this._preferredRightPlayer = priorGame?.state.rightPlayer;
     }
   
     /**
@@ -53,8 +53,8 @@ function getOtherPlayerSide(side: PongPlayer): PongPlayer {
      *
      * If both players are ready, the game will start.
      *
-     * The first player (red or yellow) is determined as follows:
-     *   - If neither player was in the last game in this area (or there was no prior game), the first player is red.
+     * The first player (leftPlayer or rightPlayer) is determined as follows:
+     *   - If neither player was in the last game in this area (or there was no prior game), the first player is leftPlayer.
      *   - If at least one player was in the last game in this area, then the first player will be the other color from last game.
      *   - If a player from the last game *left* the game and then joined this one, they will be treated as a new player (not given the same color by preference).   *
      *
@@ -84,9 +84,9 @@ function getOtherPlayerSide(side: PongPlayer): PongPlayer {
   
     /**
      * Joins a player to the game.
-     * - Assigns the player to a color (red or yellow). If the player was in the prior game, then attempts
+     * - Assigns the player to a color (leftPlayer or rightPlayer). If the player was in the prior game, then attempts
      * to reuse the same color if it is not in use. Otherwise, assigns the player to the first
-     * available color (red, then yellow).
+     * available color (leftPlayer, then rightPlayer).
      * - If both players are now assigned, updates the game status to WAITING_TO_START.
      *
      * @throws InvalidParametersError if the player is already in the game (PLAYER_ALREADY_IN_GAME_MESSAGE)
@@ -98,13 +98,13 @@ function getOtherPlayerSide(side: PongPlayer): PongPlayer {
       if (this.state.rightPlayer === player.id || this.state.leftPlayer === player.id) {
         throw new InvalidParametersError(PLAYER_ALREADY_IN_GAME_MESSAGE);
       }
-      if (this._preferredLeft === player.id && !this.state.leftPlayer) {
+      if (this._preferredLeftPlayer === player.id && !this.state.leftPlayer) {
         this.state = {
           ...this.state,
           status: 'WAITING_FOR_PLAYERS',
           leftPlayer: player.id,
         };
-      } else if (this._preferredRight === player.id && !this.state.rightPlayer) {
+      } else if (this._preferredRightPlayer === player.id && !this.state.rightPlayer) {
         this.state = {
           ...this.state,
           status: 'WAITING_FOR_PLAYERS',
@@ -186,27 +186,6 @@ function getOtherPlayerSide(side: PongPlayer): PongPlayer {
       }
     }
   
-    protected _applyMove(move: PongMove): void {
-      const newState: PongGameState = {
-        ...this.state,
-      };
-      if (move.gamePiece === 'Left') {
-        if (move.direction === 'Up') {
-          newState.leftPaddleVelocity = -350;
-        } else if (move.direction === 'Down') {
-          newState.leftPaddleVelocity = 350;
-        }
-      }
-      if (move.gamePiece === 'Right') {
-        if (move.direction === 'Up') {
-          newState.rightPaddleVelocity = -350;
-        } else if (move.direction === 'Down') {
-          newState.rightPaddleVelocity = 350;
-        }
-    }
-      this.state = newState;
-    }
-  
     /**
      * Applies a move to the game.
      * Uses the player's ID to determine which color they are playing as (ignores move.gamePiece).
@@ -229,6 +208,7 @@ function getOtherPlayerSide(side: PongPlayer): PongPlayer {
         throw new InvalidParametersError(GAME_NOT_IN_PROGRESS_MESSAGE);
       }
       let gamePiece: PongPlayer;
+      const newState = { ...this.state };
       if (move.playerID === this.state.leftPlayer) {
         gamePiece = 'Left';
       } else if (move.playerID === this.state.rightPlayer) {
@@ -236,41 +216,30 @@ function getOtherPlayerSide(side: PongPlayer): PongPlayer {
       } else {
         throw new InvalidParametersError(PLAYER_NOT_IN_GAME_MESSAGE);
       }
-      const newMove = {
-        gamePiece,
-        direction: move.move.direction,
-      };
-      this._applyMove(newMove);
+      if (gamePiece === 'Left') {
+        newState.leftPaddle = move.move.location;
+      } else {
+        newState.rightPaddle = move.move.location;
+      }
+      this.state = newState;
     }
 
-    public updateState() {
-        const newState: PongGameState = {
-          ...this.state,
-        };
-        if (newState.leftPaddle) {
-          if (newState.leftPaddleVelocity) {
-            newState.leftPaddle.y += newState.leftPaddleVelocity;
-          }
-          if (newState.leftPaddle.y < 0) {
-            newState.leftPaddle.y = 0;
-            newState.leftPaddleVelocity = 0;
-          }
-          if (newState.leftPaddle.y > 100) {
-            newState.leftPaddle.y = 100;
-            newState.leftPaddleVelocity = 0;
-          }
+    public updateScore(score: PongScoreUpdate): void {
+        if (this.state.status !== 'IN_PROGRESS') {
+            throw new InvalidParametersError(GAME_NOT_IN_PROGRESS_MESSAGE);
         }
-        if (newState.rightPaddle) {
-          newState.rightPaddle.y += newState.rightPaddleVelocity??0;
-          if (newState.rightPaddle.y < 0) {
-            newState.rightPaddle.y = 0;
-            newState.rightPaddleVelocity = 0;
-          }
-          if (newState.rightPaddle.y > 100) {
-            newState.rightPaddle.y = 100;
-            newState.rightPaddleVelocity = 0;
-          }
+        const newScore = score.score;
+        const newState = { ...this.state,  };
+        if (score.gamePiece === 'Left') {
+            newState.leftScore = newScore;
+        } else {
+            newState.rightScore = newScore;
+        }
+        if (newScore >= 5) {
+            newState.status = 'OVER';
+            newState.winner = score.gamePiece === 'Left' ? this.state.leftPlayer : this.state.rightPlayer;
         }
         this.state = newState;
     }
   }
+  

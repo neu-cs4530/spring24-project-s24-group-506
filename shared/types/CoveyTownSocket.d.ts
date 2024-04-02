@@ -18,7 +18,7 @@ export type TownJoinResponse = {
   interactables: TypedInteractable[];
 }
 
-export type InteractableType = 'ConversationArea' | 'ViewingArea' | 'TicTacToeArea' | 'ConnectFourArea';
+export type InteractableType = 'ConversationArea' | 'ViewingArea' | 'TicTacToeArea' | 'ConnectFourArea' | 'PongArea' | 'TargetShootingArea';
 export interface Interactable {
   type: InteractableType;
   id: InteractableID;
@@ -164,35 +164,33 @@ export type ConnectFourColor = 'Red' | 'Yellow';
 
 export type PongPlayer = 'Left' | 'Right';
 
-export type PongDirection = 'Up' | 'Down';
-
 export type PongMove = {
   gamePiece: PongPlayer;
-  direction: PongDirection;
+  location: XY;
+}
+
+export type PongScore = 0 | 1 | 2 | 3 | 4 | 5;
+
+export type PongScoreUpdate = {
+  gamePiece: PongPlayer;
+  score: PongScore;
 }
 
 /**
  * Type for the state of a Pong game
  */
 export interface PongGameState extends WinnableGameState {
-  ballPosition?: XY;
-  ballVelocity?: XY;
+  leftPaddle: XY;
+  rightPaddle: XY;
 
-  leftPaddle?: XY;
-  leftPaddleVelocity?: number;
-  rightPaddle?: XY;
-  rightPaddleVelocity?: number;
-
-  leftScore?: number;
-  rightScore?: number;
+  leftScore: PongScore;
+  rightScore: PongScore;
 
   leftPlayer?: PlayerID;
   rightPlayer?: PlayerID;
 
   leftPlayerReady?: boolean;
   rightPlayerReady?: boolean;
-
-  
 }
 
 export type InteractableID = string;
@@ -250,7 +248,7 @@ interface InteractableCommandBase {
   type: string;
 }
 
-export type InteractableCommand =  ViewingAreaUpdateCommand | JoinGameCommand | GameMoveCommand<TicTacToeMove> | GameMoveCommand<ConnectFourMove> | GameMoveCommand<PongMove> | StartGameCommand | LeaveGameCommand;
+export type InteractableCommand =  ViewingAreaUpdateCommand | JoinGameCommand | GameMoveCommand<TicTacToeMove> | GameMoveCommand<ConnectFourMove> | GameMoveCommand<PongMove> | UpdatePongScoreCommand | StartGameCommand | LeaveGameCommand;
 export interface ViewingAreaUpdateCommand  {
   type: 'ViewingAreaUpdate';
   update: ViewingArea;
@@ -270,6 +268,11 @@ export interface GameMoveCommand<MoveType> {
   type: 'GameMove';
   gameID: GameInstanceID;
   move: MoveType;
+}
+export interface UpdatePongScoreCommand {
+  type: 'UpdateScore';
+  gameID: GameInstanceID;
+  scoreUpdate: PongScoreUpdate;
 }
 export type InteractableCommandReturnType<CommandType extends InteractableCommand> = 
   CommandType extends JoinGameCommand ? { gameID: string}:

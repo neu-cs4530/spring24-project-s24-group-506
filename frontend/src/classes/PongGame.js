@@ -5,8 +5,8 @@ import { StartingScene } from './PongScenes/StartingScene';
 const config = {
   type: Phaser.AUTO,
   parent: 'phaser-example',
-  width: 800,
-  height: 640,
+  width: 400,
+  height: 320,
   scene: [StartingScene, PlayingScene],
   physics: {
     default: 'arcade',

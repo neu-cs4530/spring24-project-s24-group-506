@@ -126,13 +126,12 @@ function MyDebugApp(): JSX.Element {
 }
 
 function AppOrDebugApp(): JSX.Element {
-  return <MyDebugApp />;
-  // const debugTown = process.env.NEXT_PUBLIC_TOWN_DEV_MODE;
-  // if (debugTown && debugTown.toLowerCase() === 'true') {
-  //   return <DebugApp />;
-  // } else {
-  //   return <App />;
-  // }
+  const debugTown = process.env.NEXT_PUBLIC_TOWN_DEV_MODE;
+  if (debugTown && debugTown.toLowerCase() === 'true') {
+    return <DebugApp />;
+  } else {
+    return <App />;
+  }
 }
 
 export default function AppStateWrapper(): JSX.Element {
