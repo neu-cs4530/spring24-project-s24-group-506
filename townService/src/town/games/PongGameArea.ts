@@ -97,7 +97,7 @@ import { update } from 'ramda';
         this._stateUpdated(game.toModel());
         return undefined as InteractableCommandReturnType<CommandType>;
       }
-      if (command.type === 'UpdateScore') {
+      if (command.type === 'UpdatePhysics') {
         const game = this._game;
         if (!game) {
           throw new InvalidParametersError(GAME_NOT_IN_PROGRESS_MESSAGE);
@@ -105,22 +105,10 @@ import { update } from 'ramda';
         if (this._game?.id !== command.gameID) {
           throw new InvalidParametersError(GAME_ID_MISSMATCH_MESSAGE);
         }
-        game.updateScore(command.scoreUpdate);
+        game.updatePhysics();
         this._stateUpdated(game.toModel());
         return undefined as InteractableCommandReturnType<CommandType>;
       }
-      // if (command.type === 'MoveBall') {
-      //   const game = this._game;
-      //   if (!game) {
-      //     throw new InvalidParametersError(GAME_NOT_IN_PROGRESS_MESSAGE);
-      //   }
-      //   if (this._game?.id !== command.gameID) {
-      //     throw new InvalidParametersError(GAME_ID_MISSMATCH_MESSAGE);
-      //   }
-      //   game.updateBallPosition(command.move);
-      //   this._stateUpdated(game.toModel());
-      //   return undefined as InteractableCommandReturnType<CommandType>;
-      // }
       if (command.type === 'JoinGame') {
         let game = this._game;
         if (!game || game.state.status === 'OVER') {

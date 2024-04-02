@@ -1,0 +1,21 @@
+.gamecontainer {
+    width: 400px;
+    height: 320px;
+    position: relative;
+    border: 2px solid black;
+  }
+  
+  .paddle {
+    width: 16px;
+    height: 64px;
+    position: absolute;
+    background-color: black;
+  }
+  
+  .ball {
+    width: 16px;
+    height: 16px;
+    position: absolute;
+    background-color: red;
+    border-radius: 50%;
+  }

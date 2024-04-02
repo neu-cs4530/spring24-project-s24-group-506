@@ -186,7 +186,8 @@ export interface PongGameState extends WinnableGameState {
   leftScore: PongScore;
   rightScore: PongScore;
 
-  //ballPosition: XY;
+  ballPosition: XY;
+  ballVelocity: XY;
 
   leftPlayer?: PlayerID;
   rightPlayer?: PlayerID;
@@ -250,7 +251,7 @@ interface InteractableCommandBase {
   type: string;
 }
 
-export type InteractableCommand =  ViewingAreaUpdateCommand | JoinGameCommand | GameMoveCommand<TicTacToeMove> | GameMoveCommand<ConnectFourMove> | GameMoveCommand<PongMove> | UpdatePongScoreCommand | StartGameCommand | LeaveGameCommand;
+export type InteractableCommand =  ViewingAreaUpdateCommand | JoinGameCommand | GameMoveCommand<TicTacToeMove> | GameMoveCommand<ConnectFourMove> | GameMoveCommand<PongMove> | UpdatePhysicsCommand |UpdatePongScoreCommand | StartGameCommand | LeaveGameCommand;
 export interface ViewingAreaUpdateCommand  {
   type: 'ViewingAreaUpdate';
   update: ViewingArea;
@@ -275,6 +276,10 @@ export interface UpdatePongScoreCommand {
   type: 'UpdateScore';
   gameID: GameInstanceID;
   scoreUpdate: PongScoreUpdate;
+}
+export interface UpdatePhysicsCommand {
+  type: 'UpdatePhysics';
+  gameID: GameInstanceID;
 }
 // export interface MoveBallCommand {
 //   type: 'MoveBall';

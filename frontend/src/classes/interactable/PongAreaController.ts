@@ -23,7 +23,9 @@ import GameAreaController, {
 } from './GameAreaController';
 
 export type PongEvents = GameEventTypes & {
-    oppositeScoreUpdated: (score: PongScore) => void;
+    ballPositionUpdated: (position: XY) => void;
+    leftScoreUpdated: (score: PongScore) => void;
+    rightScoreUpdated: (score: PongScore) => void;
     oppositePaddleUpdated: (location: XY) => void;
 };
 
@@ -34,39 +36,25 @@ export default class PongAreaController extends GameAreaController<
   PongGameState,
   PongEvents
 > {
+    private _ballPosition: XY = { x: 200, y: 120 };
+    private _oppositePaddle: XY = { x: 0, y: 0 };
     private _leftScore: PongScore = 0;
     private _rightScore: PongScore = 0;
-    private _leftPaddle: XY = { x: 17, y: 640/2 };
-    private _rightPaddle: XY = { x: 783, y: 640/2 };
-    private _ballPosition: XY = { x: 400, y: 320 };
-    private _oppositeScore: PongScore = 0;
-    private _oppositePaddle: XY = { x: 0, y: 0 };
-
-  get leftScore(): PongScore {
-        return this._leftScore;
-    }
-    get oppositeScore(): PongScore {
-        return this._oppositeScore;
-    }
 
     get oppositePaddle(): XY {
         return this._oppositePaddle;
     }
 
+    get ballPosition(): XY {
+        return this._ballPosition;
+    }
+
+    get leftScore(): PongScore {
+        return this._leftScore;
+    }
+
     get rightScore(): PongScore {
         return this._rightScore;
-    }
-
-    get leftPaddle(): XY {
-        return this._leftPaddle;
-    }
-
-    get rightPaddle(): XY {
-        return this._rightPaddle;
-    }
-
-    get ballPosition(): XY {
-        return this.ballPosition;
     }
 
   /**
@@ -166,23 +154,30 @@ export default class PongAreaController extends GameAreaController<
     const newGame = newModel.game;
     if (newGame) {
       if (this.gamePiece === 'Left') {
-        if (newGame.state.rightScore !== this._oppositeScore) {
-          this._oppositeScore = newGame.state.rightScore;
-          this.emit('oppositeScoreUpdated', this._oppositeScore);
-        }
         if (!_.isEqual(newGame.state.rightPaddle, this._oppositePaddle)) {
           this._oppositePaddle = newGame.state.rightPaddle;
           this.emit('oppositePaddleUpdated', this._oppositePaddle);
         }
       } else {
-        if (newGame.state.leftScore !== this._oppositeScore) {
-          this._oppositeScore = newGame.state.leftScore;
-          this.emit('oppositeScoreUpdated', this._oppositeScore);
-        }
         if (!_.isEqual(newGame.state.leftPaddle, this._oppositePaddle)) {
           this._oppositePaddle = newGame.state.leftPaddle;
           this.emit('oppositePaddleUpdated', this._oppositePaddle);
         }
+      }
+
+      if (!_.isEqual(newGame.state.ballPosition, this._ballPosition)) {
+        this._ballPosition = newGame.state.ballPosition;
+        this.emit('ballPositionUpdated', this._ballPosition);
+      }
+
+      if (newGame.state.leftScore !== this._leftScore) {
+        this._leftScore = newGame.state.leftScore;
+        this.emit('leftScoreUpdated', this._leftScore);
+      }
+
+      if (newGame.state.rightScore !== this._rightScore) {
+        this._rightScore = newGame.state.rightScore;
+        this.emit('rightScoreUpdated', this._rightScore);
       }
     }
   }
@@ -233,35 +228,15 @@ export default class PongAreaController extends GameAreaController<
     });
   }
 
-  public async updateScore(score: PongScore): Promise<void> {
+  public async updatePhysics(): Promise<void> {
     const instanceID = this._instanceID;
-    if (!instanceID) {
-      throw new Error(NO_GAME_IN_PROGRESS_ERROR);
+    if (!instanceID || this._model.game?.state.status !== 'IN_PROGRESS') {
+      return;
     }
-    const gamePiece = this.gamePiece;
-    const scoreUpdate: PongScoreUpdate = {
-      gamePiece,
-      score,
-    };
 
     await this._townController.sendInteractableCommand(this.id, {
-      type: 'UpdateScore',
+      type: 'UpdatePhysics',
       gameID: instanceID,
-      scoreUpdate,
     });
   }
-
-  // public async moveBall(location: XY): Promise<void> {
-  //   const instanceID = this._instanceID;
-  //   if (!instanceID) {
-  //     throw new Error(NO_GAME_IN_PROGRESS_ERROR);
-  //   }
-  //   const move: XY = location;
-
-  //   await this._townController.sendInteractableCommand(this.id, {
-  //     type: 'MoveBall',
-  //     gameID: instanceID,
-  //     move,
-  //   });
-  // }
 }

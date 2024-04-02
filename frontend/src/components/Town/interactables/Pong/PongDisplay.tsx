@@ -2,11 +2,10 @@ import ConnectFourAreaController, {
   ConnectFourCell,
 } from '../../../../classes/interactable/ConnectFourAreaController';
 import { Button, chakra, Container, useToast } from '@chakra-ui/react';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ConnectFourColIndex, PongGameState, PongPlayer, PongScore, XY } from '../../../../types/CoveyTownSocket';
 import PongAreaController from '../../../../classes/interactable/PongAreaController';
 import { PongGame } from '../../../../classes/PongGame';
-import { set } from 'lodash';
 
 export type PongGameProps = {
   gameAreaController: PongAreaController;
@@ -33,6 +32,38 @@ const StyledConnectFourSquare = chakra(Button, {
     },
   },
 });
+
+const Paddle = ({ position }: { position: XY }) => {
+  const style = {
+    left: position.x,
+    top: position.y,
+  };
+
+  return <div className="paddle" style={style}></div>;
+};
+
+const Ball = ({ position }: { position: XY}) => {
+  const style = {
+    left: position.x,
+    top: position.y,
+  };
+
+  return <div className="ball" style={style}></div>;
+};
+
+const useEventListener = (eventName: any, handler: any, element = window) => {
+  const savedHandler = useRef();  useEffect(() => {
+    savedHandler.current = handler;
+  }, [handler]);  useEffect(() => {
+    // @ts-ignore comment
+    const eventListener = (event: any) => savedHandler.current(event);
+    element.addEventListener(eventName, eventListener);
+    return () => {
+      element.removeEventListener(eventName, eventListener);
+    };
+  }, [eventName, element]);
+};
+
 /**
  * A component that renders the ConnectFour state
  *
@@ -58,340 +89,79 @@ const StyledConnectFourSquare = chakra(Button, {
 export default function PongDisplay({
   gameAreaController,
 }: PongGameProps): JSX.Element {
-  const [oppositeScore, setOppositeScore] = useState<PongScore>(gameAreaController.oppositeScore);
   const [oppositePaddle, setOppositePaddle] = useState<XY>(gameAreaController.oppositePaddle);
-  const [ourScore, setOurScore] = useState<PongScore>(0);
+  const [ballPosition, setBallPosition] = useState(gameAreaController.ballPosition);
+  const [leftScore, setLeftScore] = useState<PongScore>(gameAreaController.leftScore);
+  const [rightScore, setRightScore] = useState<PongScore>(gameAreaController.rightScore);
   const [ourPaddle, setOurPaddle] = useState<XY>({ x: 0, y: 0 });
-  //const [ballPosition, setBallPosition] = useState<XY>(gameAreaController.ballPosition);
 
   const toast = useToast();
 
   useEffect(() => {
-    gameAreaController.addListener('oppositeScoreUpdated', setOppositeScore);
     gameAreaController.addListener('oppositePaddleUpdated', setOppositePaddle);
-    //gameAreaController.addListener('ballPositionUpdated', setBallPosition);
+    gameAreaController.addListener('ballPositionUpdated', setBallPosition);
+    gameAreaController.addListener('leftScoreUpdated', setLeftScore);
+    gameAreaController.addListener('rightScoreUpdated', setRightScore);
     return () => {
-      gameAreaController.removeListener('oppositeScoreUpdated', setOppositeScore);
       gameAreaController.removeListener('oppositePaddleUpdated', setOppositePaddle);
-      //gameAreaController.removeListener('ballPositionUpdated', setBallPosition);
+      gameAreaController.removeListener('ballPositionUpdated', setBallPosition);
+      gameAreaController.removeListener('leftScoreUpdated', setLeftScore);
+      gameAreaController.removeListener('rightScoreUpdated', setRightScore);
     };
   }, [gameAreaController]);
 
-  class StartingScene extends Phaser.Scene {
-    constructor() {
-      super('startingScene');
-    }
-
-    create() {
-      this.add.text(100, 100, 'Starting Scene');
-    }
-
-    update() {
-      if (gameAreaController.status === 'IN_PROGRESS') {
-        this.scene.start('playingScene');
-      }
-    }
-  }
-
-  class PlayingScene extends Phaser.Scene {
-    ball: any;
-    player1: any;
-    player2: any;
-    keys: { [key: string]: any };
-    p1ScoreText: any;
-    p2ScoreText: any;
-    p1VictoryText: any;
-    p2VictoryText: any;
-    gameInitialized: boolean;
-    winningScore: number;
-    side: PongPlayer;
-
-    initializeGame(direction = 1) {
-      this.ball.setPosition(this.physics.world.bounds.width / 2, this.physics.world.bounds.height / 2);
-      this.ball.setVelocity(125 * direction, 150);
-      this.gameInitialized = true;
-    }
-
-    constructor() {
-      super('playingScene');
-      this.ball = null;
-      this.player1 = null;
-      this.player2 = null;
-      this.keys = {};
-      this.p1ScoreText = null;
-      this.p2ScoreText = null;
-      this.p1VictoryText = null;
-      this.p2VictoryText = null;
-      this.winningScore = 5;
-      this.gameInitialized = false;
-      console.log('constructor');
-      this.side = 'Left'
-    }
-
-    preload() {
-      this.load.image('ball', '/assets/pong_images/ball.png');
-      this.load.image('paddle', '/assets/pong_images/paddle.png');
-      console.log('preload');
-    }
-
-    createBall() {
-      this.ball = this.physics.add.sprite(
-        this.physics.world.bounds.width / 2,
-        this.physics.world.bounds.height / 2,
-        'ball',
-      );
-      this.ball.setCollideWorldBounds(true);
-      this.ball.setBounce(1, 1);
-    }
-
-    createPlayer1(x: number, y: number) {
-      this.player1 = this.physics.add.sprite(x, y, 'paddle');
-      this.player1.setCollideWorldBounds(true);
-      this.player1.setBounce(1, 1);
-      this.player1.setImmovable(true);
-    }
-
-    createPlayer2(x: number, y: number) {
-      this.player2 = this.physics.add.sprite(x, y, 'paddle');
-      this.player2.setCollideWorldBounds(true);
-      this.player2.setBounce(1, 1);
-      this.player2.setImmovable(true);
-    }
-
-    addKeyboardInput() {
-      if (this.input.keyboard) {
-        this.keys.i = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.I);
-        this.keys.o = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.O);
-      }
-    }
-
-    initializeVictoryText() {
-      this.p1VictoryText = this.add.text(
-        this.physics.world.bounds.width / 2,
-        this.physics.world.bounds.height / 2,
-        'Player 1 wins!',
-        { fontSize: '16px', },
-      );
-      this.p2VictoryText = this.add.text(
-        this.physics.world.bounds.width / 2,
-        this.physics.world.bounds.height / 2,
-        'Player 2 wins!',
-        { fontSize: '16px', },
-      );
-      this.p1VictoryText.setOrigin(0.5, 0.5);
-      this.p2VictoryText.setOrigin(0.5, 0.5);
-      this.p1VictoryText.setVisible(false);
-      this.p2VictoryText.setVisible(false);
-    }
-
-    ballCollision(ball: any, player: any) {
-      ball.setVelocityX(ball.body.velocity.x + 25 * (ball.body.velocity.x > 0 ? 1 : -1));
-    }
-
-    async create() {
-      this.side = gameAreaController.gamePiece;
-      console.log(this.side);
-      this.createBall();
-
-      this.createPlayer1(this.ball.body.width / 2 + 1, this.physics.world.bounds.height / 2);
-      this.createPlayer2(
-        this.physics.world.bounds.width - (this.ball.body.width / 2 + 1),
-        this.physics.world.bounds.height / 2,
-      );
-      if (this.side === 'Left') {
-        setOurPaddle({ x: this.player1.body.x, y: this.player1.body.y });
-        try {
-          await gameAreaController.makeMove({ x: this.player1.body.x, y: this.player1.body.y });
-        }
-        catch (e) {
-          toast({
-            title: 'Error making move',
-            description: (e as Error).toString(),
-            status: 'error',
-          });
-        }
-      } else {
-        setOurPaddle({ x: this.player2.body.x, y: this.player2.body.y });
-        try {
-          await gameAreaController.makeMove({ x: this.player2.body.x, y: this.player2.body.y });
-        }
-        catch (e) {
-          toast({
-            title: 'Error making move',
-            description: (e as Error).toString(),
-            status: 'error',
-          });
-        }
-      }
-      if (this.side === 'Left') {
-        this.player2.setPosition(oppositePaddle.x, oppositePaddle.y);
-      } else {
-        this.player1.setPosition(oppositePaddle.x, oppositePaddle.y);
-      }
-
-      this.physics.add.collider(this.ball, this.player1, this.ballCollision);
-      this.physics.add.collider(this.ball, this.player2, this.ballCollision);
-
-      this.addKeyboardInput();
-
-      this.initializeVictoryText();
-
-      this.p1ScoreText = this.add.text(0, 16, 'Player 1: 0', { fontSize: '16px' });
-      this.p2ScoreText = this.add.text(this.physics.world.bounds.width, 16, 'Player 2: 0', {
-        fontSize: '16px',
-      });
-      this.p2ScoreText.setOrigin(1, 0);
-
-      this.initializeGame();
-      console.log('create');
-    }
-
-    async update(time: number, delta: number) {
-      if (gameAreaController.status === 'WAITING_TO_START' || gameAreaController.status === 'WAITING_FOR_PLAYERS') {
-        this.scene.start('startingScene');
-      } else if (gameAreaController.status === 'IN_PROGRESS') {
-        if (this.side === 'Left') {
-          this.p1ScoreText.setText(`Player 1: ${ourScore}`);
-          this.p2ScoreText.setText(`Player 2: ${oppositeScore}`);
-        }
-        
-
-        if (ourScore >= 5) {
-          this.side === 'Left' ? this.endScene(1) : this.endScene(2);
-        } else if (oppositeScore >= 5) {
-          this.side === 'Left' ? this.endScene(2) : this.endScene(1);
-        } else {
-          if (this.ball.body.x < this.player1.body.x) {
-            if (this.side === 'Right') {
-              setOurScore(ourScore + 1 as PongScore);
-              try {
-                await gameAreaController.updateScore(ourScore as PongScore);
-              }
-              catch (e) {
-                toast({
-                  title: 'Error updating score',
-                  description: (e as Error).toString(),
-                  status: 'error',
-                });
-              }
-            }
-              this.initializeGame(1);
-              return;
-            } else if (this.ball.body.x > this.player2.body.x) {
-              if (this.side === 'Left') {
-                setOurScore(ourScore + 1 as PongScore);
-                try {
-                  await gameAreaController.updateScore(ourScore as PongScore);
-                }
-                catch (e) {
-                  toast({
-                    title: 'Error updating score',
-                    description: (e as Error).toString(),
-                    status: 'error',
-                  });
-                }
-              }
-              this.initializeGame(-1);
-              return;
-            }
-
-            if (this.keys.i.isDown) {
-              this.side === 'Left' ? this.player1.setVelocityY(-300) : this.player2.setVelocityY(-300);
-              this.player1.setVelocityY(-300);
-            } else if (this.keys.o.isDown) {
-              this.side === 'Left' ? this.player1.setVelocityY(300) : this.player2.setVelocityY(300);
-            } else {
-              this.side === 'Left' ? this.player1.setVelocityY(0) : this.player2.setVelocityY(0);
-            }
-
-            if (this.side === 'Left') {
-              setOurPaddle({ x: this.player1.body.x, y: this.player1.body.y });
-              try {
-                await gameAreaController.makeMove({ x: this.player1.body.x, y: this.player1.body.y });
-              }
-              catch (e) {
-                toast({
-                  title: 'Error making move',
-                  description: (e as Error).toString(),
-                  status: 'error',
-                });
-              }
-            } else {
-              setOurPaddle({ x: this.player2.body.x, y: this.player2.body.y });
-              try {
-                await gameAreaController.makeMove({ x: this.player2.body.x, y: this.player2.body.y });
-              }
-              catch (e) {
-                toast({
-                  title: 'Error making move',
-                  description: (e as Error).toString(),
-                  status: 'error',
-                });
-              }           
-            }
-            if (this.side === 'Left') {
-              this.player2.setPosition(oppositePaddle.x, oppositePaddle.y);
-            } else {
-              this.player1.setPosition(oppositePaddle.x, oppositePaddle.y);
-            }
-
-            // if (this.side === 'Left') {
-            //   try {
-            //     await gameAreaController.moveBall({ x: this.ball.body.x, y: this.ball.body.y });
-            //   }
-            //   catch (e) {
-            //     toast({
-            //       title: 'Error moving ball',
-            //       description: (e as Error).toString(),
-            //       status: 'error',
-            //     });
-            //   }
-            // } else {
-            //   this.ball.setPosition(ballPosition.x, ballPosition.y);
-            // }
-          }
-        }
-      }
-
-    endScene(winner: 1 | 2) {
-      this.ball.setVelocity(0, 0);
-      this.ball.setVisible(false);
-      this.player1.setVelocity(0, 0);
-      this.player2.setVelocity(0, 0);
-      if (winner === 1) {
-        this.p1VictoryText.setVisible(true);
-      } else {
-        this.p2VictoryText.setVisible(true);
-      }
-    }
-  }
-
-  const config = {
-    type: Phaser.AUTO,
-    parent: 'phaser-example',
-    width: 400,
-    height: 320,
-    scene: [StartingScene, PlayingScene],
-    physics: {
-      default: 'arcade',
-      arcade: {
-        gravity: { x: 0, y: 0 },
-        debug: false,
-      },
-    },
-  };
-
   useEffect(() => {
-    const game = new Phaser.Game(config);
-  }, []);
+    let updateBall: NodeJS.Timeout | undefined;
+    if (gameAreaController.status === 'IN_PROGRESS' && gameAreaController.gamePiece === 'Left') {
+      updateBall = setInterval(() => {
+        gameAreaController.updatePhysics();
+      }, 10);
+    }
+    return () => clearInterval(updateBall);
+  }, [gameAreaController.status]);
+
+  const I_KEYS = ["i", "I"];
+  const O_KEYS = ["o", "O"];
+
+  const handler = async ({ key }: {key: any}) => {
+    if (I_KEYS.includes(String(key))) {
+      console.log("I key pressed!");
+      try {
+        await gameAreaController.makeMove({x: ourPaddle.x, y: ourPaddle.y - 1});
+        setOurPaddle(oldPaddle => ({ x: oldPaddle.x, y: oldPaddle.y - 1 }));
+      }
+      catch (e) {
+        toast({
+          title: 'Error making move',
+          description: (e as Error).toString(),
+          status: 'error',
+        });
+      }
+    }
+    else if (O_KEYS.includes(String(key))) {
+      console.log("O key pressed!");
+      try {
+        await gameAreaController.makeMove({x: ourPaddle.x, y: ourPaddle.y + 1});
+        setOurPaddle(oldPaddle => ({ x: oldPaddle.x, y: oldPaddle.y + 1 }));
+      }
+      catch (e) {
+        toast({
+          title: 'Error making move',
+          description: (e as Error).toString(),
+          status: 'error',
+        });
+      }
+    }
+  };  useEventListener("keydown", handler);
 
   return (
     <div>
       <h1>pong</h1>
-      <h2>Our Score: {ourScore}</h2>
-      <h2>Opposite Score: {oppositeScore}</h2>
+      <h2>Left Score: {leftScore}</h2>
+      <h2>Right Score: {rightScore}</h2>
       <h2>Our Paddle Position: {JSON.stringify(ourPaddle)}</h2>
       <h2>Opp Paddle Position: {JSON.stringify(oppositePaddle)}</h2>
+      <h2>Ball Position: {JSON.stringify(ballPosition)}</h2>
       <Button onClick={async () => {
         try {
           await gameAreaController.makeMove({ x: 0, y: 0 });
@@ -404,20 +174,11 @@ export default function PongDisplay({
           });
         }
       }}>Move</Button>
-      <Button onClick={async () => {
-        try {
-          await gameAreaController.updateScore(oppositeScore + 1 as PongScore);
-        }
-        catch (e) {
-          toast({
-            title: 'Error making move',
-            description: (e as Error).toString(),
-            status: 'error',
-          });
-        }
-      }
-      }>Update Score</Button>
-      <div id="phaser-example"></div>
+      <div className="gamecontainer">
+      <Paddle position={ourPaddle} />
+      <Paddle position={oppositePaddle} />
+      <Ball position={ballPosition} />
+    </div>
     </div>
   );
   // return (

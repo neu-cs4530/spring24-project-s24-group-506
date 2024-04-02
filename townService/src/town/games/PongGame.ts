@@ -42,7 +42,8 @@ import InvalidParametersError, {
         rightScore: 0,
         leftPaddle: { x: 9, y: 320/2 },
         rightPaddle: { x: 400 - 9, y: 320/2 },
-        //ballPosition: { x: 800/2, y: 640/2 },
+        ballPosition: { x: 400/2, y: 320/2 },
+        ballVelocity: { x: 1, y: 0 },
       });
       this._preferredLeftPlayer = priorGame?.state.leftPlayer;
       this._preferredRightPlayer = priorGame?.state.rightPlayer;
@@ -226,29 +227,38 @@ import InvalidParametersError, {
       this.state = newState;
     }
 
-    public updateScore(score: PongScoreUpdate): void {
-        if (this.state.status !== 'IN_PROGRESS') {
-            throw new InvalidParametersError(GAME_NOT_IN_PROGRESS_MESSAGE);
-        }
-        const newScore = score.score;
-        const newState = { ...this.state,  };
-        if (score.gamePiece === 'Left') {
-            newState.leftScore = newScore;
-        } else {
-            newState.rightScore = newScore;
-        }
-        if (newScore >= 5) {
-            newState.status = 'OVER';
-            newState.winner = score.gamePiece === 'Left' ? this.state.leftPlayer : this.state.rightPlayer;
-        }
-        this.state = newState;
-    }
+    public updatePhysics(): void {
+      if (this.state.status !== 'IN_PROGRESS') {
+        return;
+      }
+      const newState = { ...this.state };
+      newState.ballPosition.x += newState.ballVelocity.x;
+      newState.ballPosition.y += newState.ballVelocity.y;
 
-    // public updateBallPosition(ballPosition: XY): void {
-    //     if (this.state.status !== 'IN_PROGRESS') {
-    //         throw new InvalidParametersError(GAME_NOT_IN_PROGRESS_MESSAGE);
-    //     }
-    //     this.state.ballPosition = ballPosition;
-    // }
+      if (newState.ballPosition.y <= 0 || newState.ballPosition.y >= 320) {
+        newState.ballVelocity.y = -newState.ballVelocity.y;
+      }
+      if (newState.ballPosition.x <= 0) {
+        newState.rightScore++;
+        newState.ballPosition.x = 400/2;
+        newState.ballPosition.y = 320/2;
+        newState.ballVelocity.x = -newState.ballVelocity.x;
+      }
+      if (newState.ballPosition.x >= 400) {
+        newState.leftScore++;
+        newState.ballPosition.x = 400/2;
+        newState.ballPosition.y = 320/2;
+        newState.ballVelocity.x = -newState.ballVelocity.x;
+      }
+
+      if (newState.ballPosition.x <= 9 && newState.ballPosition.y >= newState.leftPaddle.y - 32 && newState.ballPosition.y <= newState.leftPaddle.y + 32) {
+        newState.ballVelocity.x = -newState.ballVelocity.x;
+      }
+      if (newState.ballPosition.x >= 791 && newState.ballPosition.y >= newState.rightPaddle.y - 32 && newState.ballPosition.y <= newState.rightPaddle.y + 32) {
+        newState.ballVelocity.x = -newState.ballVelocity.x;
+      }
+
+      this.state = newState;
+    }
   }
   
