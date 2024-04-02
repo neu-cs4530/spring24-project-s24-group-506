@@ -186,6 +186,8 @@ export interface PongGameState extends WinnableGameState {
   leftScore: PongScore;
   rightScore: PongScore;
 
+  //ballPosition: XY;
+
   leftPlayer?: PlayerID;
   rightPlayer?: PlayerID;
 
@@ -274,6 +276,12 @@ export interface UpdatePongScoreCommand {
   gameID: GameInstanceID;
   scoreUpdate: PongScoreUpdate;
 }
+// export interface MoveBallCommand {
+//   type: 'MoveBall';
+//   gameID: GameInstanceID;
+//   move: XY;
+// }
+
 export type InteractableCommandReturnType<CommandType extends InteractableCommand> = 
   CommandType extends JoinGameCommand ? { gameID: string}:
   CommandType extends ViewingAreaUpdateCommand ? undefined :

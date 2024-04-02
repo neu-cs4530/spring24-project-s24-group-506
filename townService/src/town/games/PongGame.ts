@@ -14,9 +14,11 @@ import InvalidParametersError, {
     PongMove,
     GameStatus,
     PongScoreUpdate,
+    XY,
   } from '../../types/CoveyTownSocket';
   import Game from './Game';
-  
+  import { update } from 'ramda';
+
   /**
    * A PongGame is a Game that implements the rules of Connect Four.
    * @see https://en.wikipedia.org/wiki/Connect_Four
@@ -40,7 +42,7 @@ import InvalidParametersError, {
         rightScore: 0,
         leftPaddle: { x: 17, y: 640/2 },
         rightPaddle: { x: 800 - 17, y: 640/2 },
-        
+        //ballPosition: { x: 800/2, y: 640/2 },
       });
       this._preferredLeftPlayer = priorGame?.state.leftPlayer;
       this._preferredRightPlayer = priorGame?.state.rightPlayer;
@@ -241,5 +243,12 @@ import InvalidParametersError, {
         }
         this.state = newState;
     }
+
+    // public updateBallPosition(ballPosition: XY): void {
+    //     if (this.state.status !== 'IN_PROGRESS') {
+    //         throw new InvalidParametersError(GAME_NOT_IN_PROGRESS_MESSAGE);
+    //     }
+    //     this.state.ballPosition = ballPosition;
+    // }
   }
   

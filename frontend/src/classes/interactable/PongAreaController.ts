@@ -27,6 +27,7 @@ export type PongEvents = GameEventTypes & {
     rightScoreUpdated: (score: PongScore) => void;
     leftPaddleUpdated: (location: XY) => void;
     rightPaddleUpdated: (location: XY) => void;
+    ballPositionUpdated: (location: XY) => void;
 };
 
 /**
@@ -40,6 +41,7 @@ export default class PongAreaController extends GameAreaController<
     private _rightScore: PongScore = 0;
     private _leftPaddle: XY = { x: 17, y: 640/2 };
     private _rightPaddle: XY = { x: 783, y: 640/2 };
+    private _ballPosition: XY = { x: 400, y: 320 };
 
   get leftScore(): PongScore {
         return this._leftScore;
@@ -55,6 +57,10 @@ export default class PongAreaController extends GameAreaController<
 
     get rightPaddle(): XY {
         return this._rightPaddle;
+    }
+
+    get ballPosition(): XY {
+        return this.ballPosition;
     }
 
   /**
@@ -173,6 +179,10 @@ export default class PongAreaController extends GameAreaController<
             this._rightPaddle = newRightPaddle;
             this.emit('rightPaddleUpdated', this._rightPaddle);
         }
+        if  (!_.isEqual(newGame.state.ballPosition, this._ballPosition)) {
+            this._ballPosition = newGame.state.ballPosition;
+            this.emit('ballPositionUpdated', this._ballPosition);
+        }
     }
   }
 
@@ -239,4 +249,18 @@ export default class PongAreaController extends GameAreaController<
       scoreUpdate,
     });
   }
+
+  // public async moveBall(location: XY): Promise<void> {
+  //   const instanceID = this._instanceID;
+  //   if (!instanceID) {
+  //     throw new Error(NO_GAME_IN_PROGRESS_ERROR);
+  //   }
+  //   const move: XY = location;
+
+  //   await this._townController.sendInteractableCommand(this.id, {
+  //     type: 'MoveBall',
+  //     gameID: instanceID,
+  //     move,
+  //   });
+  // }
 }
