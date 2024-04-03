@@ -1,25 +1,45 @@
-import { Button, List, ListItem, useToast } from '@chakra-ui/react';
-import React, { useEffect, useState } from 'react';
+import {
+  Accordion,
+  AccordionButton,
+  AccordionIcon,
+  AccordionItem,
+  AccordionPanel,
+  Box,
+  Flex,
+  Heading,
+  List,
+  ListItem,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalHeader,
+  ModalOverlay,
+  Button,
+  useToast,
+} from '@chakra-ui/react';
+import React, { useCallback, useEffect, useState } from 'react';
 import TicketBoothAreaController from '../../../../classes/interactable/TicketBoothAreaController';
 import { BoothItem } from '../../../../types/CoveyTownSocket';
 import PlayerController from '../../../../classes/PlayerController';
-import { useInteractableAreaController } from '../../../../classes/TownController';
+import { useInteractable, useInteractableAreaController } from '../../../../classes/TownController';
 import useTownController from '../../../../hooks/useTownController';
 import { InteractableID } from '../../../../types/CoveyTownSocket';
 import TicketBoothBoard from './TicketBoothBoard';
+import TicketBoothArea from './TicketBoothArea';
 
 /**
  * The TicketBoothArea component renders the Ticket Booth area.
  * It renders the current state of the area, optionally allowing the player to purchase items.
  */
-export default function TicketBoothArea2({
+export function TicketBoothArea2({
   interactableID,
 }: {
   interactableID: InteractableID;
 }): JSX.Element {
   const ticketBoothAreaController =
     useInteractableAreaController<TicketBoothAreaController>(interactableID);
-  //const townController = useTownController();
+  const townController = useTownController();
 
   const [items, setItems] = useState<[BoothItem, number, number][]>(
     ticketBoothAreaController.itemPrices,
@@ -33,7 +53,7 @@ export default function TicketBoothArea2({
     return () => {
       ticketBoothAreaController.removeListener('itemPurchased', handleItemPurchased);
     };
-  }, [ticketBoothAreaController]);
+  }, [townController, ticketBoothAreaController]);
 
   const [purchasingItem, setPurchasingItem] = useState(false);
 
@@ -70,4 +90,29 @@ export default function TicketBoothArea2({
       <TicketBoothBoard ticketBoothAreaController={ticketBoothAreaController} />
     </div>
   );
+}
+
+export default function TicketBoothAreaWrapper(): JSX.Element {
+  const gameArea = useInteractable<TicketBoothArea>('TicketBoothArea');
+  const townController = useTownController();
+  const closeModal = useCallback(() => {
+    if (gameArea) {
+      townController.interactEnd(gameArea);
+    }
+  }, [townController, gameArea]);
+  if (gameArea) {
+    return (
+      <Modal isOpen={true} onClose={closeModal} closeOnOverlayClick={false} size='xl'>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>{gameArea.name}</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <TicketBoothArea2 interactableID={gameArea.id} />
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+    );
+  }
+  return <></>;
 }
