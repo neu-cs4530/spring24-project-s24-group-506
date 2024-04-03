@@ -1,6 +1,4 @@
-import TicketBoothAreaController, {
-  TicketBoothItemType,
-} from '../../../../classes/interactable/TicketBoothAreaController';
+import TicketBoothAreaController from '../../../../classes/interactable/TicketBoothAreaController';
 import { Button, chakra, Container, useToast } from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react';
 import { BoothItem } from '../../../../types/CoveyTownSocket';
