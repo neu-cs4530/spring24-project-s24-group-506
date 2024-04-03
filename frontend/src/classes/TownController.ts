@@ -15,6 +15,7 @@ import { LoginController } from '../contexts/LoginControllerContext';
 import { TownsService, TownsServiceClient } from '../generated/client';
 import useTownController from '../hooks/useTownController';
 import {
+  BoothItem,
   ChatMessage,
   CoveyTownSocket,
   GameState,
@@ -802,6 +803,12 @@ export function useInteractableAreaController<T>(interactableAreaID: string): T 
     eachArea => eachArea.id == interactableAreaID,
   );
   if (!interactableAreaController) {
+    const interactableAreaController2 = townController.ticketBoothAreas.find(
+      eachArea => eachArea.id == interactableAreaID,
+    );
+    return interactableAreaController2 as unknown as T;
+  }
+  if (!interactableAreaController) {
     throw new Error(`Requested interactable area ${interactableAreaID} does not exist`);
   }
   return interactableAreaController as unknown as T;
@@ -856,6 +863,7 @@ export function useActiveInteractableAreas(): GenericInteractableAreaController[
       const allAreas = (townController.gameAreas as GenericInteractableAreaController[]).concat(
         townController.conversationAreas,
         townController.viewingAreas,
+        townController.ticketBoothAreas,
       );
       setInteractableAreas(allAreas.filter(eachArea => eachArea.isActive()));
     };
@@ -888,6 +896,7 @@ export function useActiveInteractableAreasSortedByOccupancyAndName(): GenericInt
   const [interactableAreas, setInteractableAreas] = useState<InteractableAreaReadAheadOccupancy[]>(
     (townController.gameAreas as GenericInteractableAreaController[])
       .concat(townController.conversationAreas, townController.viewingAreas)
+      .concat(townController.ticketBoothAreas)
       .filter(eachArea => eachArea.isActive())
       .map(area => ({ area, occupancy: area.occupants.length })),
   );
@@ -906,10 +915,9 @@ export function useActiveInteractableAreasSortedByOccupancyAndName(): GenericInt
     };
 
     const onAreaSetChanged = () => {
-      const allAreas = (townController.gameAreas as GenericInteractableAreaController[]).concat(
-        townController.conversationAreas,
-        townController.viewingAreas,
-      );
+      const allAreas = (townController.gameAreas as GenericInteractableAreaController[])
+        .concat(townController.conversationAreas, townController.viewingAreas)
+        .concat(townController.ticketBoothAreas);
       const activeAreas = allAreas.filter(eachArea => eachArea.isActive());
       // Update the areas, *and* the occupancy listeners by comparing the new set of areas to the old set
       setInteractableAreas(prevAreaPairs => {

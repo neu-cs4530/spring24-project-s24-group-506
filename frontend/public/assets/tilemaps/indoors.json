@@ -575,14 +575,8 @@
                  "height":83.8442547785938,
                  "id":43,
                  "name":"Connect Four 2",
-                 "properties":[
-                        {
-                         "name":"type",
-                         "type":"string",
-                         "value":"ConnectFour"
-                        }],
                  "rotation":0,
-                 "type":"GameArea",
+                 "type":"TicketBoothArea",
                  "visible":true,
                  "width":131.271120353522,
                  "x":2943.98493302529,
