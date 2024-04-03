@@ -1,10 +1,15 @@
 import { useEffect, useState } from 'react';
-import { BoothItem, TicketBoothArea as TicketBoothAreaModel } from '../../types/CoveyTownSocket';
+import {
+  BoothItem,
+  InteractableID,
+  TicketBoothArea as TicketBoothAreaModel,
+} from '../../types/CoveyTownSocket';
 import PlayerController from '../PlayerController';
 import InteractableAreaController, {
   BaseInteractableEventMap,
   TICKET_BOOTH_AREA_TYPE,
 } from './InteractableAreaController';
+import TownController from '../TownController';
 
 /**
  * The events that the TicketBoothAreaController emits to subscribers. These events
@@ -13,6 +18,8 @@ import InteractableAreaController, {
 export type TicketBoothAreaEvents = BaseInteractableEventMap & {
   itemPurchased: (newItemPrices: [BoothItem, number, number][] | undefined) => void;
 };
+
+export type TicketBoothItemType = BoothItem | undefined; // [ItemName, ItemPrice, ItemQuantity]
 
 // The special string that will be displayed when a conversation area does not have a topic set
 export const NO_ITEM_STRING = '(No Items Available)';
@@ -34,19 +41,26 @@ export default class TicketBoothAreaController extends InteractableAreaControlle
   TicketBoothAreaEvents,
   TicketBoothAreaModel
 > {
-  private _items?: [BoothItem, number, number][] = createItemsInBooth();
+  private _items: [BoothItem, number, number][] = createItemsInBooth();
+
+  protected _townController: TownController;
 
   /**
    * Create a new TicketBoothAreaController
    * @param id
    * @param itemPrices
    */
-  constructor(id: string, itemPrices?: [BoothItem, number, number][]) {
+  constructor(
+    id: InteractableID,
+    townController: TownController,
+    itemPrices?: [BoothItem, number, number][],
+  ) {
     super(id);
-    this._items = itemPrices;
+    this._items = itemPrices ?? createItemsInBooth();
+    this._townController = townController;
   }
 
-  get itemPrices(): [BoothItem, number, number][] | undefined {
+  get itemPrices(): [BoothItem, number, number][] {
     return this._items;
   }
 
@@ -54,7 +68,7 @@ export default class TicketBoothAreaController extends InteractableAreaControlle
     return {
       id: this.id,
       occupants: this.occupants.map(player => player.id),
-      items: this.itemPrices ?? [],
+      items: this.itemPrices,
       type: 'TicketBoothArea',
     };
   }
@@ -90,24 +104,31 @@ export default class TicketBoothAreaController extends InteractableAreaControlle
    */
   static fromTicketBoothAreaModel(
     tBoothAreaModel: TicketBoothAreaModel,
-    playerFinder: (playerIDs: string[]) => PlayerController[],
-  ): TicketBoothAreaController {
-    const ret = new TicketBoothAreaController(tBoothAreaModel.id, tBoothAreaModel.items);
-    ret.occupants = playerFinder(tBoothAreaModel.occupants);
-    return ret;
+    playerFinder: TownController,
+  ): void {
+    const ret = new TicketBoothAreaController(tBoothAreaModel.id, playerFinder);
+    ret.occupants = tBoothAreaModel.occupants.map(playerID => playerFinder.getPlayer(playerID));
+    ret._items = tBoothAreaModel.items;
   }
 
   /**
    * Purchase an item from the ticket booth area.
    * @param itemName The name of the item to purchase
    */
-  public purchaseItem(newItemPrices: [BoothItem, number, number][]): void {
-    if (this._items !== newItemPrices) {
-      this.emit('itemPurchased', newItemPrices);
-      if (newItemPrices !== undefined) this.emit('friendlyNameChange', newItemPrices[0][0]);
-      else this.emit('friendlyNameChange', NO_ITEM_STRING);
+  public purchaseItem(item: BoothItem): void {
+    const itemIndex = this._items.findIndex(([itemName]) => itemName === item);
+    if (itemIndex === -1) {
+      throw new Error(`Item ${item} not found in ticket booth area`);
     }
-    this._items = newItemPrices;
+    if (this._items[itemIndex][2] === 0) {
+      throw new Error(`Item ${item} is out of stock`);
+    }
+    this._items[itemIndex][2] += 1;
+    this.emit('itemPurchased', this.itemPrices);
+    this._townController.sendInteractableCommand(this.id, {
+      type: 'HandlePurchase',
+      item,
+    });
   }
 }
 /**
@@ -119,7 +140,9 @@ export default class TicketBoothAreaController extends InteractableAreaControlle
 export function useTicketBoothAreaItemPrices(
   area: TicketBoothAreaController,
 ): [BoothItem, number, number][] {
-  const [itemPrices, setItemPrices] = useState(area.itemPrices);
+  const [itemPrices, setItemPrices] = useState<[BoothItem, number, number][] | undefined>(
+    area.itemPrices,
+  );
   useEffect(() => {
     area.addListener('itemPurchased', setItemPrices);
     return () => {

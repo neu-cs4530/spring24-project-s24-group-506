@@ -643,7 +643,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
             );
           } else if (isTicketBoothArea(eachInteractable)) {
             this._interactableControllers.push(
-              new TicketBoothAreaController(eachInteractable.id, eachInteractable.items),
+              new TicketBoothAreaController(eachInteractable.id, this, eachInteractable.items),
             );
           }
         });
