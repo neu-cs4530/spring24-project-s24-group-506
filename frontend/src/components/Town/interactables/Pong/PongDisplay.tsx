@@ -5,33 +5,10 @@ import { Button, chakra, Container, useToast } from '@chakra-ui/react';
 import React, { useEffect, useRef, useState } from 'react';
 import { ConnectFourColIndex, PongGameState, PongPlayer, PongScore, XY } from '../../../../types/CoveyTownSocket';
 import PongAreaController from '../../../../classes/interactable/PongAreaController';
-import { PongGame } from '../../../../classes/PongGame';
 
 export type PongGameProps = {
   gameAreaController: PongAreaController;
 };
-const StyledConnectFourstate = chakra(Container, {
-  baseStyle: {
-    display: 'flex',
-    width: '350px',
-    height: '350px',
-    padding: '5px',
-    flexWrap: 'wrap',
-  },
-});
-const StyledConnectFourSquare = chakra(Button, {
-  baseStyle: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexBasis: '14%',
-    border: '1px solid black',
-    height: '14%',
-    fontSize: '50px',
-    _disabled: {
-      opacity: '100%',
-    },
-  },
-});
 
 const Paddle = ({ position }: { position: XY }) => {
   const style = {
@@ -49,19 +26,6 @@ const Ball = ({ position }: { position: XY}) => {
   };
 
   return <div className="ball" style={style}></div>;
-};
-
-const useEventListener = (eventName: any, handler: any, element = window) => {
-  const savedHandler = useRef();  useEffect(() => {
-    savedHandler.current = handler;
-  }, [handler]);  useEffect(() => {
-    // @ts-ignore comment
-    const eventListener = (event: any) => savedHandler.current(event);
-    element.addEventListener(eventName, eventListener);
-    return () => {
-      element.removeEventListener(eventName, eventListener);
-    };
-  }, [eventName, element]);
 };
 
 /**
@@ -89,30 +53,34 @@ const useEventListener = (eventName: any, handler: any, element = window) => {
 export default function PongDisplay({
   gameAreaController,
 }: PongGameProps): JSX.Element {
-  const [oppositePaddle, setOppositePaddle] = useState<XY>(gameAreaController.oppositePaddle);
   const [ballPosition, setBallPosition] = useState(gameAreaController.ballPosition);
   const [leftScore, setLeftScore] = useState<PongScore>(gameAreaController.leftScore);
   const [rightScore, setRightScore] = useState<PongScore>(gameAreaController.rightScore);
-  const [ourPaddle, setOurPaddle] = useState<XY>(gameAreaController.oppositePaddle.x === 0 ? { x: 400-16, y: 320/2 } : { x: 0, y: 320/2 });
+  const [leftPaddle, setLeftPaddle] = useState<XY>(gameAreaController.leftPaddle);
+  const [rightPaddle, setRightPaddle] = useState<XY>(gameAreaController.rightPaddle);
+  let iPressed = false;
+  let oPressed = false;
 
   const toast = useToast();
 
   useEffect(() => {
-    gameAreaController.addListener('oppositePaddleUpdated', setOppositePaddle);
     gameAreaController.addListener('ballPositionUpdated', setBallPosition);
     gameAreaController.addListener('leftScoreUpdated', setLeftScore);
     gameAreaController.addListener('rightScoreUpdated', setRightScore);
+    gameAreaController.addListener('leftPaddleUpdated', setLeftPaddle);
+    gameAreaController.addListener('rightPaddleUpdated', setRightPaddle);
     return () => {
-      gameAreaController.removeListener('oppositePaddleUpdated', setOppositePaddle);
       gameAreaController.removeListener('ballPositionUpdated', setBallPosition);
       gameAreaController.removeListener('leftScoreUpdated', setLeftScore);
       gameAreaController.removeListener('rightScoreUpdated', setRightScore);
+      gameAreaController.removeListener('leftPaddleUpdated', setLeftPaddle);
+      gameAreaController.removeListener('rightPaddleUpdated', setRightPaddle);
     };
   }, [gameAreaController]);
 
   useEffect(() => {
     let updateBall: NodeJS.Timeout | undefined;
-    if (gameAreaController.status === 'IN_PROGRESS' && gameAreaController.gamePiece === 'Left') {
+    if (gameAreaController.status === 'IN_PROGRESS' && gameAreaController.isPlayer && gameAreaController.gamePiece === 'Left') {
       updateBall = setInterval(() => {
         gameAreaController.updatePhysics();
       }, 10);
@@ -120,93 +88,103 @@ export default function PongDisplay({
     return () => clearInterval(updateBall);
   }, [gameAreaController.status]);
 
-  const I_KEYS = ["i", "I"];
-  const O_KEYS = ["o", "O"];
+  useEffect(() => {
+    const handleKeyDown = async (event: any) => {
+      if (event.key === 'i' && gameAreaController.isPlayer) {
+        // Handle 'i' key press
+        if (!iPressed && gameAreaController.status === 'IN_PROGRESS') {
+          iPressed = true;
+          console.log("Key 'i' pressed");
+          if (gameAreaController.status !== 'IN_PROGRESS') return;
+          try {
+            await gameAreaController.makeMove('Up');
+          }
+          catch (e) {
+            toast({
+              title: 'Error making move',
+              description: (e as Error).toString(),
+              status: 'error',
+            });
+          }
+        }
+      } else if (event.key === 'o' && gameAreaController.isPlayer) {
+        // Handle 'o' key press
+        if (!oPressed && gameAreaController.status === 'IN_PROGRESS') {
+          oPressed = true;
+          console.log("Key 'o' pressed");
+          if (gameAreaController.status !== 'IN_PROGRESS') return;
+          try {
+            await gameAreaController.makeMove('Down');
+          }
+          catch (e) {
+            toast({
+              title: 'Error making move',
+              description: (e as Error).toString(),
+              status: 'error',
+            });
+          }
+        }
+      }
+    };
 
-  const handler = async ({ key }: {key: any}) => {
-    if (I_KEYS.includes(String(key))) {
-      console.log("I key pressed!");
-      try {
-        await gameAreaController.makeMove({x: gameAreaController.gamePiece === 'Left' ? 0 : 400-16, y: ourPaddle.y - 4});
-        setOurPaddle(oldPaddle => ({ x: gameAreaController.gamePiece === 'Left' ? 0 : 400-16, y: oldPaddle.y - 4 }));
+    const handleKeyUp = async (event: any) => {
+      if (event.key === 'i' && gameAreaController.isPlayer) {
+        // Handle 'i' key release
+        if (iPressed) {
+          iPressed = false;
+          try {
+            await gameAreaController.makeMove('Still');
+          }
+          catch (e) {
+            toast({
+              title: 'Error making move',
+              description: (e as Error).toString(),
+              status: 'error',
+            });
+          }
+        }
+        console.log("Key 'i' released");
+      } else if (event.key === 'o' && gameAreaController.isPlayer) {
+        // Handle 'o' key release
+        if (oPressed) {
+          oPressed = false;
+          try {
+            await gameAreaController.makeMove('Still');
+          }
+          catch (e) {
+            toast({
+              title: 'Error making move',
+              description: (e as Error).toString(),
+              status: 'error',
+            });
+          }
+        }
+        console.log("Key 'o' released");
       }
-      catch (e) {
-        toast({
-          title: 'Error making move',
-          description: (e as Error).toString(),
-          status: 'error',
-        });
-      }
-    }
-    else if (O_KEYS.includes(String(key))) {
-      console.log("O key pressed!");
-      try {
-        await gameAreaController.makeMove({x: gameAreaController.gamePiece === 'Left' ? 0 : 400-16, y: ourPaddle.y + 4});
-        setOurPaddle(oldPaddle => ({ x: gameAreaController.gamePiece === 'Left' ? 0 : 400-16, y: oldPaddle.y + 4 }));
-      }
-      catch (e) {
-        toast({
-          title: 'Error making move',
-          description: (e as Error).toString(),
-          status: 'error',
-        });
-      }
-    }
-  };  useEventListener("keydown", handler);
+    };
+
+    addEventListener('keydown', handleKeyDown);
+    addEventListener('keyup', handleKeyUp);
+
+    return () => {
+      removeEventListener('keydown', handleKeyDown);
+      removeEventListener('keyup', handleKeyUp);
+    };
+  }, []);
 
   return (
     <div>
       <h1>pong</h1>
       <h2>Left Score: {leftScore}</h2>
       <h2>Right Score: {rightScore}</h2>
-      <h2>Our Paddle Position: {JSON.stringify(ourPaddle)}</h2>
-      <h2>Opp Paddle Position: {JSON.stringify(oppositePaddle)}</h2>
+      <h2>Our Paddle Position: {JSON.stringify(leftPaddle)}</h2>
+      <h2>Opp Paddle Position: {JSON.stringify(rightPaddle)}</h2>
       <h2>Ball Position: {JSON.stringify(ballPosition)}</h2>
-      <Button onClick={async () => {
-        try {
-          await gameAreaController.makeMove({ x: 0, y: 0 });
-        }
-        catch (e) {
-          toast({
-            title: 'Error making move',
-            description: (e as Error).toString(),
-            status: 'error',
-          });
-        }
-      }}>Move</Button>
       <div className="gamecontainer">
-      <Paddle position={ourPaddle} />
-      <Paddle position={oppositePaddle} />
+      <Paddle position={leftPaddle} />
+      <Paddle position={rightPaddle} />
       <Ball position={ballPosition} />
     </div>
     </div>
   );
-  // return (
-  //   <StyledConnectFourstate aria-label='Connect Four state'>
-  //     {state.map((row, rowIndex) => {
-  //       return row.map((cell, colIndex) => {
-  //         return (
-  //           <StyledConnectFourSquare
-  //             key={`${rowIndex}.${colIndex}`}
-  //             onClick={async () => {
-  //               try {
-  //                 await gameAreaController.makeMove(colIndex as ConnectFourColIndex);
-  //               } catch (e) {
-  //                 toast({
-  //                   title: 'Error making move',
-  //                   description: (e as Error).toString(),
-  //                   status: 'error',
-  //                 });
-  //               }
-  //             }}
-  //             disabled={!isOurTurn}
-  //             backgroundColor={cell}
-  //             aria-label={`Cell ${rowIndex},${colIndex} (${
-  //               cell || 'Empty'
-  //             })`}></StyledConnectFourSquare>
-  //         );
-  //       });
-  //     })}
-  //   </StyledConnectFourstate>
-  // );
 }

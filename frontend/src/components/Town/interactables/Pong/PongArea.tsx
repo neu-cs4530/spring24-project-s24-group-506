@@ -1,12 +1,9 @@
 import { Button, List, ListItem, useToast } from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react';
-import ConnectFourAreaController from '../../../../classes/interactable/ConnectFourAreaController';
 import PlayerController from '../../../../classes/PlayerController';
 import { useInteractableAreaController } from '../../../../classes/TownController';
 import useTownController from '../../../../hooks/useTownController';
 import { GameStatus, InteractableID } from '../../../../types/CoveyTownSocket';
-import ConnectFourBoard from '../ConnectFour/ConnectFourBoard';
-import { PongGame } from '../../../../classes/PongGame';
 import PongAreaController from '../../../../classes/interactable/PongAreaController';
 import PongDisplay from './PongDisplay';
 
@@ -82,11 +79,17 @@ export default function PongArea({
           description: 'You won!',
           status: 'success',
         });
-      } else {
+      } else if (gameAreaController.isPlayer) {
         toast({
           title: 'Game over',
           description: `You lost :(`,
           status: 'error',
+        });
+      } else {
+        toast({
+          title: 'Game over',
+          description: `${winner.userName} won!`,
+          status: 'info',
         });
       }
     };
@@ -103,8 +106,8 @@ export default function PongArea({
       <>
         Game in progress{' '}
         {townController.ourPlayer === gameAreaController.rightPlayer
-          ? "(You're on the right)"
-          : "(You're on the left)"}
+          ? "(You're on the right)" : townController.ourPlayer === gameAreaController.leftPlayer
+          ? "(You're on the left)" : 'You are observing'}
       </>
     );
   } else if (gameStatus == 'WAITING_TO_START') {

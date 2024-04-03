@@ -166,8 +166,10 @@ export type PongPlayer = 'Left' | 'Right';
 
 export type PongMove = {
   gamePiece: PongPlayer;
-  location: XY;
+  direction: PongPaddleDirection;
 }
+
+export type PongPaddleDirection = 'Up' | 'Down' | 'Still';
 
 export type PongScore = 0 | 1 | 2 | 3 | 4 | 5;
 
@@ -181,7 +183,9 @@ export type PongScoreUpdate = {
  */
 export interface PongGameState extends WinnableGameState {
   leftPaddle: XY;
+  leftPaddleDirection: PongPaddleDirection;
   rightPaddle: XY;
+  rightPaddleDirection: PongPaddleDirection;
 
   leftScore: PongScore;
   rightScore: PongScore;

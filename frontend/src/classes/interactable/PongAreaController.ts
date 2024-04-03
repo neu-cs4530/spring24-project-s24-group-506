@@ -1,17 +1,12 @@
 import _ from 'lodash';
 import {
-  ConnectFourColIndex,
-  ConnectFourColor,
-  ConnectFourGameState,
-  ConnectFourMove,
-  ConnectFourRowIndex,
   GameArea,
   GameStatus,
   PongGameState,
   PongMove,
+  PongPaddleDirection,
   PongPlayer,
   PongScore,
-  PongScoreUpdate,
   XY,
 } from '../../types/CoveyTownSocket';
 import PlayerController from '../PlayerController';
@@ -22,43 +17,62 @@ import GameAreaController, {
   PLAYER_NOT_IN_GAME_ERROR,
 } from './GameAreaController';
 
+export const PADDLE_MOVE_SPEED = 8;
+export const PONG_WIDTH = 400;
+export const PONG_HEIGHT = 320;
+export const PONG_PADDLE_WIDTH = 16;
+export const PONG_PADDLE_HEIGHT = 64;
+export const PONG_BALL_SIZE = 16;
+export const PONG_BALL_STARTING_SPEED = 2;
+
 export type PongEvents = GameEventTypes & {
-    ballPositionUpdated: (position: XY) => void;
-    leftScoreUpdated: (score: PongScore) => void;
-    rightScoreUpdated: (score: PongScore) => void;
-    oppositePaddleUpdated: (location: XY) => void;
+  ballPositionUpdated: (position: XY) => void;
+  leftScoreUpdated: (score: PongScore) => void;
+  rightScoreUpdated: (score: PongScore) => void;
+  leftPaddleUpdated: (location: XY) => void;
+  rightPaddleUpdated: (location: XY) => void;
 };
 
 /**
- * This class is responsible for managing the state of the Connect Four game, and for sending commands to the server
+ * This class is responsible for managing the state of the Pong game, and for sending commands to the server
  */
 export default class PongAreaController extends GameAreaController<
   PongGameState,
   PongEvents
 > {
-    private _ballPosition: XY = { x: 200-8, y: 160-8 };
-    private _oppositePaddle: XY = { x: 0, y: 160-32};
-    private _leftScore: PongScore = 0;
-    private _rightScore: PongScore = 0;
+  private _ballPosition: XY = { x: PONG_WIDTH / 2 - PONG_BALL_SIZE / 2, y: PONG_HEIGHT / 2 - PONG_BALL_SIZE / 2 };
+  private _leftPaddle: XY = { x: 0, y: PONG_HEIGHT / 2 - PONG_PADDLE_HEIGHT / 2 };
+  private _rightPaddle: XY = { x: PONG_WIDTH - PONG_PADDLE_WIDTH, y: PONG_HEIGHT / 2 - PONG_PADDLE_HEIGHT / 2 };
+  private _leftScore: PongScore = 0;
+  private _rightScore: PongScore = 0;
 
-    get oppositePaddle(): XY {
-        return this._oppositePaddle;
-    }
+  // returns the current position of the left paddle
+  get leftPaddle(): XY {
+    return this._leftPaddle;
+  }
 
-    get ballPosition(): XY {
-        return this._ballPosition;
-    }
+  // returns the current position of the right paddle
+  get rightPaddle(): XY {
+    return this._rightPaddle;
+  }
 
-    get leftScore(): PongScore {
-        return this._leftScore;
-    }
+  // returns the current position of the ball
+  get ballPosition(): XY {
+    return this._ballPosition;
+  }
 
-    get rightScore(): PongScore {
-        return this._rightScore;
-    }
+  // returns the current score of the left player
+  get leftScore(): PongScore {
+    return this._leftScore;
+  }
+
+  // returns the current score of the right player
+  get rightScore(): PongScore {
+    return this._rightScore;
+  }
 
   /**
-   * Returns the player with the 'leftPlayer' game piece, if there is one, or undefined otherwise
+   * Returns the player with the 'Left' game piece, if there is one, or undefined otherwise
    */
   get leftPlayer(): PlayerController | undefined {
     const leftPlayer = this._model.game?.state.leftPlayer;
@@ -69,7 +83,7 @@ export default class PongAreaController extends GameAreaController<
   }
 
   /**
-   * Returns the player with the 'rightPlayer' game piece, if there is one, or undefined otherwise
+   * Returns the player with the 'Right' game piece, if there is one, or undefined otherwise
    */
   get rightPlayer(): PlayerController | undefined {
     const rightPlayer = this._model.game?.state.rightPlayer;
@@ -138,31 +152,30 @@ export default class PongAreaController extends GameAreaController<
   }
 
   /**
-   * Updates the internal state of this ConnectFourAreaController based on the new model.
+   * Updates the internal state of this PONGAreaController based on the new model.
    *
    * Calls super._updateFrom, which updates the occupants of this game area and other
    * common properties (including this._model)
-   *
-   * If the board has changed, emits a boardChanged event with the new board.
-   * If the board has not changed, does not emit a boardChanged event.
-   *
-   * If the turn has changed, emits a turnChanged event with the new turn (true if our turn, false otherwise)
-   * If the turn has not changed, does not emit a turnChanged event.
+   * 
+   * If the opposite paddle has changed, emits an oppositePaddleUpdated event with the new paddle location
+   * If the our paddle has changed, emits an ourPaddleUpdated event with the new paddle location
+   * If the ball position has changed, emits a ballPositionUpdated event with the new ball position
+   * If the left score has changed, emits a leftScoreUpdated event with the new left score
+   * If the right score has changed, emits a rightScoreUpdated event with the new right score
+   * 
    */
   protected _updateFrom(newModel: GameArea<PongGameState>): void {
     super._updateFrom(newModel);
     const newGame = newModel.game;
     if (newGame) {
-      if (this.gamePiece === 'Left') {
-        if (!_.isEqual(newGame.state.rightPaddle, this._oppositePaddle)) {
-          this._oppositePaddle = newGame.state.rightPaddle;
-          this.emit('oppositePaddleUpdated', this._oppositePaddle);
-        }
-      } else {
-        if (!_.isEqual(newGame.state.leftPaddle, this._oppositePaddle)) {
-          this._oppositePaddle = newGame.state.leftPaddle;
-          this.emit('oppositePaddleUpdated', this._oppositePaddle);
-        }
+      if (!_.isEqual(newGame.state.leftPaddle, this._leftPaddle)) {
+        this._leftPaddle = newGame.state.leftPaddle;
+        this.emit('leftPaddleUpdated', this._leftPaddle);
+      }
+
+      if (!_.isEqual(newGame.state.rightPaddle, this._rightPaddle)) {
+        this._rightPaddle = newGame.state.rightPaddle;
+        this.emit('rightPaddleUpdated', this._rightPaddle);
       }
 
       if (!_.isEqual(newGame.state.ballPosition, this._ballPosition)) {
@@ -210,7 +223,7 @@ export default class PongAreaController extends GameAreaController<
    *
    * @param col Column to place the game piece in
    */
-  public async makeMove(location: XY): Promise<void> {
+  public async makeMove(direction: PongPaddleDirection): Promise<void> {
     const instanceID = this._instanceID;
     if (!instanceID || this._model.game?.state.status !== 'IN_PROGRESS') {
       throw new Error(NO_GAME_IN_PROGRESS_ERROR);
@@ -219,7 +232,7 @@ export default class PongAreaController extends GameAreaController<
     const gamePiece = this.gamePiece;
     const move: PongMove = {
       gamePiece,
-      location,
+      direction,
     };
     await this._townController.sendInteractableCommand(this.id, {
       type: 'GameMove',
