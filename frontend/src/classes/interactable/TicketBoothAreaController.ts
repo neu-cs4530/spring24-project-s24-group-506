@@ -37,9 +37,9 @@ export default class TicketBoothAreaController extends InteractableAreaControlle
    *
    * @param TicketBoothAreaModel The viewing area model that this controller should represent
    */
-  constructor(TicketBoothAreaModel: TicketBoothAreaModel) {
-    super(TicketBoothAreaModel.id);
-    this._model = TicketBoothAreaModel;
+  constructor(ticketBoothAreaModel: TicketBoothAreaModel) {
+    super(ticketBoothAreaModel.id);
+    this._model = ticketBoothAreaModel;
   }
 
   public isActive(): boolean {

@@ -23,10 +23,6 @@ import {
   import useTownController from '../../../hooks/useTownController';
   import { GameResult, InteractableID } from '../../../types/CoveyTownSocket';
   import ChatChannel from './ChatChannel';
-  import ConnectFourArea from './ConnectFour/ConnectFourArea';
-  import TicketBoothAreaInteractable from './TicketBoothArea';
-  import Leaderboard from './Leaderboard';
-  import TicTacToeArea from './TicTacToe/TicTacToeArea';
 
   export const INVALID_GAME_AREA_TYPE_MESSAGE = 'Invalid game area type';
   
@@ -39,23 +35,20 @@ import {
    *
    * It renders the following:
    *  - A leaderboard of the game results
-   *  - A list of observers' usernames (in a list with the aria-label 'list of observers in the game')
+   *  - A list of occupants' usernames (in a list with the aria-label 'list of occupants in the game')
    *  - The game area component (either ConnectFourArea or TicTacToeArea). If the game area is NOT a ConnectFourArea or TicTacToeArea, then the message INVALID_GAME_AREA_TYPE_MESSAGE appears within the component
    *  - A chat channel for the game area (@see ChatChannel.tsx), with the property interactableID set to the interactableID of the game area
    *
    */
   function TicketBoothsArea({ interactableID }: { interactableID: InteractableID }): JSX.Element {
     const ticketBoothAreaController =
-      useInteractableAreaController<TicketBoothAreaController>(interactableID);
+      useInteractableAreaController(interactableID) as TicketBoothAreaController;
     const townController = useTownController();
-    const [observers, setObservers] = useState<PlayerController[]>(ticketBoothAreaController.occupants);
+    const [occupants, setOccupants] = useState<PlayerController[]>(ticketBoothAreaController.occupants);
     useEffect(() => {
-      const updateGameState = () => {
-        setObservers(ticketBoothAreaController.occupants);
-      };
-      ticketBoothAreaController.addListener('gameUpdated', updateGameState);
+      ticketBoothAreaController.addListener('occupantsChange', setOccupants);
       return () => {
-        ticketBoothAreaController.removeListener('gameUpdated', updateGameState);
+        ticketBoothAreaController.removeListener('occupantsChange', setOccupants);
       };
     }, [townController, ticketBoothAreaController]);
     return (
@@ -64,27 +57,15 @@ import {
           <AccordionItem>
             <Heading as='h3'>
               <AccordionButton>
-                <Box flex='1' textAlign='left'>
-                  Leaderboard
-                </Box>
-                <AccordionIcon />
-              </AccordionButton>
-              <AccordionPanel>
-              </AccordionPanel>
-            </Heading>
-          </AccordionItem>
-          <AccordionItem>
-            <Heading as='h3'>
-              <AccordionButton>
                 <Box as='span' flex='1' textAlign='left'>
-                  Current Observers
+                  Current occupants
                   <AccordionIcon />
                 </Box>
               </AccordionButton>
             </Heading>
             <AccordionPanel>
-              <List aria-label='list of observers in the game'>
-                {observers.map(player => {
+              <List aria-label='list of occupants in the game'>
+                {occupants.map(player => {
                   return <ListItem key={player.id}>{player.userName}</ListItem>;
                 })}
               </List>
@@ -92,22 +73,7 @@ import {
           </AccordionItem>
         </Accordion>
         <Flex>
-          <Box>
-          </Box>
-          <Box
-            style={{
-              height: '400px',
-              overflowY: 'scroll',
-            }}>
-            <div
-              style={{
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-              }}>
-              <ChatChannel interactableID={ticketBoothAreaController.id} />
-            </div>
-          </Box>
+            <h1>Ticket Booth</h1>
         </Flex>
       </>
     );
@@ -134,7 +100,6 @@ import {
             <ModalHeader>{ticketBoothArea.name}</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
-                <h1>ticketbooth</h1>
               <TicketBoothsArea interactableID={ticketBoothArea.id} />
             </ModalBody>
           </ModalContent>
