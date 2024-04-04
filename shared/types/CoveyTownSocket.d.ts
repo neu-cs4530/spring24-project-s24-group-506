@@ -258,7 +258,7 @@ export interface GameMoveCommand<MoveType> {
 }
 export interface TicketBoothPurchaseCommand {
   type: 'TicketBoothPurchase';
-  update: TicketBoothArea;
+  itemName: BoothItemName;
 }
 
 export type InteractableCommandReturnType<CommandType extends InteractableCommand> = 

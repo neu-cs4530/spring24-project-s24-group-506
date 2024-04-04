@@ -1,9 +1,14 @@
-import { BoothItem, BoothItemName, TicketBoothArea as TicketBoothAreaModel } from '../../types/CoveyTownSocket';
+import {
+  BoothItem,
+  BoothItemName,
+  TicketBoothArea as TicketBoothAreaModel,
+} from '../../types/CoveyTownSocket';
 import InteractableAreaController, {
   BaseInteractableEventMap,
   TICKET_BOOTH_AREA_TYPE,
 } from './InteractableAreaController';
 import _ from 'lodash';
+import TownController from '../TownController';
 
 /**
  * The events that a TicketBoothAreaController can emit
@@ -31,15 +36,18 @@ export default class TicketBoothAreaController extends InteractableAreaControlle
 > {
   private _model: TicketBoothAreaModel;
 
+  private _townController: TownController;
+
   /**
    * Constructs a new TicketBoothAreaController, initialized with the state of the
    * provided TicketBoothAreaModel.
    *
    * @param TicketBoothAreaModel The viewing area model that this controller should represent
    */
-  constructor(ticketBoothAreaModel: TicketBoothAreaModel) {
+  constructor(ticketBoothAreaModel: TicketBoothAreaModel, _townController: TownController) {
     super(ticketBoothAreaModel.id);
     this._model = ticketBoothAreaModel;
+    this._townController = _townController;
   }
 
   public isActive(): boolean {
@@ -65,7 +73,6 @@ export default class TicketBoothAreaController extends InteractableAreaControlle
     }
   }
 
-
   public get friendlyName(): string {
     return this.id;
   }
@@ -89,5 +96,17 @@ export default class TicketBoothAreaController extends InteractableAreaControlle
    */
   protected _updateFrom(updatedModel: TicketBoothAreaModel): void {
     this.items = updatedModel.items;
+  }
+
+  /**
+   * Sends a request to the server to purchase an item from the ticket booth.
+   *
+   * @param itemName The name of the item to purchase
+   */
+  public async purchaseItem(itemName: BoothItemName) {
+    await this._townController.sendInteractableCommand(this.id, {
+      type: 'TicketBoothPurchase',
+      itemName: itemName,
+    });
   }
 }
