@@ -119,7 +119,7 @@ import {
    *
    */
   export default function TicketBoothAreaWrapper(): JSX.Element {
-    const ticketBoothArea = useInteractable<TicketBoothAreaInteractable>('TicketBoothArea');
+    const ticketBoothArea = useInteractable('ticketBoothArea');
     const townController = useTownController();
     const closeModal = useCallback(() => {
       if (ticketBoothArea) {

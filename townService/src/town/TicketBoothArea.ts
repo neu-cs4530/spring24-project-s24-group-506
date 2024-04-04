@@ -43,6 +43,10 @@ export default class TicketBoothArea extends InteractableArea {
         return this._items;
     }
 
+    public get isActive(): boolean {
+        return true;
+      }
+
     /**
      * Creates a new TicketBoothArea
      *
