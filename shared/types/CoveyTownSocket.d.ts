@@ -17,7 +17,7 @@ export type TownJoinResponse = {
   interactables: TypedInteractable[];
 }
 
-export type InteractableType = 'ConversationArea' | 'ViewingArea' | 'TicTacToeArea' | 'ConnectFourArea';
+export type InteractableType = 'ConversationArea' | 'ViewingArea' | 'TicTacToeArea' | 'ConnectFourArea' | 'TicketBoothArea';
 export interface Interactable {
   type: InteractableType;
   id: InteractableID;
@@ -61,6 +61,20 @@ export type ChatMessage = {
 export interface ConversationArea extends Interactable {
   topic?: string;
 };
+
+export type BoothItemName = 'BlueHat' | 'RedHat' | 'GreenHat';
+
+export interface BoothItem {
+  name: BoothItemName;
+  cost: number;
+  timesPurchased: number;
+  description: string;
+}
+
+export interface TicketBoothArea extends Interactable {
+  items?: BoothItem[];
+}
+
 export interface BoundingBox {
   x: number;
   y: number;
@@ -216,7 +230,12 @@ interface InteractableCommandBase {
   type: string;
 }
 
-export type InteractableCommand =  ViewingAreaUpdateCommand | JoinGameCommand | GameMoveCommand<TicTacToeMove> | GameMoveCommand<ConnectFourMove> | StartGameCommand | LeaveGameCommand;
+export type TicketBoothPurchase = {
+  item: BoothItemName;
+  player: PlayerID;
+}
+
+export type InteractableCommand = TicketBoothPurchaseCommand | ViewingAreaUpdateCommand | JoinGameCommand | GameMoveCommand<TicTacToeMove> | GameMoveCommand<ConnectFourMove> | StartGameCommand | LeaveGameCommand;
 export interface ViewingAreaUpdateCommand  {
   type: 'ViewingAreaUpdate';
   update: ViewingArea;
@@ -237,11 +256,18 @@ export interface GameMoveCommand<MoveType> {
   gameID: GameInstanceID;
   move: MoveType;
 }
+export interface TicketBoothPurchaseCommand {
+  type: 'TicketBoothPurchase';
+  update: TicketBoothArea;
+}
+
 export type InteractableCommandReturnType<CommandType extends InteractableCommand> = 
   CommandType extends JoinGameCommand ? { gameID: string}:
   CommandType extends ViewingAreaUpdateCommand ? undefined :
   CommandType extends GameMoveCommand<TicTacToeMove> ? undefined :
   CommandType extends LeaveGameCommand ? undefined :
+  CommandType extends StartGameCommand ? undefined :
+  CommandType extends TicketBoothPurchaseCommand ? undefined :
   never;
 
 export type InteractableCommandResponse<MessageType> = {

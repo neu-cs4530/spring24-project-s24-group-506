@@ -32,6 +32,7 @@ import {
   isConversationArea,
   isTicTacToeArea,
   isViewingArea,
+  isTicketBoothArea,
 } from '../types/TypeUtils';
 import ConnectFourAreaController from './interactable/ConnectFourAreaController';
 import ConversationAreaController from './interactable/ConversationAreaController';
@@ -43,6 +44,8 @@ import InteractableAreaController, {
 import TicTacToeAreaController from './interactable/TicTacToeAreaController';
 import ViewingAreaController from './interactable/ViewingAreaController';
 import PlayerController from './PlayerController';
+import TicketBoothAreaController from './interactable/TicketBoothAreaController';
+import TicketBoothArea from '../components/Town/interactables/TicketBoothArea';
 
 const CALCULATE_NEARBY_PLAYERS_DELAY_MS = 300;
 const SOCKET_COMMAND_TIMEOUT_MS = 5000;
@@ -332,6 +335,13 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     return ret as ViewingAreaController[];
   }
 
+  public get ticketBoothAreas() {
+    const ret = this._interactableControllers.filter(
+      eachInteractable => eachInteractable instanceof TicketBoothAreaController,
+    );
+    return ret as TicketBoothAreaController[];
+  }
+
   public get gameAreas() {
     const ret = this._interactableControllers.filter(
       eachInteractable => eachInteractable instanceof GameAreaController,
@@ -581,7 +591,6 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   async createViewingArea(newArea: Omit<ViewingAreaModel, 'type'>) {
     await this._townsService.createViewingArea(this.townID, this.sessionToken, newArea);
   }
-
   /**
    * Disconnect from the town, notifying the townService that we are leaving and returning
    * to the login page
@@ -630,6 +639,10 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
           } else if (isConnectFourArea(eachInteractable)) {
             this._interactableControllers.push(
               new ConnectFourAreaController(eachInteractable.id, eachInteractable, this),
+            );
+          } else if (isTicketBoothArea(eachInteractable)) {
+            this._interactableControllers.push(
+              new TicketBoothAreaController(eachInteractable),
             );
           }
         });
@@ -691,6 +704,17 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
       return existingController as GameAreaController<GameType, EventsType>;
     } else {
       throw new Error('Game area controller not created');
+    }
+  }
+
+  public getTicketBoothAreaController(ticketBoothArea: TicketBoothArea): TicketBoothAreaController {
+    const existingController = this._interactableControllers.find(
+      eachExistingArea => eachExistingArea.id === ticketBoothArea.name,
+    );
+    if (existingController instanceof TicketBoothAreaController) {
+      return existingController;
+    } else {
+      throw new Error('Ticket booth area controller not created');
     }
   }
 
@@ -777,7 +801,14 @@ export function useInteractableAreaController<T>(interactableAreaID: string): T 
     eachArea => eachArea.id == interactableAreaID,
   );
   if (!interactableAreaController) {
-    throw new Error(`Requested interactable area ${interactableAreaID} does not exist`);
+    const ticketBoothAreaController = townController.ticketBoothAreas.find(
+      eachArea => eachArea.id == interactableAreaID,
+    );
+    if (ticketBoothAreaController) {
+      return ticketBoothAreaController as unknown as T;
+    } else {
+      throw new Error(`No interactable area controller for ID ${interactableAreaID}`);
+    }
   }
   return interactableAreaController as unknown as T;
 }
@@ -831,6 +862,7 @@ export function useActiveInteractableAreas(): GenericInteractableAreaController[
       const allAreas = (townController.gameAreas as GenericInteractableAreaController[]).concat(
         townController.conversationAreas,
         townController.viewingAreas,
+        townController.ticketBoothAreas,
       );
       setInteractableAreas(allAreas.filter(eachArea => eachArea.isActive()));
     };
@@ -862,7 +894,7 @@ export function useActiveInteractableAreasSortedByOccupancyAndName(): GenericInt
 
   const [interactableAreas, setInteractableAreas] = useState<InteractableAreaReadAheadOccupancy[]>(
     (townController.gameAreas as GenericInteractableAreaController[])
-      .concat(townController.conversationAreas, townController.viewingAreas)
+      .concat(townController.conversationAreas, townController.viewingAreas, townController.ticketBoothAreas)
       .filter(eachArea => eachArea.isActive())
       .map(area => ({ area, occupancy: area.occupants.length })),
   );
@@ -884,6 +916,7 @@ export function useActiveInteractableAreasSortedByOccupancyAndName(): GenericInt
       const allAreas = (townController.gameAreas as GenericInteractableAreaController[]).concat(
         townController.conversationAreas,
         townController.viewingAreas,
+        townController.ticketBoothAreas,
       );
       const activeAreas = allAreas.filter(eachArea => eachArea.isActive());
       // Update the areas, *and* the occupancy listeners by comparing the new set of areas to the old set
