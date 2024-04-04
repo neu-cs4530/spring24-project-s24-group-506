@@ -644,7 +644,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
           } else if (isTicketBoothArea(eachInteractable)) {
             console.log(eachInteractable);
             this._interactableControllers.push(
-              new TicketBoothAreaController(eachInteractable),
+              new TicketBoothAreaController(eachInteractable, this),
             )
           }
         });

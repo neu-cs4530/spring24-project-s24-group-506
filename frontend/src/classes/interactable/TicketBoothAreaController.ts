@@ -67,10 +67,7 @@ export default class TicketBoothAreaController extends InteractableAreaControlle
    * Changing this value will emit a 'videoChange' event to listeners
    */
   public set items(items: BoothItem[] | undefined) {
-    if (_!.isEqual(this._model.items, items)) {
-      this._model.items = items;
-      this.emit('itemPurchased', items);
-    }
+    this.items = items;
   }
 
   public get friendlyName(): string {
@@ -95,7 +92,10 @@ export default class TicketBoothAreaController extends InteractableAreaControlle
    * @param updatedModel
    */
   protected _updateFrom(updatedModel: TicketBoothAreaModel): void {
-    this.items = updatedModel.items;
+    if (!_.isEqual(this._model, updatedModel)) {
+      this._model = updatedModel;
+      this.emit('itemPurchased', this._model.items);
+    }
   }
 
   /**
@@ -108,5 +108,6 @@ export default class TicketBoothAreaController extends InteractableAreaControlle
       type: 'TicketBoothPurchase',
       itemName: itemName,
     });
+    console.log(`Purchased item: ${itemName}`);
   }
 }

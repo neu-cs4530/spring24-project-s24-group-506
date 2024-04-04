@@ -36,6 +36,7 @@ export interface Player {
   id: PlayerID;
   userName: string;
   location: PlayerLocation;
+  // tokens: number;
 };
 
 export type XY = { x: number, y: number };

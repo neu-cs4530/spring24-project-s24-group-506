@@ -20,6 +20,8 @@ export default class Player {
   /** The secret token that allows this client to access our video resources for this town * */
   private _videoToken?: string;
 
+  private _tokens: number;
+
   /** A special town emitter that will emit events to the entire town BUT NOT to this player */
   public readonly townEmitter: TownEmitter;
 
@@ -34,6 +36,7 @@ export default class Player {
     this._id = nanoid();
     this._sessionToken = nanoid();
     this.townEmitter = townEmitter;
+    this._tokens = 0;
   }
 
   get userName(): string {
@@ -42,6 +45,14 @@ export default class Player {
 
   get id(): string {
     return this._id;
+  }
+
+  get tokens(): number {
+    return this._tokens;
+  }
+
+  set tokens(value: number) {
+    this._tokens = value;
   }
 
   set videoToken(value: string | undefined) {
@@ -61,6 +72,11 @@ export default class Player {
       id: this._id,
       location: this.location,
       userName: this._userName,
+      //tokens: this._tokens,
     };
+  }
+
+  addTokens(tokens: number): void {
+    this._tokens += tokens;
   }
 }

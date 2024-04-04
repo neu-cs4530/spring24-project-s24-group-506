@@ -63,6 +63,7 @@ function TicketBoothsArea({ interactableID }: { interactableID: InteractableID }
   useEffect(() => {
     ticketBoothAreaController.addListener('occupantsChange', setOccupants);
     ticketBoothAreaController.addListener('itemPurchased', setItems);
+    
     return () => {
       ticketBoothAreaController.removeListener('occupantsChange', setOccupants);
       ticketBoothAreaController.removeListener('itemPurchased', setItems);
