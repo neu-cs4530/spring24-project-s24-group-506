@@ -36,7 +36,7 @@ export default class Player {
     this._id = nanoid();
     this._sessionToken = nanoid();
     this.townEmitter = townEmitter;
-    this._tokens = 0;
+    this._tokens = 100;
   }
 
   get userName(): string {
@@ -72,11 +72,15 @@ export default class Player {
       id: this._id,
       location: this.location,
       userName: this._userName,
-      // tokens: this._tokens,
+      tokens: this._tokens,
     };
   }
 
   addTokens(tokens: number): void {
     this._tokens += tokens;
+  }
+
+  removeTokens(tokens: number): void {
+    this._tokens -= tokens;
   }
 }

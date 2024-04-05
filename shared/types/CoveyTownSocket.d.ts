@@ -36,7 +36,7 @@ export interface Player {
   id: PlayerID;
   userName: string;
   location: PlayerLocation;
-  // tokens: number;
+  tokens: number;
 };
 
 export type XY = { x: number, y: number };
@@ -260,6 +260,7 @@ export interface GameMoveCommand<MoveType> {
 export interface TicketBoothPurchaseCommand {
   type: 'TicketBoothPurchase';
   itemName: BoothItemName;
+  playerID: PlayerID;
 }
 
 export type InteractableCommandReturnType<CommandType extends InteractableCommand> = 
@@ -279,6 +280,7 @@ export type InteractableCommandResponse<MessageType> = {
 }
 
 export interface ServerToClientEvents {
+  playerTokensChanged: (playerChanged: Player) => void;
   playerMoved: (movedPlayer: Player) => void;
   playerDisconnect: (disconnectedPlayer: Player) => void;
   playerJoined: (newPlayer: Player) => void;
@@ -295,4 +297,5 @@ export interface ClientToServerEvents {
   playerMovement: (movementData: PlayerLocation) => void;
   interactableUpdate: (update: Interactable) => void;
   interactableCommand: (command: InteractableCommand & InteractableCommandBase) => void;
+  playerTokenUpdate: (playerID: PlayerID, tokens: number) => void;
 }

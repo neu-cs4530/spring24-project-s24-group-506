@@ -447,6 +447,13 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
       }
     });
 
+    this._socket.on('playerTokensChanged', playerChanged => {
+      const playerToUpdate = this.players.find(eachPlayer => eachPlayer.id === playerChanged.id);
+      if (playerToUpdate) {
+        playerToUpdate.tokens = playerChanged.tokens;
+      }
+    });
+
     /**
      * When an interactable's state changes, push that update into the relevant controller
      *

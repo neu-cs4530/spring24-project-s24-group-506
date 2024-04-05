@@ -16,9 +16,7 @@ import {
   ModalContent,
   ModalHeader,
   ModalOverlay,
-  Image,
-  Stack,
-  Text,
+  useToast,
 } from '@chakra-ui/react';
 import React, { useCallback, useEffect, useState } from 'react';
 import TicketBoothAreaController from '../../../classes/interactable/TicketBoothAreaController';
@@ -30,17 +28,11 @@ import {
   BoothItemName,
   GameResult,
   InteractableID,
+  PlayerID,
 } from '../../../types/CoveyTownSocket';
 import ChatChannel from './ChatChannel';
-// import blueHat from './assets/hatPictures/BlueHat.png';
 
 export const INVALID_GAME_AREA_TYPE_MESSAGE = 'Invalid game area type';
-const itemImages = {
-  BlueHat: './assets/hatPictures/BlueHat.png',
-  RedHat: './assets/hatPictures/redHat.png',
-  GreenHat: './assets/hatPictures/GreenHat.png',
-  // Add more items as needed
-};
 
 /**
  * A generic component that renders a game area.
@@ -65,15 +57,23 @@ function TicketBoothsArea({ interactableID }: { interactableID: InteractableID }
     ticketBoothAreaController.occupants,
   );
   const [items, setItems] = useState<BoothItem[] | undefined>(ticketBoothAreaController.items);
+  const toast = useToast();
 
-  const handlePurchase = async (itemName: BoothItemName) => {
+  const handlePurchase = async (itemName: BoothItemName, playerID: PlayerID) => {
     // Add your purchase logic here
-    await ticketBoothAreaController.purchaseItem(itemName);
-  };
+    try {
+      await ticketBoothAreaController.purchaseItem(itemName, playerID);
+    } catch (e) {
+        toast({
+          title: 'Error buying item',
+          description: (e as Error).toString(),
+          status: 'error',
+        });
+      }
+    };
   useEffect(() => {
     ticketBoothAreaController.addListener('occupantsChange', setOccupants);
     ticketBoothAreaController.addListener('itemPurchased', setItems);
-
     return () => {
       ticketBoothAreaController.removeListener('occupantsChange', setOccupants);
       ticketBoothAreaController.removeListener('itemPurchased', setItems);
@@ -93,39 +93,25 @@ function TicketBoothsArea({ interactableID }: { interactableID: InteractableID }
           </Heading>
           <AccordionPanel>
             <List aria-label='list of occupants in the game'>
-              {occupants.map(player => (
-                <ListItem key={player.id}>{player.userName}</ListItem>
-              ))}
+              {occupants.map(player => {
+                return <ListItem key={player.id}>{player.userName}</ListItem>;
+              })}
             </List>
           </AccordionPanel>
         </AccordionItem>
       </Accordion>
-      <Flex direction='column' align='center'>
-        <Heading as='h1' size='lg' mb={4}>
-          Ticket Booth
-        </Heading>
-        <Stack spacing={4}>
-          {items?.map(boothItem => (
-            <Box key={boothItem.name} p={5} shadow='md' borderWidth='1px'>
-              <Flex align='center'>
-                <Image
-                  boxSize='100px'
-                  src={itemImages[boothItem.name]}
-                  alt={boothItem.name}
-                  mr={4}
-                />
-                <Box>
-                  <Heading as='h2' size='md' mb={2}>
-                    {boothItem.name} - ${boothItem.cost}
-                  </Heading>
-                  <Text mb={2}>{boothItem.description}</Text>
-                  <Text mb={2}>Times Purchased: {boothItem.timesPurchased}</Text>
-                  <Button onClick={() => handlePurchase(boothItem.name)}>Purchase</Button>
-                </Box>
-              </Flex>
-            </Box>
-          ))}
-        </Stack>
+      <h1>Tokens: {townController.ourPlayer.tokens}</h1>
+      <Flex>
+        <h1>Ticket Booth</h1>
+        {items?.map(boothItem => (
+          <Box key={boothItem.name}>
+            <h2>
+              {boothItem.name} - ${boothItem.cost} - {boothItem.description} -{' '}
+              {boothItem.timesPurchased}
+            </h2>
+            <Button onClick={() => handlePurchase(boothItem.name, townController.ourPlayer.id)}>Purchase</Button>
+          </Box>
+        ))}
       </Flex>
     </>
   );
