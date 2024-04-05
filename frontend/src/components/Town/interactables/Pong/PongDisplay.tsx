@@ -173,18 +173,15 @@ export default function PongDisplay({
   }, []);
 
   return (
-    <div>
-      <h1>pong</h1>
-      <h2>Left Score: {leftScore}</h2>
-      <h2>Right Score: {rightScore}</h2>
-      <h2>Our Paddle Position: {JSON.stringify(leftPaddle)}</h2>
-      <h2>Opp Paddle Position: {JSON.stringify(rightPaddle)}</h2>
-      <h2>Ball Position: {JSON.stringify(ballPosition)}</h2>
+    <div className='pong-border'>
+
       <div className="gamecontainer">
-      <Paddle position={leftPaddle} />
-      <Paddle position={rightPaddle} />
-      <Ball position={ballPosition} />
-    </div>
+        <div className="score score-left">{leftScore}</div>
+        <div className="score score-right">{rightScore}</div>
+        <Paddle position={{x: leftPaddle.x + 8, y: leftPaddle.y}} />
+        <Paddle position={rightPaddle} />
+        <Ball position={ballPosition} />
+      </div>
     </div>
   );
 }

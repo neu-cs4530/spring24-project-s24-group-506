@@ -20,7 +20,7 @@ export const PONG_WIDTH = 400;
 export const PONG_HEIGHT = 320;
 export const PONG_PADDLE_WIDTH = 16;
 export const PONG_PADDLE_HEIGHT = 64;
-export const PONG_BALL_SIZE = 16;
+export const PONG_BALL_SIZE = 12;
 export const PONG_BALL_STARTING_SPEED = 2;
 
 /**
@@ -273,8 +273,10 @@ export default class PongGame extends Game<PongGameState, PongMove> {
       0,
       PONG_HEIGHT - PONG_PADDLE_HEIGHT,
     );
+    newState.ballPosition.x = this.clamp(newState.ballPosition.x, 0, PONG_WIDTH - PONG_BALL_SIZE);
+    newState.ballPosition.y = this.clamp(newState.ballPosition.y, 0, PONG_HEIGHT - PONG_BALL_SIZE);
 
-    if (newState.ballPosition.y <= 0 || newState.ballPosition.y >= PONG_HEIGHT - PONG_BALL_SIZE) {
+    if (newState.ballPosition.y <= 0 || newState.ballPosition.y >= (PONG_HEIGHT - PONG_BALL_SIZE)) {
       newState.ballVelocity.y = -newState.ballVelocity.y;
     }
     if (newState.ballPosition.x <= 0) {
@@ -286,7 +288,7 @@ export default class PongGame extends Game<PongGameState, PongMove> {
       newState.ballPosition.x = PONG_WIDTH / 2 - PONG_BALL_SIZE;
       newState.ballPosition.y = PONG_HEIGHT / 2 - PONG_BALL_SIZE;
       newState.ballVelocity.x = newState.ballVelocity.x > 0 ? -2 : 2;
-      newState.ballVelocity.y = Math.random() * 20 - 10;
+      newState.ballVelocity.y = Math.random() * 10 - 5;
     }
     if (newState.ballPosition.x >= PONG_WIDTH - PONG_BALL_SIZE) {
       newState.leftScore++;
@@ -302,6 +304,7 @@ export default class PongGame extends Game<PongGameState, PongMove> {
 
     if (
       newState.ballPosition.x <= PONG_BALL_SIZE &&
+      newState.ballPosition.x >= PONG_BALL_SIZE - 4 &&
       newState.ballPosition.y <= newState.leftPaddle.y + PONG_PADDLE_HEIGHT &&
       newState.ballPosition.y >= newState.leftPaddle.y
     ) {
@@ -309,9 +312,11 @@ export default class PongGame extends Game<PongGameState, PongMove> {
       newState.ballVelocity.x =
         newState.ballVelocity.x > 0 ? newState.ballVelocity.x + 1 : newState.ballVelocity.x - 1;
       newState.ballVelocity.y = newState.ballVelocity.y + (Math.random() * 4 - 2);
+      newState.ballPosition.x = PONG_BALL_SIZE;
     }
     if (
-      newState.ballPosition.x >= PONG_WIDTH - PONG_PADDLE_HEIGHT / 2 &&
+      newState.ballPosition.x >= PONG_WIDTH - 2 * PONG_PADDLE_WIDTH &&
+      newState.ballPosition.x <= PONG_WIDTH - 2 * PONG_PADDLE_WIDTH + 4 &&
       newState.ballPosition.y <= newState.rightPaddle.y + PONG_PADDLE_HEIGHT &&
       newState.ballPosition.y >= newState.rightPaddle.y
     ) {
@@ -319,6 +324,7 @@ export default class PongGame extends Game<PongGameState, PongMove> {
       newState.ballVelocity.x =
         newState.ballVelocity.x > 0 ? newState.ballVelocity.x + 1 : newState.ballVelocity.x - 1;
       newState.ballVelocity.y = newState.ballVelocity.y + (Math.random() * 4 - 2);
+      newState.ballPosition.x = PONG_WIDTH - 2 * PONG_PADDLE_WIDTH;
     }
 
     this.state = newState;

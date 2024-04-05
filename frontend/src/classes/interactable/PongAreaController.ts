@@ -22,7 +22,7 @@ export const PONG_WIDTH = 400;
 export const PONG_HEIGHT = 320;
 export const PONG_PADDLE_WIDTH = 16;
 export const PONG_PADDLE_HEIGHT = 64;
-export const PONG_BALL_SIZE = 16;
+export const PONG_BALL_SIZE = 12;
 export const PONG_BALL_STARTING_SPEED = 2;
 
 export type PongEvents = GameEventTypes & {

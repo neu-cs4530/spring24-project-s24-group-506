@@ -1,4 +1,4 @@
-import { Button, List, ListItem, useToast } from '@chakra-ui/react';
+import { Badge, Box, Button, Center, Flex, List, ListItem, Stack, VStack, useToast } from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react';
 import PlayerController from '../../../../classes/PlayerController';
 import { useInteractableAreaController } from '../../../../classes/TownController';
@@ -103,12 +103,16 @@ export default function PongArea({
   let gameStatusText = <></>;
   if (gameStatus === 'IN_PROGRESS') {
     gameStatusText = (
-      <>
-        Game in progress{' '}
-        {townController.ourPlayer === gameAreaController.rightPlayer
-          ? "(You're on the right)" : townController.ourPlayer === gameAreaController.leftPlayer
-          ? "(You're on the left)" : 'You are observing'}
-      </>
+      <Stack direction='column' marginTop='3' marginBottom='4'>
+        <Center className="status-text">Game in progress</Center>
+        {townController.ourPlayer === gameAreaController.rightPlayer ? (
+          <Center className="player-status">(You're on the right)</Center>
+        ) : townController.ourPlayer === gameAreaController.leftPlayer ? (
+          <Center className="player-status">(You're on the left)</Center>
+        ) : (
+          <Center className="player-status">You are observing</Center>
+        )}
+      </Stack>
     );
   } else if (gameStatus == 'WAITING_TO_START') {
     const startGameButton = (
@@ -131,10 +135,14 @@ export default function PongArea({
         Start Game
       </Button>
     );
-    gameStatusText = <b>Waiting for players to press start. {startGameButton}</b>;
+    gameStatusText =
+      <Stack direction='column' marginTop='3' marginBottom='4'>
+        <Center className='status-text'>Waiting for players to press start. </Center>
+        <Center>{startGameButton}</Center>
+      </Stack>
   } else {
     const joinGameButton = (
-      <Button
+      <Button colorScheme='gray' size='sm'
         onClick={async () => {
           setJoiningGame(true);
           try {
@@ -157,19 +165,26 @@ export default function PongArea({
     if (gameStatus === 'OVER') gameStatusStr = 'over';
     else if (gameStatus === 'WAITING_FOR_PLAYERS') gameStatusStr = 'waiting for players to join';
     gameStatusText = (
-      <b>
-        Game {gameStatusStr}. {joinGameButton}
-      </b>
+      <Stack direction='column' marginTop='3' marginBottom='4'>
+        <Center className='status-text'>Game {gameStatusStr} </Center>
+        <Center>{joinGameButton}</Center>
+      </Stack>
+
     );
   }
   return (
     <>
       {gameStatusText}
-      <List aria-label='list of players in the game'>
-        <ListItem>leftPlayer: {leftPlayer?.userName || '(No player yet!)'}</ListItem>
-        <ListItem>rightPlayer: {rightPlayer?.userName || '(No player yet!)'}</ListItem>
-      </List>
-      <PongDisplay gameAreaController={gameAreaController} />
+      <Box position="relative">
+        <Box aria-label="list of players in the game" className='player-list'>
+          <span className='left-player'>{leftPlayer?.userName || '(No player yet!)'}</span>
+        </Box>
+        <PongDisplay gameAreaController={gameAreaController} />
+        <Box aria-label="list of players in the game" className='player-list'>
+          <span className='left-player'></span>
+          <span className='right-player'>{rightPlayer?.userName || '(No player yet!)'}</span>
+        </Box>
+      </Box>
     </>
   );
 }

@@ -119,12 +119,6 @@ function DebugApp(): JSX.Element {
   }
 }
 
-function MyDebugApp(): JSX.Element {
-  return (
-    <PongArea interactableID='1'/>
-  );
-}
-
 function AppOrDebugApp(): JSX.Element {
   const debugTown = process.env.NEXT_PUBLIC_TOWN_DEV_MODE;
   if (debugTown && debugTown.toLowerCase() === 'true') {
