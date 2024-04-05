@@ -28,6 +28,7 @@
     "swagger": "tsoa spec",
     "format": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "lint:fix": "npm run lint -- --fix",
     "stryker-prepare": "replace-in-file '/../../..//g' '../../../../../' src/types/CoveyTownSocket.d.ts --isRegex"
   },
   "keywords": [],

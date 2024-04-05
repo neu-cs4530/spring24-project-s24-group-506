@@ -103,8 +103,7 @@ function GameArea({ interactableID }: { interactableID: InteractableID }): JSX.E
             <TicTacToeArea interactableID={interactableID} />
           ) : gameAreaController.toInteractableAreaModel().type === 'PongArea' ? (
             <PongArea interactableID={interactableID} />
-          ) :
-          (
+          ) : (
             <>{INVALID_GAME_AREA_TYPE_MESSAGE}</>
           )}
         </Box>

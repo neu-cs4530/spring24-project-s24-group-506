@@ -16,7 +16,8 @@
   "homepage": "https://github.com/neu-se/covey.town#readme",
   "scripts": {
     "format": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
-    "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "lint:fix": "npm run lint -- --fix"
   },
   "types": "./types/index.d.ts",
   "keywords": [],

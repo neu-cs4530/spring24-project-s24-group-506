@@ -19,7 +19,6 @@ import LoginControllerContext from './contexts/LoginControllerContext';
 import { TownsServiceClient } from './generated/client';
 import { nanoid } from 'nanoid';
 import ToggleChatButton from './components/VideoCall/VideoFrontend/components/Buttons/ToggleChatButton/ToggleChatButton';
-import PongArea from './components/Town/interactables/Pong/PongArea';
 
 function App() {
   const [townController, setTownController] = useState<TownController | null>(null);

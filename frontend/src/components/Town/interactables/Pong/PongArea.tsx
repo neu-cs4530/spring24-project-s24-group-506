@@ -1,4 +1,4 @@
-import { Badge, Box, Button, Center, Flex, List, ListItem, Stack, VStack, useToast } from '@chakra-ui/react';
+import { Box, Button, Center, Stack, useToast } from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react';
 import PlayerController from '../../../../classes/PlayerController';
 import { useInteractableAreaController } from '../../../../classes/TownController';
@@ -49,12 +49,15 @@ export default function PongArea({
 }: {
   interactableID: InteractableID;
 }): JSX.Element {
-  const gameAreaController =
-    useInteractableAreaController<PongAreaController>(interactableID);
+  const gameAreaController = useInteractableAreaController<PongAreaController>(interactableID);
   const townController = useTownController();
 
-  const [leftPlayer, setLeftPlayer] = useState<PlayerController | undefined>(gameAreaController.leftPlayer);
-  const [rightPlayer, setRightPlayer] = useState<PlayerController | undefined>(gameAreaController.rightPlayer);
+  const [leftPlayer, setLeftPlayer] = useState<PlayerController | undefined>(
+    gameAreaController.leftPlayer,
+  );
+  const [rightPlayer, setRightPlayer] = useState<PlayerController | undefined>(
+    gameAreaController.rightPlayer,
+  );
   const [joiningGame, setJoiningGame] = useState(false);
 
   const [gameStatus, setGameStatus] = useState<GameStatus>(gameAreaController.status);
@@ -104,13 +107,13 @@ export default function PongArea({
   if (gameStatus === 'IN_PROGRESS') {
     gameStatusText = (
       <Stack direction='column' marginTop='3' marginBottom='4'>
-        <Center className="status-text">Game in progress</Center>
+        <Center className='status-text'>Game in progress</Center>
         {townController.ourPlayer === gameAreaController.rightPlayer ? (
-          <Center className="player-status">(You're on the right)</Center>
+          <Center className='player-status'>(You&#39;re on the right)</Center>
         ) : townController.ourPlayer === gameAreaController.leftPlayer ? (
-          <Center className="player-status">(You're on the left)</Center>
+          <Center className='player-status'>(You&#39;re on the left)</Center>
         ) : (
-          <Center className="player-status">You are observing</Center>
+          <Center className='player-status'>You are observing</Center>
         )}
       </Stack>
     );
@@ -135,14 +138,17 @@ export default function PongArea({
         Start Game
       </Button>
     );
-    gameStatusText =
+    gameStatusText = (
       <Stack direction='column' marginTop='3' marginBottom='4'>
         <Center className='status-text'>Waiting for players to press start. </Center>
         <Center>{startGameButton}</Center>
       </Stack>
+    );
   } else {
     const joinGameButton = (
-      <Button colorScheme='gray' size='sm'
+      <Button
+        colorScheme='gray'
+        size='sm'
         onClick={async () => {
           setJoiningGame(true);
           try {
@@ -169,18 +175,17 @@ export default function PongArea({
         <Center className='status-text'>Game {gameStatusStr} </Center>
         <Center>{joinGameButton}</Center>
       </Stack>
-
     );
   }
   return (
     <>
       {gameStatusText}
-      <Box position="relative">
-        <Box aria-label="list of players in the game" className='player-list'>
+      <Box position='relative'>
+        <Box aria-label='list of players in the game' className='player-list'>
           <span className='left-player'>{leftPlayer?.userName || '(No player yet!)'}</span>
         </Box>
         <PongDisplay gameAreaController={gameAreaController} />
-        <Box aria-label="list of players in the game" className='player-list'>
+        <Box aria-label='list of players in the game' className='player-list'>
           <span className='left-player'></span>
           <span className='right-player'>{rightPlayer?.userName || '(No player yet!)'}</span>
         </Box>

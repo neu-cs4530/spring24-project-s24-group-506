@@ -36,14 +36,21 @@ export type PongEvents = GameEventTypes & {
 /**
  * This class is responsible for managing the state of the Pong game, and for sending commands to the server
  */
-export default class PongAreaController extends GameAreaController<
-  PongGameState,
-  PongEvents
-> {
-  private _ballPosition: XY = { x: PONG_WIDTH / 2 - PONG_BALL_SIZE / 2, y: PONG_HEIGHT / 2 - PONG_BALL_SIZE / 2 };
+export default class PongAreaController extends GameAreaController<PongGameState, PongEvents> {
+  private _ballPosition: XY = {
+    x: PONG_WIDTH / 2 - PONG_BALL_SIZE / 2,
+    y: PONG_HEIGHT / 2 - PONG_BALL_SIZE / 2,
+  };
+
   private _leftPaddle: XY = { x: 0, y: PONG_HEIGHT / 2 - PONG_PADDLE_HEIGHT / 2 };
-  private _rightPaddle: XY = { x: PONG_WIDTH - PONG_PADDLE_WIDTH, y: PONG_HEIGHT / 2 - PONG_PADDLE_HEIGHT / 2 };
+
+  private _rightPaddle: XY = {
+    x: PONG_WIDTH - PONG_PADDLE_WIDTH,
+    y: PONG_HEIGHT / 2 - PONG_PADDLE_HEIGHT / 2,
+  };
+
   private _leftScore: PongScore = 0;
+
   private _rightScore: PongScore = 0;
 
   // returns the current position of the left paddle
@@ -156,13 +163,13 @@ export default class PongAreaController extends GameAreaController<
    *
    * Calls super._updateFrom, which updates the occupants of this game area and other
    * common properties (including this._model)
-   * 
+   *
    * If the opposite paddle has changed, emits an oppositePaddleUpdated event with the new paddle location
    * If the our paddle has changed, emits an ourPaddleUpdated event with the new paddle location
    * If the ball position has changed, emits a ballPositionUpdated event with the new ball position
    * If the left score has changed, emits a leftScoreUpdated event with the new left score
    * If the right score has changed, emits a rightScoreUpdated event with the new right score
-   * 
+   *
    */
   protected _updateFrom(newModel: GameArea<PongGameState>): void {
     super._updateFrom(newModel);

@@ -1,9 +1,6 @@
-import ConnectFourAreaController, {
-  ConnectFourCell,
-} from '../../../../classes/interactable/ConnectFourAreaController';
-import { Button, chakra, Container, useToast } from '@chakra-ui/react';
+import { useToast } from '@chakra-ui/react';
 import React, { useEffect, useRef, useState } from 'react';
-import { ConnectFourColIndex, PongGameState, PongPlayer, PongScore, XY } from '../../../../types/CoveyTownSocket';
+import { PongScore, XY } from '../../../../types/CoveyTownSocket';
 import PongAreaController from '../../../../classes/interactable/PongAreaController';
 
 export type PongGameProps = {
@@ -16,16 +13,16 @@ const Paddle = ({ position }: { position: XY }) => {
     top: position.y,
   };
 
-  return <div className="paddle" style={style}></div>;
+  return <div className='paddle' style={style}></div>;
 };
 
-const Ball = ({ position }: { position: XY}) => {
+const Ball = ({ position }: { position: XY }) => {
   const style = {
     left: position.x,
     top: position.y,
   };
 
-  return <div className="ball" style={style}></div>;
+  return <div className='ball' style={style}></div>;
 };
 
 /**
@@ -50,16 +47,14 @@ const Ball = ({ position }: { position: XY}) => {
  *
  * @param gameAreaController the controller for the ConnectFour game
  */
-export default function PongDisplay({
-  gameAreaController,
-}: PongGameProps): JSX.Element {
+export default function PongDisplay({ gameAreaController }: PongGameProps): JSX.Element {
   const [ballPosition, setBallPosition] = useState(gameAreaController.ballPosition);
   const [leftScore, setLeftScore] = useState<PongScore>(gameAreaController.leftScore);
   const [rightScore, setRightScore] = useState<PongScore>(gameAreaController.rightScore);
   const [leftPaddle, setLeftPaddle] = useState<XY>(gameAreaController.leftPaddle);
   const [rightPaddle, setRightPaddle] = useState<XY>(gameAreaController.rightPaddle);
-  let iPressed = false;
-  let oPressed = false;
+  const iPressed = useRef(false);
+  const oPressed = useRef(false);
 
   const toast = useToast();
 
@@ -80,26 +75,29 @@ export default function PongDisplay({
 
   useEffect(() => {
     let updateBall: NodeJS.Timeout | undefined;
-    if (gameAreaController.status === 'IN_PROGRESS' && gameAreaController.isPlayer && gameAreaController.gamePiece === 'Left') {
+    if (
+      gameAreaController.status === 'IN_PROGRESS' &&
+      gameAreaController.isPlayer &&
+      gameAreaController.gamePiece === 'Left'
+    ) {
       updateBall = setInterval(() => {
         gameAreaController.updatePhysics();
       }, 10);
     }
     return () => clearInterval(updateBall);
-  }, [gameAreaController.status]);
+  }, [gameAreaController.status, gameAreaController]);
 
   useEffect(() => {
-    const handleKeyDown = async (event: any) => {
+    const handleKeyDown = async (event: KeyboardEvent) => {
       if (event.key === 'i' && gameAreaController.isPlayer) {
         // Handle 'i' key press
-        if (!iPressed && gameAreaController.status === 'IN_PROGRESS') {
-          iPressed = true;
+        if (!iPressed.current && gameAreaController.status === 'IN_PROGRESS') {
+          iPressed.current = true;
           console.log("Key 'i' pressed");
           if (gameAreaController.status !== 'IN_PROGRESS') return;
           try {
             await gameAreaController.makeMove('Up');
-          }
-          catch (e) {
+          } catch (e) {
             toast({
               title: 'Error making move',
               description: (e as Error).toString(),
@@ -109,14 +107,13 @@ export default function PongDisplay({
         }
       } else if (event.key === 'o' && gameAreaController.isPlayer) {
         // Handle 'o' key press
-        if (!oPressed && gameAreaController.status === 'IN_PROGRESS') {
-          oPressed = true;
+        if (!oPressed.current && gameAreaController.status === 'IN_PROGRESS') {
+          oPressed.current = true;
           console.log("Key 'o' pressed");
           if (gameAreaController.status !== 'IN_PROGRESS') return;
           try {
             await gameAreaController.makeMove('Down');
-          }
-          catch (e) {
+          } catch (e) {
             toast({
               title: 'Error making move',
               description: (e as Error).toString(),
@@ -127,15 +124,14 @@ export default function PongDisplay({
       }
     };
 
-    const handleKeyUp = async (event: any) => {
+    const handleKeyUp = async (event: KeyboardEvent) => {
       if (event.key === 'i' && gameAreaController.isPlayer) {
         // Handle 'i' key release
-        if (iPressed) {
-          iPressed = false;
+        if (iPressed.current) {
+          iPressed.current = false;
           try {
             await gameAreaController.makeMove('Still');
-          }
-          catch (e) {
+          } catch (e) {
             toast({
               title: 'Error making move',
               description: (e as Error).toString(),
@@ -146,12 +142,11 @@ export default function PongDisplay({
         console.log("Key 'i' released");
       } else if (event.key === 'o' && gameAreaController.isPlayer) {
         // Handle 'o' key release
-        if (oPressed) {
-          oPressed = false;
+        if (oPressed.current) {
+          oPressed.current = false;
           try {
             await gameAreaController.makeMove('Still');
-          }
-          catch (e) {
+          } catch (e) {
             toast({
               title: 'Error making move',
               description: (e as Error).toString(),
@@ -170,15 +165,14 @@ export default function PongDisplay({
       removeEventListener('keydown', handleKeyDown);
       removeEventListener('keyup', handleKeyUp);
     };
-  }, []);
+  }, [gameAreaController, toast]);
 
   return (
     <div className='pong-border'>
-
-      <div className="gamecontainer">
-        <div className="score score-left">{leftScore}</div>
-        <div className="score score-right">{rightScore}</div>
-        <Paddle position={{x: leftPaddle.x + 8, y: leftPaddle.y}} />
+      <div className='gamecontainer'>
+        <div className='score score-left'>{leftScore}</div>
+        <div className='score score-right'>{rightScore}</div>
+        <Paddle position={{ x: leftPaddle.x + 8, y: leftPaddle.y }} />
         <Paddle position={rightPaddle} />
         <Ball position={ballPosition} />
       </div>
