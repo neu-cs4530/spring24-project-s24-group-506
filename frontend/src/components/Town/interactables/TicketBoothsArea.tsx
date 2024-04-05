@@ -8,6 +8,7 @@ import {
   Button,
   Flex,
   Heading,
+  Image,
   List,
   ListItem,
   Modal,
@@ -16,6 +17,8 @@ import {
   ModalContent,
   ModalHeader,
   ModalOverlay,
+  Stack,
+  Text,
   useToast,
 } from '@chakra-ui/react';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -34,6 +37,12 @@ import ChatChannel from './ChatChannel';
 import { css, keyframes } from '@emotion/react';
 
 export const INVALID_GAME_AREA_TYPE_MESSAGE = 'Invalid game area type';
+
+const itemImages = {
+  BlueHat: './assets/hatPictures/BlueHat.png',
+  RedHat: './assets/hatPictures/redHat.png',
+  GreenHat: './assets/hatPictures/GreenHat.png',
+};
 
 const flashing = keyframes`
   0% { color: red; }
