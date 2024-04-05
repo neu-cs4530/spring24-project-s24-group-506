@@ -31,8 +31,15 @@ import {
   PlayerID,
 } from '../../../types/CoveyTownSocket';
 import ChatChannel from './ChatChannel';
+import { css, keyframes } from '@emotion/react';
 
 export const INVALID_GAME_AREA_TYPE_MESSAGE = 'Invalid game area type';
+
+const flashing = keyframes`
+  0% { color: red; }
+  50% { color: green; }
+  100% { color: blue; }
+`;
 
 /**
  * A generic component that renders a game area.
@@ -100,18 +107,36 @@ function TicketBoothsArea({ interactableID }: { interactableID: InteractableID }
           </AccordionPanel>
         </AccordionItem>
       </Accordion>
-      <h1>Tokens: {townController.ourPlayer.tokens}</h1>
-      <Flex>
-        <h1>Ticket Booth</h1>
-        {items?.map(boothItem => (
-          <Box key={boothItem.name}>
-            <h2>
-              {boothItem.name} - ${boothItem.cost} - {boothItem.description} -{' '}
-              {boothItem.timesPurchased}
-            </h2>
-            <Button onClick={() => handlePurchase(boothItem.name, townController.ourPlayer.id)}>Purchase</Button>
-          </Box>
-        ))}
+      <Flex direction='column' align='center'>
+        <Heading
+          css={css`
+            animation: ${flashing} 3s infinite;
+          `}>
+          TICKETBOOTH
+        </Heading>
+        <h1>Tokens: {townController.ourPlayer.tokens}</h1>
+        <Stack spacing={4}>
+          {items?.map(boothItem => (
+            <Box key={boothItem.name} p={5} shadow='md' borderWidth='1px'>
+              <Flex align='center'>
+                <Image
+                  boxSize='100px'
+                  src={itemImages[boothItem.name]}
+                  alt={boothItem.name}
+                  mr={4}
+                />
+                <Box>
+                  <Heading as='h2' size='md' mb={2}>
+                    {boothItem.name} - ${boothItem.cost}
+                  </Heading>
+                  <Text mb={2}>{boothItem.description}</Text>
+                  <Text mb={2}>Times Purchased: {boothItem.timesPurchased}</Text>
+                  <Button onClick={() => handlePurchase(boothItem.name, townController.ourPlayer.id)}>Purchase</Button>
+                </Box>
+              </Flex>
+            </Box>
+          ))}
+        </Stack>
       </Flex>
     </>
   );
