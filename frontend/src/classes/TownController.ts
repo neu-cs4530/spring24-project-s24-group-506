@@ -653,6 +653,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
             console.log(eachInteractable);
             this._interactableControllers.push(
               new TicketBoothAreaController(eachInteractable, this),
+            );
           } else if (isPongArea(eachInteractable)) {
             this._interactableControllers.push(
               new PongAreaController(eachInteractable.id, eachInteractable, this),
