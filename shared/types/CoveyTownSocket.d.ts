@@ -17,7 +17,7 @@ export type TownJoinResponse = {
   interactables: TypedInteractable[];
 }
 
-export type InteractableType = 'ConversationArea' | 'ViewingArea' | 'TicTacToeArea' | 'ConnectFourArea';
+export type InteractableType = 'ConversationArea' | 'ViewingArea' | 'TicTacToeArea' | 'ConnectFourArea' | 'TargetShooterArea';
 export interface Interactable {
   type: InteractableType;
   id: InteractableID;
@@ -164,6 +164,48 @@ export type ConnectFourColor = 'Red' | 'Yellow';
 export type InteractableID = string;
 export type GameInstanceID = string;
 
+export type TargetShooterPlayer = 'player1' | 'player2';
+
+export type TargetShooterScore = 0 | 1 | 2 | 3 | 4 | 5;
+
+export type TargetShooterScoreUpdate = {
+  gamePiece: TargetShooterPlayer;
+  score: TargetShooterScore;
+}
+
+export type TargetShooterMove = {
+  gamePiece: TargetShooterPlayer;
+  position: XY;
+}
+
+
+export interface TargetShooterGameState extends WinnableGameState{
+  player1Score: TargetShooterScore;
+  player2Score: TargetShooterScore;
+
+  player1Cursor: XY;
+  player2Cursor: XY;
+
+  currentTarget: XY;
+
+  player1?: PlayerID;
+  player2?: PlayerID;
+
+  player1Ready?: boolean;
+  player2Ready?: boolean;
+}
+
+export type MouseClickEvent = {
+  player: PlayerID;
+  position: XY;
+};
+
+
+// not sure if i need this
+export interface TargetShootingEventHandler {
+  handleEvent(event: MouseClickEvent): void;
+}
+
 /**
  * Type for the result of a game
  */
@@ -216,7 +258,7 @@ interface InteractableCommandBase {
   type: string;
 }
 
-export type InteractableCommand =  ViewingAreaUpdateCommand | JoinGameCommand | GameMoveCommand<TicTacToeMove> | GameMoveCommand<ConnectFourMove> | StartGameCommand | LeaveGameCommand;
+export type InteractableCommand =  ViewingAreaUpdateCommand | JoinGameCommand | GameMoveCommand<TicTacToeMove> | GameMoveCommand<ConnectFourMove> | GameMoveCommand<TargetShooterMove> | StartGameCommand | LeaveGameCommand;
 export interface ViewingAreaUpdateCommand  {
   type: 'ViewingAreaUpdate';
   update: ViewingArea;
