@@ -4,6 +4,7 @@ import {
   AccordionIcon,
   AccordionItem,
   AccordionPanel,
+  Badge,
   Box,
   Button,
   Flex,
@@ -80,13 +81,13 @@ function TicketBoothsArea({ interactableID }: { interactableID: InteractableID }
     try {
       await ticketBoothAreaController.purchaseItem(itemName, playerID);
     } catch (e) {
-        toast({
-          title: 'Error buying item',
-          description: (e as Error).toString(),
-          status: 'error',
-        });
-      }
-    };
+      toast({
+        title: 'Error buying item',
+        description: (e as Error).toString(),
+        status: 'error',
+      });
+    }
+  };
   useEffect(() => {
     ticketBoothAreaController.addListener('occupantsChange', setOccupants);
     ticketBoothAreaController.addListener('itemPurchased', setItems);
@@ -123,7 +124,14 @@ function TicketBoothsArea({ interactableID }: { interactableID: InteractableID }
           `}>
           TICKETBOOTH
         </Heading>
-        <h1>Tokens: {townController.ourPlayer.tokens}</h1>
+        <Flex align='center' justify='center' mb={4}>
+          <Text fontSize='2xl' fontWeight='bold' mr={2}>
+            Your Tokens:
+          </Text>
+          <Badge p={1} fontSize='2xl'>
+            {townController.ourPlayer.tokens}
+          </Badge>
+        </Flex>
         <Stack spacing={4}>
           {items?.map(boothItem => (
             <Box key={boothItem.name} p={5} shadow='md' borderWidth='1px'>
@@ -140,7 +148,10 @@ function TicketBoothsArea({ interactableID }: { interactableID: InteractableID }
                   </Heading>
                   <Text mb={2}>{boothItem.description}</Text>
                   <Text mb={2}>Times Purchased: {boothItem.timesPurchased}</Text>
-                  <Button onClick={() => handlePurchase(boothItem.name, townController.ourPlayer.id)}>Purchase</Button>
+                  <Button
+                    onClick={() => handlePurchase(boothItem.name, townController.ourPlayer.id)}>
+                    Purchase
+                  </Button>
                 </Box>
               </Flex>
             </Box>
