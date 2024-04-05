@@ -29,6 +29,7 @@ import {
 import {
   isConnectFourArea,
   isConversationArea,
+  isPongArea,
   isTicTacToeArea,
   isViewingArea,
   isTicketBoothArea,
@@ -45,6 +46,7 @@ import ViewingAreaController from './interactable/ViewingAreaController';
 import PlayerController from './PlayerController';
 import TicketBoothAreaController from './interactable/TicketBoothAreaController';
 import TicketBoothArea from '../components/Town/interactables/TicketBoothArea';
+import PongAreaController from './interactable/PongAreaController';
 
 const CALCULATE_NEARBY_PLAYERS_DELAY_MS = 300;
 const SOCKET_COMMAND_TIMEOUT_MS = 5000;
@@ -651,6 +653,9 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
             console.log(eachInteractable);
             this._interactableControllers.push(
               new TicketBoothAreaController(eachInteractable, this),
+          } else if (isPongArea(eachInteractable)) {
+            this._interactableControllers.push(
+              new PongAreaController(eachInteractable.id, eachInteractable, this),
             );
           }
         });

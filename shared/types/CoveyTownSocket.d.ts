@@ -17,7 +17,7 @@ export type TownJoinResponse = {
   interactables: TypedInteractable[];
 }
 
-export type InteractableType = 'ConversationArea' | 'ViewingArea' | 'TicTacToeArea' | 'ConnectFourArea' | 'TicketBoothArea';
+export type InteractableType = 'ConversationArea' | 'ViewingArea' | 'TicTacToeArea' | 'ConnectFourArea' | 'PongArea' | 'TicketBoothArea' | 'TargetShootingArea';
 export interface Interactable {
   type: InteractableType;
   id: InteractableID;
@@ -176,6 +176,44 @@ export type ConnectFourColIndex = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
 export type ConnectFourColor = 'Red' | 'Yellow';
 
+export type PongPlayer = 'Left' | 'Right';
+
+export type PongMove = {
+  gamePiece: PongPlayer;
+  direction: PongPaddleDirection;
+}
+
+export type PongPaddleDirection = 'Up' | 'Down' | 'Still';
+
+export type PongScore = 0 | 1 | 2 | 3 | 4 | 5;
+
+export type PongScoreUpdate = {
+  gamePiece: PongPlayer;
+  score: PongScore;
+}
+
+/**
+ * Type for the state of a Pong game
+ */
+export interface PongGameState extends WinnableGameState {
+  leftPaddle: XY;
+  leftPaddleDirection: PongPaddleDirection;
+  rightPaddle: XY;
+  rightPaddleDirection: PongPaddleDirection;
+
+  leftScore: PongScore;
+  rightScore: PongScore;
+
+  ballPosition: XY;
+  ballVelocity: XY;
+
+  leftPlayer?: PlayerID;
+  rightPlayer?: PlayerID;
+
+  leftPlayerReady?: boolean;
+  rightPlayerReady?: boolean;
+}
+
 export type InteractableID = string;
 export type GameInstanceID = string;
 
@@ -236,7 +274,7 @@ export type TicketBoothPurchase = {
   player: PlayerID;
 }
 
-export type InteractableCommand = TicketBoothPurchaseCommand | AddTokenCommand | ViewingAreaUpdateCommand | JoinGameCommand | GameMoveCommand<TicTacToeMove> | GameMoveCommand<ConnectFourMove> | StartGameCommand | LeaveGameCommand;
+export type InteractableCommand =  TicketBoothPurchaseCommand | AddTokenCommand | ViewingAreaUpdateCommand | JoinGameCommand | GameMoveCommand<TicTacToeMove> | GameMoveCommand<ConnectFourMove> | GameMoveCommand<PongMove> | UpdatePhysicsCommand |UpdatePongScoreCommand | StartGameCommand | LeaveGameCommand;
 export interface ViewingAreaUpdateCommand  {
   type: 'ViewingAreaUpdate';
   update: ViewingArea;
@@ -266,11 +304,20 @@ export interface AddTokenCommand {
   type: 'AddToken';
   amount: number;
 }
+export interface UpdatePongScoreCommand {
+  type: 'UpdateScore';
+  gameID: GameInstanceID;
+  scoreUpdate: PongScoreUpdate;
+}
+export interface UpdatePhysicsCommand {
+  type: 'UpdatePhysics';
+  gameID: GameInstanceID;
+}
 
 export type InteractableCommandReturnType<CommandType extends InteractableCommand> = 
   CommandType extends JoinGameCommand ? { gameID: string}:
   CommandType extends ViewingAreaUpdateCommand ? undefined :
-  CommandType extends GameMoveCommand<TicTacToeMove> ? undefined :
+  CommandType extends GameMoveCommand<GameMove> ? undefined :
   CommandType extends LeaveGameCommand ? undefined :
   CommandType extends StartGameCommand ? undefined :
   CommandType extends TicketBoothPurchaseCommand ? undefined :

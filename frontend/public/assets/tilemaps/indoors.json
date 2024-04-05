@@ -596,7 +596,7 @@
                         {
                          "name":"type",
                          "type":"string",
-                         "value":"ConnectFour"
+                         "value":"Pong"
                         }],
                  "rotation":0,
                  "type":"GameArea",
@@ -613,7 +613,7 @@
                         {
                          "name":"type",
                          "type":"string",
-                         "value":"ConnectFour"
+                         "value":"Pong"
                         }],
                  "rotation":0,
                  "type":"GameArea",
