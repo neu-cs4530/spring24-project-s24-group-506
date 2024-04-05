@@ -32,6 +32,7 @@ import {
   InteractableID,
 } from '../../../types/CoveyTownSocket';
 import ChatChannel from './ChatChannel';
+import { css, keyframes } from '@emotion/react';
 // import blueHat from './assets/hatPictures/BlueHat.png';
 
 export const INVALID_GAME_AREA_TYPE_MESSAGE = 'Invalid game area type';
@@ -41,6 +42,12 @@ const itemImages = {
   GreenHat: './assets/hatPictures/GreenHat.png',
   // Add more items as needed
 };
+
+const flashing = keyframes`
+  0% { color: red; }
+  50% { color: green; }
+  100% { color: blue; }
+`;
 
 /**
  * A generic component that renders a game area.
@@ -101,8 +108,11 @@ function TicketBoothsArea({ interactableID }: { interactableID: InteractableID }
         </AccordionItem>
       </Accordion>
       <Flex direction='column' align='center'>
-        <Heading as='h1' size='lg' mb={4}>
-          Ticket Booth
+        <Heading
+          css={css`
+            animation: ${flashing} 3s infinite;
+          `}>
+          TICKETBOOTH
         </Heading>
         <Stack spacing={4}>
           {items?.map(boothItem => (
