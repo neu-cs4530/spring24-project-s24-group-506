@@ -76,6 +76,7 @@ export default function ConnectFourArea({
           status: 'info',
         });
       } else if (winner === townController.ourPlayer) {
+        gameAreaController.addToken(10);
         toast({
           title: 'Game over',
           description: 'You won!',

@@ -1,4 +1,3 @@
-
 export type TownJoinResponse = {
   /** Unique ID that represents this player * */
   userID: string;
@@ -18,7 +17,7 @@ export type TownJoinResponse = {
   interactables: TypedInteractable[];
 }
 
-export type InteractableType = 'ConversationArea' | 'ViewingArea' | 'TicTacToeArea' | 'ConnectFourArea' | 'PongArea' | 'TargetShootingArea';
+export type InteractableType = 'ConversationArea' | 'ViewingArea' | 'TicTacToeArea' | 'ConnectFourArea' | 'PongArea' | 'TicketBoothArea' | 'TargetShootingArea';
 export interface Interactable {
   type: InteractableType;
   id: InteractableID;
@@ -37,6 +36,7 @@ export interface Player {
   id: PlayerID;
   userName: string;
   location: PlayerLocation;
+  tokens: number;
 };
 
 export type XY = { x: number, y: number };
@@ -62,6 +62,20 @@ export type ChatMessage = {
 export interface ConversationArea extends Interactable {
   topic?: string;
 };
+
+export type BoothItemName = 'BlueHat' | 'RedHat' | 'GreenHat';
+
+export interface BoothItem {
+  name: BoothItemName;
+  cost: number;
+  timesPurchased: number;
+  description: string;
+}
+
+export interface TicketBoothArea extends Interactable {
+  items?: BoothItem[];
+}
+
 export interface BoundingBox {
   x: number;
   y: number;
@@ -255,7 +269,12 @@ interface InteractableCommandBase {
   type: string;
 }
 
-export type InteractableCommand =  ViewingAreaUpdateCommand | JoinGameCommand | GameMoveCommand<TicTacToeMove> | GameMoveCommand<ConnectFourMove> | GameMoveCommand<PongMove> | UpdatePhysicsCommand |UpdatePongScoreCommand | StartGameCommand | LeaveGameCommand;
+export type TicketBoothPurchase = {
+  item: BoothItemName;
+  player: PlayerID;
+}
+
+export type InteractableCommand =  TicketBoothPurchaseCommand | AddTokenCommand | ViewingAreaUpdateCommand | JoinGameCommand | GameMoveCommand<TicTacToeMove> | GameMoveCommand<ConnectFourMove> | GameMoveCommand<PongMove> | UpdatePhysicsCommand |UpdatePongScoreCommand | StartGameCommand | LeaveGameCommand;
 export interface ViewingAreaUpdateCommand  {
   type: 'ViewingAreaUpdate';
   update: ViewingArea;
@@ -276,6 +295,15 @@ export interface GameMoveCommand<MoveType> {
   gameID: GameInstanceID;
   move: MoveType;
 }
+export interface TicketBoothPurchaseCommand {
+  type: 'TicketBoothPurchase';
+  itemName: BoothItemName;
+  playerID: PlayerID;
+}
+export interface AddTokenCommand {
+  type: 'AddToken';
+  amount: number;
+}
 export interface UpdatePongScoreCommand {
   type: 'UpdateScore';
   gameID: GameInstanceID;
@@ -285,17 +313,15 @@ export interface UpdatePhysicsCommand {
   type: 'UpdatePhysics';
   gameID: GameInstanceID;
 }
-// export interface MoveBallCommand {
-//   type: 'MoveBall';
-//   gameID: GameInstanceID;
-//   move: XY;
-// }
 
 export type InteractableCommandReturnType<CommandType extends InteractableCommand> = 
   CommandType extends JoinGameCommand ? { gameID: string}:
   CommandType extends ViewingAreaUpdateCommand ? undefined :
   CommandType extends GameMoveCommand<GameMove> ? undefined :
   CommandType extends LeaveGameCommand ? undefined :
+  CommandType extends StartGameCommand ? undefined :
+  CommandType extends TicketBoothPurchaseCommand ? undefined :
+  CommandType extends AddTokenCommand ? undefined :
   never;
 
 export type InteractableCommandResponse<MessageType> = {
@@ -306,6 +332,7 @@ export type InteractableCommandResponse<MessageType> = {
 }
 
 export interface ServerToClientEvents {
+  playerTokensChanged: (playerChanged: Player) => void;
   playerMoved: (movedPlayer: Player) => void;
   playerDisconnect: (disconnectedPlayer: Player) => void;
   playerJoined: (newPlayer: Player) => void;
@@ -322,4 +349,5 @@ export interface ClientToServerEvents {
   playerMovement: (movementData: PlayerLocation) => void;
   interactableUpdate: (update: Interactable) => void;
   interactableCommand: (command: InteractableCommand & InteractableCommandBase) => void;
+  playerTokenUpdate: (playerID: PlayerID, tokens: number) => void;
 }

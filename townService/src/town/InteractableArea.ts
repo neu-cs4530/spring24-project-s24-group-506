@@ -177,4 +177,8 @@ export default abstract class InteractableArea {
     command: CommandType,
     player: Player,
   ): InteractableCommandReturnType<CommandType>;
+
+  protected _emitPlayerTokensChanged(player: Player) {
+    this._townEmitter.emit('playerTokensChanged', player.toPlayerModel());
+  }
 }

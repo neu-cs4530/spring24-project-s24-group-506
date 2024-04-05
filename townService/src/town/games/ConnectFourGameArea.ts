@@ -44,6 +44,7 @@ export default class ConnectFourGameArea extends GameArea<ConnectFourGame> {
               [yellowName]: updatedState.state.winner === yellow ? 1 : 0,
             },
           });
+          // this.addTokensToWinner(updatedState);
         }
       }
     }
@@ -129,6 +130,11 @@ export default class ConnectFourGameArea extends GameArea<ConnectFourGame> {
       }
       game.startGame(player);
       this._stateUpdated(game.toModel());
+      return undefined as InteractableCommandReturnType<CommandType>;
+    }
+    if (command.type === 'AddToken') {
+      player.addTokens(command.amount);
+      this._emitPlayerTokensChanged(player);
       return undefined as InteractableCommandReturnType<CommandType>;
     }
     throw new InvalidParametersError(INVALID_COMMAND_MESSAGE);

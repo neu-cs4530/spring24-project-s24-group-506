@@ -643,14 +643,8 @@
                  "height":141.844254778594,
                  "id":57,
                  "name":"TicketBooth",
-                 "properties":[
-                        {
-                         "name":"type",
-                         "type":"string",
-                         "value":"ConnectFour"
-                        }],
                  "rotation":0,
-                 "type":"GameArea",
+                 "type":"TicketBoothArea",
                  "visible":true,
                  "width":302.271120353522,
                  "x":4042.98493302529,

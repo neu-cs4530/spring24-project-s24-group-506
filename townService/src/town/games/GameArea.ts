@@ -4,9 +4,11 @@ import InvalidParametersError, {
 import Player from '../../lib/Player';
 import {
   GameArea as GameAreaModel,
+  GameInstance,
   GameResult,
   GameState,
   InteractableType,
+  WinnableGameState,
 } from '../../types/CoveyTownSocket';
 import InteractableArea from '../InteractableArea';
 import Game from './Game';
@@ -59,5 +61,15 @@ export default abstract class GameArea<
       }
     }
     super.remove(player);
+  }
+
+  protected addTokensToWinner(updatedState: GameInstance<WinnableGameState>) {
+    if (updatedState.state.status === 'OVER' && updatedState.state.winner) {
+      const winner = this.occupants.find(eachPlayer => eachPlayer.id === updatedState.state.winner);
+      if (winner) {
+        winner.addTokens(10);
+        this._emitPlayerTokensChanged(winner);
+      }
+    }
   }
 }
