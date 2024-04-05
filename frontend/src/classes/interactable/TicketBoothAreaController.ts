@@ -1,6 +1,7 @@
 import {
   BoothItem,
   BoothItemName,
+  PlayerID,
   TicketBoothArea as TicketBoothAreaModel,
 } from '../../types/CoveyTownSocket';
 import InteractableAreaController, {
@@ -103,10 +104,11 @@ export default class TicketBoothAreaController extends InteractableAreaControlle
    *
    * @param itemName The name of the item to purchase
    */
-  public async purchaseItem(itemName: BoothItemName) {
+  public async purchaseItem(itemName: BoothItemName, playerID: PlayerID) {
     await this._townController.sendInteractableCommand(this.id, {
       type: 'TicketBoothPurchase',
       itemName: itemName,
+      playerID: playerID,
     });
     console.log(`Purchased item: ${itemName}`);
   }

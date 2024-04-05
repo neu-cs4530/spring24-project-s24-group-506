@@ -44,6 +44,7 @@ export default class ConnectFourGameArea extends GameArea<ConnectFourGame> {
               [yellowName]: updatedState.state.winner === yellow ? 1 : 0,
             },
           });
+          this.addTokensToWinner(updatedState);
         }
       }
     }

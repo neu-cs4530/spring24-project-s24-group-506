@@ -215,6 +215,13 @@ export default class Town {
         });
       }
     });
+
+    socket.on('playerTokenUpdate', (playerID: string, tokens: number) => {
+      if (playerID === newPlayer.id) {
+        newPlayer.tokens = tokens;
+      }
+    });
+
     return newPlayer;
   }
 

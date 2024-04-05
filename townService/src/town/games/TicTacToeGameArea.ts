@@ -41,6 +41,8 @@ export default class TicTacToeGameArea extends GameArea<TicTacToeGame> {
               [oName]: updatedState.state.winner === o ? 1 : 0,
             },
           });
+          // if we have a winner, give them tokens
+          this.addTokensToWinner(updatedState);
         }
       }
     }

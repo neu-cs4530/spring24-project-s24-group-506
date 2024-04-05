@@ -121,14 +121,27 @@ export default class TicketBoothArea extends InteractableArea {
       if (!items) {
         throw new InvalidParametersError('No items available for purchase');
       }
-      const { itemName } = command;
+      let areaChanged = false;
+      const { itemName, playerID } = command;
       items.forEach(item => {
         if (item.name === itemName) {
+          areaChanged = true;
           item.timesPurchased++;
+          const player = this.occupants.find(p => p.id === playerID);
+          if (!player) {
+            throw new InvalidParametersError('Player not found');
+          }
+          if (player.tokens < item.cost) {
+            throw new InvalidParametersError('Player does not have enough tokens');
+          }
+          player.removeTokens(item.cost);
+          this._emitPlayerTokensChanged(player);
         }
       });
-      this._items = items;
-      this._emitAreaChanged();
+      if (areaChanged) {
+        this._items = items;
+        this._emitAreaChanged();
+      }
       return undefined as InteractableCommandReturnType<CommandType>;
     }
     throw new InvalidParametersError(INVALID_COMMAND_MESSAGE);
