@@ -72,7 +72,7 @@ export default class Player {
       id: this._id,
       location: this.location,
       userName: this._userName,
-      //tokens: this._tokens,
+      // tokens: this._tokens,
     };
   }
 
