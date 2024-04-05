@@ -2,7 +2,7 @@ import assert from 'assert';
 import EventEmitter from 'events';
 import _ from 'lodash';
 import { nanoid } from 'nanoid';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
 import TypedEmitter from 'typed-emitter';
 import Interactable from '../components/Town/Interactable';
@@ -597,6 +597,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   async createViewingArea(newArea: Omit<ViewingAreaModel, 'type'>) {
     await this._townsService.createViewingArea(this.townID, this.sessionToken, newArea);
   }
+
   /**
    * Disconnect from the town, notifying the townService that we are leaving and returning
    * to the login page
@@ -643,7 +644,6 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
               new TicTacToeAreaController(eachInteractable.id, eachInteractable, this),
             );
           } else if (isConnectFourArea(eachInteractable)) {
-            
             this._interactableControllers.push(
               new ConnectFourAreaController(eachInteractable.id, eachInteractable, this),
             );
@@ -651,7 +651,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
             console.log(eachInteractable);
             this._interactableControllers.push(
               new TicketBoothAreaController(eachInteractable, this),
-            )
+            );
           }
         });
         this._userID = initialData.userID;
@@ -862,7 +862,11 @@ export function useActiveInteractableAreas(): GenericInteractableAreaController[
   const townController = useTownController();
   const [interactableAreas, setInteractableAreas] = useState<GenericInteractableAreaController[]>(
     (townController.gameAreas as GenericInteractableAreaController[])
-      .concat(townController.conversationAreas, townController.viewingAreas, townController.ticketBoothAreas)
+      .concat(
+        townController.conversationAreas,
+        townController.viewingAreas,
+        townController.ticketBoothAreas,
+      )
       .filter(eachArea => eachArea.isActive()),
   );
   useEffect(() => {
@@ -902,7 +906,11 @@ export function useActiveInteractableAreasSortedByOccupancyAndName(): GenericInt
 
   const [interactableAreas, setInteractableAreas] = useState<InteractableAreaReadAheadOccupancy[]>(
     (townController.gameAreas as GenericInteractableAreaController[])
-      .concat(townController.conversationAreas, townController.viewingAreas, townController.ticketBoothAreas)
+      .concat(
+        townController.conversationAreas,
+        townController.viewingAreas,
+        townController.ticketBoothAreas,
+      )
       .filter(eachArea => eachArea.isActive())
       .map(area => ({ area, occupancy: area.occupants.length })),
   );

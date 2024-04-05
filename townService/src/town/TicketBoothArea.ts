@@ -7,7 +7,6 @@ import {
   InteractableID,
   TownEmitter,
   TicketBoothArea as TicketBoothAreaModel,
-  TicketBoothPurchaseCommand,
   BoothItem,
 } from '../types/CoveyTownSocket';
 import InteractableArea from './InteractableArea';

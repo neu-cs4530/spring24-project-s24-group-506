@@ -100,6 +100,13 @@ export default abstract class GameAreaController<
     }
   }
 
+  public async addToken(amount: number) {
+    await this._townController.sendInteractableCommand(this.id, {
+      type: 'AddToken',
+      amount,
+    });
+  }
+
   protected _updateFrom(newModel: GameArea<State>): void {
     const gameEnding =
       this._model.game?.state.status === 'IN_PROGRESS' && newModel.game?.state.status === 'OVER';

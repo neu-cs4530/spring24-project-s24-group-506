@@ -24,8 +24,7 @@ function interactableTypeForObjectType(type: string): any {
     return GameArea;
   } else if (type === 'TicketBoothArea') {
     return TicketBoothArea;
-  } 
-  else {
+  } else {
     throw new Error(`Unknown object type: ${type}`);
   }
 }

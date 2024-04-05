@@ -236,7 +236,7 @@ export type TicketBoothPurchase = {
   player: PlayerID;
 }
 
-export type InteractableCommand = TicketBoothPurchaseCommand | ViewingAreaUpdateCommand | JoinGameCommand | GameMoveCommand<TicTacToeMove> | GameMoveCommand<ConnectFourMove> | StartGameCommand | LeaveGameCommand;
+export type InteractableCommand = TicketBoothPurchaseCommand | AddTokenCommand | ViewingAreaUpdateCommand | JoinGameCommand | GameMoveCommand<TicTacToeMove> | GameMoveCommand<ConnectFourMove> | StartGameCommand | LeaveGameCommand;
 export interface ViewingAreaUpdateCommand  {
   type: 'ViewingAreaUpdate';
   update: ViewingArea;
@@ -262,6 +262,10 @@ export interface TicketBoothPurchaseCommand {
   itemName: BoothItemName;
   playerID: PlayerID;
 }
+export interface AddTokenCommand {
+  type: 'AddToken';
+  amount: number;
+}
 
 export type InteractableCommandReturnType<CommandType extends InteractableCommand> = 
   CommandType extends JoinGameCommand ? { gameID: string}:
@@ -270,6 +274,7 @@ export type InteractableCommandReturnType<CommandType extends InteractableComman
   CommandType extends LeaveGameCommand ? undefined :
   CommandType extends StartGameCommand ? undefined :
   CommandType extends TicketBoothPurchaseCommand ? undefined :
+  CommandType extends AddTokenCommand ? undefined :
   never;
 
 export type InteractableCommandResponse<MessageType> = {

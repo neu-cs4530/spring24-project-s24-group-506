@@ -27,14 +27,7 @@ import TicketBoothAreaController from '../../../classes/interactable/TicketBooth
 import PlayerController from '../../../classes/PlayerController';
 import { useInteractable, useInteractableAreaController } from '../../../classes/TownController';
 import useTownController from '../../../hooks/useTownController';
-import {
-  BoothItem,
-  BoothItemName,
-  GameResult,
-  InteractableID,
-  PlayerID,
-} from '../../../types/CoveyTownSocket';
-import ChatChannel from './ChatChannel';
+import { BoothItem, BoothItemName, InteractableID, PlayerID } from '../../../types/CoveyTownSocket';
 import { css, keyframes } from '@emotion/react';
 
 export const INVALID_GAME_AREA_TYPE_MESSAGE = 'Invalid game area type';
