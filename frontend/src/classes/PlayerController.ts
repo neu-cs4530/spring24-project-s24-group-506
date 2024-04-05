@@ -23,7 +23,7 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
 
   public gameObjects?: PlayerGameObjects;
 
-  constructor(id: string, userName: string, location: PlayerLocation, tokens: number) {
+  constructor(id: string, userName: string, location: PlayerLocation, tokens = 0) {
     super();
     this._id = id;
     this._userName = userName;
