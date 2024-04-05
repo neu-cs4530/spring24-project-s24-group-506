@@ -126,7 +126,6 @@ export default class TicketBoothArea extends InteractableArea {
       items.forEach(item => {
         if (item.name === itemName) {
           areaChanged = true;
-          item.timesPurchased++;
           const player = this.occupants.find(p => p.id === playerID);
           if (!player) {
             throw new InvalidParametersError('Player not found');
@@ -134,6 +133,7 @@ export default class TicketBoothArea extends InteractableArea {
           if (player.tokens < item.cost) {
             throw new InvalidParametersError('Player does not have enough tokens');
           }
+          item.timesPurchased++;
           player.removeTokens(item.cost);
           this._emitPlayerTokensChanged(player);
         }
