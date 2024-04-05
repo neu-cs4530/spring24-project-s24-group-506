@@ -37,7 +37,7 @@ export function isConnectFourArea(
 export function isTicketBoothArea(interactable: Interactable): interactable is TicketBoothArea {
   return interactable.type === 'TicketBoothArea';
 }
-  
+
 export function isPongArea(interactable: Interactable): interactable is GameArea<PongGameState> {
   return interactable.type === 'PongArea';
 }
