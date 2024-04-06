@@ -165,6 +165,11 @@ export default class PongGameArea extends GameArea<PongGame> {
       this._stateUpdated(game.toModel());
       return undefined as InteractableCommandReturnType<CommandType>;
     }
+    if (command.type === 'AddToken') {
+      player.addTokens(command.amount);
+      this._emitPlayerTokensChanged(player);
+      return undefined as InteractableCommandReturnType<CommandType>;
+    }
     throw new InvalidParametersError(INVALID_COMMAND_MESSAGE);
   }
 }

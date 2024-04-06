@@ -132,9 +132,14 @@ export default class TicketBoothArea extends InteractableArea {
           if (player.tokens < item.cost) {
             throw new InvalidParametersError('Player does not have enough tokens');
           }
+          if (player.hasItem(itemName)) {
+            throw new InvalidParametersError('Player already owns this item');
+          }
           item.timesPurchased++;
           player.removeTokens(item.cost);
+          player.addItem(itemName);
           this._emitPlayerTokensChanged(player);
+          this._emitPlayerItemsChanged(player);
         }
       });
       if (areaChanged) {

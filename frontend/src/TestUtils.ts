@@ -162,6 +162,8 @@ export async function mockTownControllerConnection(
           userName: testController.userName,
           location: { moving: false, x: 0, y: 0, rotation: 'back' },
           tokens: 0,
+          itemsOwned: [],
+          itemEquipped: undefined,
         },
       ],
       friendlyName: nanoid(),
@@ -183,6 +185,8 @@ export async function mockTownControllerConnection(
         userName: nanoid(),
         location: { moving: false, x: 0, y: 0, rotation: 'back' },
         tokens: 0,
+        itemsOwned: [],
+        itemEquipped: undefined,
       });
       responseToSendController.interactables.push({
         id: nanoid(),

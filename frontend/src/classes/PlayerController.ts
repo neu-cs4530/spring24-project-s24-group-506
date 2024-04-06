@@ -1,6 +1,6 @@
 import EventEmitter from 'events';
 import TypedEmitter from 'typed-emitter';
-import { Player as PlayerModel, PlayerLocation } from '../types/CoveyTownSocket';
+import { Player as PlayerModel, PlayerLocation, BoothItemName } from '../types/CoveyTownSocket';
 export const MOVEMENT_SPEED = 175;
 
 export type PlayerEvents = {
@@ -21,14 +21,20 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
 
   private _tokens: number;
 
+  private _itemsOwned: BoothItemName[];
+
+  private _itemEquipped: BoothItemName | undefined;
+
   public gameObjects?: PlayerGameObjects;
 
-  constructor(id: string, userName: string, location: PlayerLocation, tokens = 0) {
+  constructor(id: string, userName: string, location: PlayerLocation, tokens = 0, itemsOwned = [], itemEquipped = undefined) {
     super();
     this._id = id;
     this._userName = userName;
     this._location = location;
     this._tokens = tokens;
+    this._itemsOwned = itemsOwned;
+    this._itemEquipped = itemEquipped;
   }
 
   set location(newLocation: PlayerLocation) {
@@ -57,8 +63,24 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
     this._tokens = value;
   }
 
+  get itemsOwned(): BoothItemName[] {
+    return this._itemsOwned;
+  }
+
+  set itemsOwned(value: BoothItemName[]) {
+    this._itemsOwned = value;
+  }
+
+  get itemEquipped(): BoothItemName | undefined {
+    return this._itemEquipped;
+  }
+
+  set itemEquipped(value: BoothItemName | undefined) {
+    this._itemEquipped = value;
+  }
+
   toPlayerModel(): PlayerModel {
-    return { id: this.id, userName: this.userName, location: this.location, tokens: this._tokens };
+    return { id: this.id, userName: this.userName, location: this.location, tokens: this._tokens, itemsOwned: this._itemsOwned, itemEquipped: this._itemEquipped};
   }
 
   private _updateGameComponentLocation() {

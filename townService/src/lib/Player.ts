@@ -1,5 +1,5 @@
 import { nanoid } from 'nanoid';
-import { Player as PlayerModel, PlayerLocation, TownEmitter } from '../types/CoveyTownSocket';
+import { Player as PlayerModel, PlayerLocation, TownEmitter, BoothItemName } from '../types/CoveyTownSocket';
 
 /**
  * Each user who is connected to a town is represented by a Player object
@@ -22,6 +22,10 @@ export default class Player {
 
   private _tokens: number;
 
+  private _itemsOwned: BoothItemName[];
+
+  private _itemEquipped: BoothItemName | undefined;
+
   /** A special town emitter that will emit events to the entire town BUT NOT to this player */
   public readonly townEmitter: TownEmitter;
 
@@ -37,6 +41,8 @@ export default class Player {
     this._sessionToken = nanoid();
     this.townEmitter = townEmitter;
     this._tokens = 0;
+    this._itemsOwned = [];
+    this._itemEquipped = undefined;
   }
 
   get userName(): string {
@@ -51,12 +57,28 @@ export default class Player {
     return this._tokens;
   }
 
+  get itemsOwned(): BoothItemName[] {
+    return this._itemsOwned;
+  }
+
+  get itemEquipped(): BoothItemName | undefined {
+    return this._itemEquipped;
+  }
+
   set tokens(value: number) {
     this._tokens = value;
   }
 
+  set itemsOwned(value: BoothItemName[]) {
+    this._itemsOwned = value;
+  }
+
   set videoToken(value: string | undefined) {
     this._videoToken = value;
+  }
+
+  set itemEquipped(value: BoothItemName | undefined) {
+    this._itemEquipped = value;
   }
 
   get videoToken(): string | undefined {
@@ -73,6 +95,8 @@ export default class Player {
       location: this.location,
       userName: this._userName,
       tokens: this._tokens,
+      itemsOwned: this._itemsOwned,
+      itemEquipped: this._itemEquipped,
     };
   }
 
@@ -82,5 +106,21 @@ export default class Player {
 
   removeTokens(tokens: number): void {
     this._tokens -= tokens;
+  }
+
+  addItem(item: BoothItemName): void {
+    this._itemsOwned.push(item);
+  }
+
+  equipItem(item: BoothItemName): void {
+    this._itemEquipped = item;
+  }
+
+  unequipItem(): void {
+    this._itemEquipped = undefined;
+  }
+
+  hasItem(item: BoothItemName): boolean {
+    return this._itemsOwned.includes(item);
   }
 }

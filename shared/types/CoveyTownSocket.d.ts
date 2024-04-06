@@ -37,6 +37,8 @@ export interface Player {
   userName: string;
   location: PlayerLocation;
   tokens: number;
+  itemsOwned: BoothItemName[];
+  itemEquipped?: BoothItemName;
 };
 
 export type XY = { x: number, y: number };
@@ -337,6 +339,7 @@ export type InteractableCommandResponse<MessageType> = {
 
 export interface ServerToClientEvents {
   playerTokensChanged: (playerChanged: Player) => void;
+  playerItemsChanged: (playerChanged: Player) => void;
   playerMoved: (movedPlayer: Player) => void;
   playerDisconnect: (disconnectedPlayer: Player) => void;
   playerJoined: (newPlayer: Player) => void;
