@@ -94,6 +94,8 @@ function TicketBoothsArea({ interactableID }: { interactableID: InteractableID }
       ticketBoothAreaController.removeListener('itemPurchased', setItems);
     };
   }, [townController, ticketBoothAreaController]);
+  function handleEquip(item: string): void {}
+
   return (
     <>
       <Tabs isFitted variant='enclosed'>
@@ -125,8 +127,8 @@ function TicketBoothsArea({ interactableID }: { interactableID: InteractableID }
             <Flex direction='column' align='center'>
               <Heading
                 css={css`
-            animation: ${flashing} 3s infinite;
-          `}>
+                  animation: ${flashing} 3s infinite;
+                `}>
                 TICKETBOOTH
               </Heading>
               <Flex align='center' justify='center' mb={4}>
@@ -154,7 +156,9 @@ function TicketBoothsArea({ interactableID }: { interactableID: InteractableID }
                         <Text mb={2}>{boothItem.description}</Text>
                         <Text mb={2}>Times Purchased: {boothItem.timesPurchased}</Text>
                         <Button
-                          onClick={() => handlePurchase(boothItem.name, townController.ourPlayer.id)}>
+                          onClick={() =>
+                            handlePurchase(boothItem.name, townController.ourPlayer.id)
+                          }>
                           Purchase
                         </Button>
                       </Box>
@@ -165,7 +169,19 @@ function TicketBoothsArea({ interactableID }: { interactableID: InteractableID }
             </Flex>
           </TabPanel>
           <TabPanel>
-            <p>Items: {JSON.stringify(townController.ourPlayer.itemsOwned)}</p>
+            <Flex wrap='wrap' justify='space-around'>
+              {townController.ourPlayer.itemsOwned.map((item, index) => (
+                <Box key={index} p={5} shadow='md' borderWidth='1px' m={4}>
+                  <Image boxSize='100px' src={itemImages[item]} alt={item} />
+                  <Text mt={2} textAlign='center'>
+                    {item}
+                  </Text>
+                  <Button mt={2} onClick={() => handleEquip(item)}>
+                    Equip Prize
+                  </Button>
+                </Box>
+              ))}
+            </Flex>
           </TabPanel>
         </TabPanels>
       </Tabs>
