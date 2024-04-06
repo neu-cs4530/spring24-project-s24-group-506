@@ -94,7 +94,17 @@ function TicketBoothsArea({ interactableID }: { interactableID: InteractableID }
       ticketBoothAreaController.removeListener('itemPurchased', setItems);
     };
   }, [townController, ticketBoothAreaController]);
-  function handleEquip(item: string): void {}
+  async function handleEquip(item: BoothItemName, playerID: PlayerID): Promise<void> {
+    try {
+      await ticketBoothAreaController.equipItem(item, playerID);
+    } catch (e) {
+      toast({
+        title: 'Error equipping item',
+        description: (e as Error).toString(),
+        status: 'error',
+      });
+    }
+  }
 
   return (
     <>
@@ -169,6 +179,12 @@ function TicketBoothsArea({ interactableID }: { interactableID: InteractableID }
             </Flex>
           </TabPanel>
           <TabPanel>
+            <Flex align='center' justify='center' mt={2}>
+              <Text mr={2}>Item you have equipped:</Text>
+              <Badge colorScheme='green' p={1}>
+                {townController.ourPlayer.itemEquipped}
+              </Badge>
+            </Flex>
             <Flex wrap='wrap' justify='space-around'>
               {townController.ourPlayer.itemsOwned.map((item, index) => (
                 <Box key={index} p={5} shadow='md' borderWidth='1px' m={4}>
@@ -176,7 +192,7 @@ function TicketBoothsArea({ interactableID }: { interactableID: InteractableID }
                   <Text mt={2} textAlign='center'>
                     {item}
                   </Text>
-                  <Button mt={2} onClick={() => handleEquip(item)}>
+                  <Button mt={2} onClick={() => handleEquip(item, townController.ourPlayer.id)}>
                     Equip Prize
                   </Button>
                 </Box>

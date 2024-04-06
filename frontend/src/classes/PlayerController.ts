@@ -27,7 +27,14 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
 
   public gameObjects?: PlayerGameObjects;
 
-  constructor(id: string, userName: string, location: PlayerLocation, tokens = 0, itemsOwned = [], itemEquipped = undefined) {
+  constructor(
+    id: string,
+    userName: string,
+    location: PlayerLocation,
+    tokens = 0,
+    itemsOwned: BoothItemName[] = [],
+    itemEquipped: BoothItemName | undefined = undefined,
+  ) {
     super();
     this._id = id;
     this._userName = userName;
@@ -80,7 +87,14 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
   }
 
   toPlayerModel(): PlayerModel {
-    return { id: this.id, userName: this.userName, location: this.location, tokens: this._tokens, itemsOwned: this._itemsOwned, itemEquipped: this._itemEquipped};
+    return {
+      id: this.id,
+      userName: this.userName,
+      location: this.location,
+      tokens: this._tokens,
+      itemsOwned: this._itemsOwned,
+      itemEquipped: this._itemEquipped,
+    };
   }
 
   private _updateGameComponentLocation() {
@@ -122,6 +136,8 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
       modelPlayer.userName,
       modelPlayer.location,
       modelPlayer.tokens,
+      modelPlayer.itemsOwned,
+      modelPlayer.itemEquipped,
     );
   }
 }

@@ -38,7 +38,7 @@ export interface Player {
   location: PlayerLocation;
   tokens: number;
   itemsOwned: BoothItemName[];
-  itemEquipped?: BoothItemName;
+  itemEquipped?: BoothItemName | undefined;
 };
 
 export type XY = { x: number, y: number };
@@ -276,7 +276,7 @@ export type TicketBoothPurchase = {
   player: PlayerID;
 }
 
-export type InteractableCommand =  TicketBoothPurchaseCommand | AddTokenCommand | ViewingAreaUpdateCommand | JoinGameCommand | GameMoveCommand<TicTacToeMove> | GameMoveCommand<ConnectFourMove> | GameMoveCommand<PongMove> | StartUpdatePhysicsCommand | StopUpdatePhysicsCommand | UpdatePongScoreCommand | StartGameCommand | LeaveGameCommand;
+export type InteractableCommand =  TicketBoothPurchaseCommand | AddTokenCommand | ViewingAreaUpdateCommand | JoinGameCommand | GameMoveCommand<TicTacToeMove> | GameMoveCommand<ConnectFourMove> | GameMoveCommand<PongMove> | StartUpdatePhysicsCommand | StopUpdatePhysicsCommand | UpdatePongScoreCommand | StartGameCommand | LeaveGameCommand | TicketBoothEquipCommand;
 export interface ViewingAreaUpdateCommand  {
   type: 'ViewingAreaUpdate';
   update: ViewingArea;
@@ -300,6 +300,11 @@ export interface GameMoveCommand<MoveType> {
 export interface TicketBoothPurchaseCommand {
   type: 'TicketBoothPurchase';
   itemName: BoothItemName;
+  playerID: PlayerID;
+}
+export interface TicketBoothEquipCommand {
+  type: 'TicketBoothEquip';
+  itemName: BoothItemName | undefined;
   playerID: PlayerID;
 }
 export interface AddTokenCommand {
@@ -327,6 +332,7 @@ export type InteractableCommandReturnType<CommandType extends InteractableComman
   CommandType extends LeaveGameCommand ? undefined :
   CommandType extends StartGameCommand ? undefined :
   CommandType extends TicketBoothPurchaseCommand ? undefined :
+  CommandType extends TicketBoothEquipCommand ? undefined :
   CommandType extends AddTokenCommand ? undefined :
   never;
 
@@ -349,6 +355,7 @@ export interface ServerToClientEvents {
   chatMessage: (message: ChatMessage) => void;
   interactableUpdate: (interactable: Interactable) => void;
   commandResponse: (response: InteractableCommandResponse) => void;
+  playerEquippedChanged: (playerChanged: Player) => void;
 }
 
 export interface ClientToServerEvents {

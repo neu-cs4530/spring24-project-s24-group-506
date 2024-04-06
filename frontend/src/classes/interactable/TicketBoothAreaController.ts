@@ -112,4 +112,18 @@ export default class TicketBoothAreaController extends InteractableAreaControlle
     });
     console.log(`Purchased item: ${itemName}`);
   }
+
+  /**
+   * Sends a request to the server to equip an item from the ticket booth.
+   * @param itemName The name of the item to equip
+   * @param playerID The ID of the player equipping the item
+   */
+  public async equipItem(itemName: BoothItemName, playerID: PlayerID) {
+    await this._townController.sendInteractableCommand(this.id, {
+      type: 'TicketBoothEquip',
+      itemName: itemName,
+      playerID: playerID,
+    });
+    console.log(`Equipped item: ${itemName}`);
+  }
 }

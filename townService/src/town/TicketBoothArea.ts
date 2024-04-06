@@ -148,6 +148,23 @@ export default class TicketBoothArea extends InteractableArea {
       }
       return undefined as InteractableCommandReturnType<CommandType>;
     }
+    if (command.type === 'TicketBoothEquip') {
+      const { items } = this;
+      const { itemName, playerID } = command;
+      const player = this.occupants.find(p => p.id === playerID);
+      if (!player) {
+        throw new InvalidParametersError('Player not found');
+      }
+      if (itemName && !player.hasItem(itemName)) {
+        throw new InvalidParametersError('Player does not own this item');
+      }
+      if (player.itemEquipped === itemName) {
+        throw new InvalidParametersError('Player already has this item equipped');
+      }
+      player.equipItem(itemName);
+      this._emitPlayerEquippedChanged(player);
+      return undefined as InteractableCommandReturnType<CommandType>;
+    }
     throw new InvalidParametersError(INVALID_COMMAND_MESSAGE);
   }
 }

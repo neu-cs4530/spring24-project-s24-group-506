@@ -185,4 +185,8 @@ export default abstract class InteractableArea {
   protected _emitPlayerItemsChanged(player: Player) {
     this._townEmitter.emit('playerItemsChanged', player.toPlayerModel());
   }
+
+  protected _emitPlayerEquippedChanged(player: Player) {
+    this._townEmitter.emit('playerEquippedChanged', player.toPlayerModel());
+  }
 }

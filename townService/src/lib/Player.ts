@@ -1,5 +1,10 @@
 import { nanoid } from 'nanoid';
-import { Player as PlayerModel, PlayerLocation, TownEmitter, BoothItemName } from '../types/CoveyTownSocket';
+import {
+  Player as PlayerModel,
+  PlayerLocation,
+  TownEmitter,
+  BoothItemName,
+} from '../types/CoveyTownSocket';
 
 /**
  * Each user who is connected to a town is represented by a Player object
@@ -40,7 +45,7 @@ export default class Player {
     this._id = nanoid();
     this._sessionToken = nanoid();
     this.townEmitter = townEmitter;
-    this._tokens = 0;
+    this._tokens = 100;
     this._itemsOwned = [];
     this._itemEquipped = undefined;
   }
@@ -112,12 +117,8 @@ export default class Player {
     this._itemsOwned.push(item);
   }
 
-  equipItem(item: BoothItemName): void {
+  equipItem(item: BoothItemName | undefined): void {
     this._itemEquipped = item;
-  }
-
-  unequipItem(): void {
-    this._itemEquipped = undefined;
   }
 
   hasItem(item: BoothItemName): boolean {
