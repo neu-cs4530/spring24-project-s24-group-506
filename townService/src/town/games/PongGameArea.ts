@@ -22,6 +22,8 @@ import GameArea from './GameArea';
  * @see GameArea
  */
 export default class PongGameArea extends GameArea<PongGame> {
+  private _physicsInterval: NodeJS.Timeout | undefined;
+
   protected getType(): InteractableType {
     return 'PongArea';
   }
@@ -98,7 +100,7 @@ export default class PongGameArea extends GameArea<PongGame> {
       this._stateUpdated(game.toModel());
       return undefined as InteractableCommandReturnType<CommandType>;
     }
-    if (command.type === 'UpdatePhysics') {
+    if (command.type === 'StartUpdatePhysics') {
       const game = this._game;
       if (!game) {
         throw new InvalidParametersError(GAME_NOT_IN_PROGRESS_MESSAGE);
@@ -106,8 +108,26 @@ export default class PongGameArea extends GameArea<PongGame> {
       if (this._game?.id !== command.gameID) {
         throw new InvalidParametersError(GAME_ID_MISSMATCH_MESSAGE);
       }
-      game.updatePhysics();
-      this._stateUpdated(game.toModel());
+      this._physicsInterval = setInterval(() => {
+        game.updatePhysics();
+        this._stateUpdated(game.toModel());
+      }, 1000 / 40);
+      return undefined as InteractableCommandReturnType<CommandType>;
+    }
+    if (command.type === 'StopUpdatePhysics') {
+      const game = this._game;
+      if (!game) {
+        throw new InvalidParametersError(GAME_NOT_IN_PROGRESS_MESSAGE);
+      }
+      if (this._game?.id !== command.gameID) {
+        throw new InvalidParametersError(GAME_ID_MISSMATCH_MESSAGE);
+      }
+      if (this._physicsInterval) {
+        clearInterval(this._physicsInterval);
+        this._physicsInterval = undefined;
+      } else {
+        throw new InvalidParametersError('Physics update not started');
+      }
       return undefined as InteractableCommandReturnType<CommandType>;
     }
     if (command.type === 'JoinGame') {

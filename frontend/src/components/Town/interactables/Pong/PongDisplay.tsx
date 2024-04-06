@@ -74,17 +74,13 @@ export default function PongDisplay({ gameAreaController }: PongGameProps): JSX.
   }, [gameAreaController]);
 
   useEffect(() => {
-    let updateBall: NodeJS.Timeout | undefined;
-    if (
-      gameAreaController.status === 'IN_PROGRESS' &&
-      gameAreaController.isPlayer &&
-      gameAreaController.gamePiece === 'Left'
-    ) {
-      updateBall = setInterval(() => {
-        gameAreaController.updatePhysics();
-      }, 10);
+    if (gameAreaController.isPlayer && gameAreaController.gamePiece === 'Left') {
+      if (gameAreaController.status === 'IN_PROGRESS') {
+        gameAreaController.startUpdatePhysics();
+      } else if (gameAreaController.status === 'OVER') {
+        gameAreaController.stopUpdatePhysics();
+      }
     }
-    return () => clearInterval(updateBall);
   }, [gameAreaController.status, gameAreaController]);
 
   useEffect(() => {

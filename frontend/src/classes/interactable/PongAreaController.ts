@@ -248,14 +248,26 @@ export default class PongAreaController extends GameAreaController<PongGameState
     });
   }
 
-  public async updatePhysics(): Promise<void> {
+  public async startUpdatePhysics(): Promise<void> {
     const instanceID = this._instanceID;
     if (!instanceID || this._model.game?.state.status !== 'IN_PROGRESS') {
       return;
     }
 
     await this._townController.sendInteractableCommand(this.id, {
-      type: 'UpdatePhysics',
+      type: 'StartUpdatePhysics',
+      gameID: instanceID,
+    });
+  }
+
+  public async stopUpdatePhysics(): Promise<void> {
+    const instanceID = this._instanceID;
+    if (!instanceID || this._model.game?.state.status !== 'IN_PROGRESS') {
+      return;
+    }
+
+    await this._townController.sendInteractableCommand(this.id, {
+      type: 'StopUpdatePhysics',
       gameID: instanceID,
     });
   }
