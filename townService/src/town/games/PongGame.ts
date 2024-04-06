@@ -21,7 +21,7 @@ export const PONG_HEIGHT = 320;
 export const PONG_PADDLE_WIDTH = 16;
 export const PONG_PADDLE_HEIGHT = 64;
 export const PONG_BALL_SIZE = 12;
-export const PONG_BALL_STARTING_SPEED = 2;
+export const PONG_BALL_STARTING_SPEED = 4;
 
 /**
  * A PongGame is a Game that implements the rules of Pong.
@@ -31,6 +31,8 @@ export default class PongGame extends Game<PongGameState, PongMove> {
   private _preferredLeftPlayer?: PlayerID;
 
   private _preferredRightPlayer?: PlayerID;
+
+  private _physicsIntervalID?: NodeJS.Timeout;
 
   /**
    * Creates a new PongGame.
@@ -246,6 +248,17 @@ export default class PongGame extends Game<PongGameState, PongMove> {
     this.state = newState;
   }
 
+  private _resetBall(stateToUpdate: PongGameState): void {
+    stateToUpdate.ballPosition = {
+      x: PONG_WIDTH / 2 - PONG_BALL_SIZE / 2,
+      y: PONG_HEIGHT / 2 - PONG_BALL_SIZE / 2,
+    };
+    stateToUpdate.ballVelocity = {
+      x: stateToUpdate.ballVelocity.x > 0 ? -PONG_BALL_STARTING_SPEED : PONG_BALL_STARTING_SPEED,
+      y: Math.random() * 8 - 4,
+    };
+  }
+
   public updatePhysics(): void {
     if (this.state.status !== 'IN_PROGRESS') {
       return;
@@ -284,10 +297,7 @@ export default class PongGame extends Game<PongGameState, PongMove> {
         newState.status = 'OVER';
         newState.winner = newState.rightPlayer;
       }
-      newState.ballPosition.x = PONG_WIDTH / 2 - PONG_BALL_SIZE;
-      newState.ballPosition.y = PONG_HEIGHT / 2 - PONG_BALL_SIZE;
-      newState.ballVelocity.x = newState.ballVelocity.x > 0 ? -2 : 2;
-      newState.ballVelocity.y = Math.random() * 8 - 4;
+      this._resetBall(newState);
     }
     if (newState.ballPosition.x >= PONG_WIDTH - PONG_BALL_SIZE) {
       newState.leftScore++;
@@ -295,10 +305,7 @@ export default class PongGame extends Game<PongGameState, PongMove> {
         newState.status = 'OVER';
         newState.winner = this.state.leftPlayer;
       }
-      newState.ballPosition.x = PONG_WIDTH / 2 - PONG_BALL_SIZE;
-      newState.ballPosition.y = PONG_HEIGHT / 2 - PONG_BALL_SIZE;
-      newState.ballVelocity.x = newState.ballVelocity.x > 0 ? -2 : 2;
-      newState.ballVelocity.y = Math.random() * 8 - 4;
+      this._resetBall(newState);
     }
 
     if (

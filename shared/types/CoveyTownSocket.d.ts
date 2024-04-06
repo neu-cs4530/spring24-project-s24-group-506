@@ -274,7 +274,7 @@ export type TicketBoothPurchase = {
   player: PlayerID;
 }
 
-export type InteractableCommand =  TicketBoothPurchaseCommand | AddTokenCommand | ViewingAreaUpdateCommand | JoinGameCommand | GameMoveCommand<TicTacToeMove> | GameMoveCommand<ConnectFourMove> | GameMoveCommand<PongMove> | UpdatePhysicsCommand |UpdatePongScoreCommand | StartGameCommand | LeaveGameCommand;
+export type InteractableCommand =  TicketBoothPurchaseCommand | AddTokenCommand | ViewingAreaUpdateCommand | JoinGameCommand | GameMoveCommand<TicTacToeMove> | GameMoveCommand<ConnectFourMove> | GameMoveCommand<PongMove> | StartUpdatePhysicsCommand | StopUpdatePhysicsCommand | UpdatePongScoreCommand | StartGameCommand | LeaveGameCommand;
 export interface ViewingAreaUpdateCommand  {
   type: 'ViewingAreaUpdate';
   update: ViewingArea;
@@ -309,8 +309,12 @@ export interface UpdatePongScoreCommand {
   gameID: GameInstanceID;
   scoreUpdate: PongScoreUpdate;
 }
-export interface UpdatePhysicsCommand {
-  type: 'UpdatePhysics';
+export interface StartUpdatePhysicsCommand {
+  type: 'StartUpdatePhysics';
+  gameID: GameInstanceID;
+}
+export interface StopUpdatePhysicsCommand {
+  type: 'StopUpdatePhysics';
   gameID: GameInstanceID;
 }
 
