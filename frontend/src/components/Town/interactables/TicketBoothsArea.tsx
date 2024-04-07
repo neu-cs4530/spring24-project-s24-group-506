@@ -72,6 +72,7 @@ function TicketBoothsArea({ interactableID }: { interactableID: InteractableID }
     ticketBoothAreaController.occupants,
   );
   const [items, setItems] = useState<BoothItem[] | undefined>(ticketBoothAreaController.items);
+  const [itemEquipped, setItemEquipped] = useState<BoothItemName | undefined>(ticketBoothAreaController.itemEquipped);
   const toast = useToast();
 
   const handlePurchase = async (itemName: BoothItemName, playerID: PlayerID) => {
@@ -86,15 +87,7 @@ function TicketBoothsArea({ interactableID }: { interactableID: InteractableID }
       });
     }
   };
-  useEffect(() => {
-    ticketBoothAreaController.addListener('occupantsChange', setOccupants);
-    ticketBoothAreaController.addListener('itemPurchased', setItems);
-    return () => {
-      ticketBoothAreaController.removeListener('occupantsChange', setOccupants);
-      ticketBoothAreaController.removeListener('itemPurchased', setItems);
-    };
-  }, [townController, ticketBoothAreaController]);
-  async function handleEquip(item: BoothItemName, playerID: PlayerID): Promise<void> {
+  const handleEquip = async (item: BoothItemName | undefined, playerID: PlayerID) => {
     try {
       await ticketBoothAreaController.equipItem(item, playerID);
     } catch (e) {
@@ -105,6 +98,26 @@ function TicketBoothsArea({ interactableID }: { interactableID: InteractableID }
       });
     }
   }
+
+  const equipPrize = (item: BoothItemName) => {
+    return (<Button mt={2} onClick={() => handleEquip(item, townController.ourPlayer.id)}>
+  Equip Prize
+</Button>);};
+  const unequipPrize = () => {
+    return (<Button mt={2} onClick={() => handleEquip(undefined, townController.ourPlayer.id)}>Unequip Item</Button>);
+  };
+
+  useEffect(() => {
+    ticketBoothAreaController.addListener('occupantsChange', setOccupants);
+    ticketBoothAreaController.addListener('itemPurchased', setItems);
+    ticketBoothAreaController.addListener('itemEquipped', setItemEquipped);
+    return () => {
+      ticketBoothAreaController.removeListener('occupantsChange', setOccupants);
+      ticketBoothAreaController.removeListener('itemPurchased', setItems);
+      ticketBoothAreaController.removeListener('itemEquipped', setItemEquipped);
+    };
+  }, [townController, ticketBoothAreaController]);
+  
 
   return (
     <>
@@ -182,7 +195,7 @@ function TicketBoothsArea({ interactableID }: { interactableID: InteractableID }
             <Flex align='center' justify='center' mt={2}>
               <Text mr={2}>Item you have equipped:</Text>
               <Badge colorScheme='green' p={1}>
-                {townController.ourPlayer.itemEquipped}
+                {itemEquipped ? itemEquipped : 'None'}
               </Badge>
             </Flex>
             <Flex wrap='wrap' justify='space-around'>
@@ -192,9 +205,7 @@ function TicketBoothsArea({ interactableID }: { interactableID: InteractableID }
                   <Text mt={2} textAlign='center'>
                     {item}
                   </Text>
-                  <Button mt={2} onClick={() => handleEquip(item, townController.ourPlayer.id)}>
-                    Equip Prize
-                  </Button>
+                  {itemEquipped !== item ? equipPrize(item) : unequipPrize()}
                 </Box>
               ))}
             </Flex>

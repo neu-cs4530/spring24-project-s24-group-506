@@ -21,6 +21,7 @@ export type TicketBoothAreaEvents = BaseInteractableEventMap & {
    * the value `undefined` to indicate that there is no video set.
    */
   itemPurchased: (items: BoothItem[] | undefined) => void;
+  itemEquipped: (itemName: BoothItemName | undefined) => void;
 };
 
 /**
@@ -39,6 +40,8 @@ export default class TicketBoothAreaController extends InteractableAreaControlle
 
   private _townController: TownController;
 
+  private _itemEquipped: BoothItemName | undefined;
+
   /**
    * Constructs a new TicketBoothAreaController, initialized with the state of the
    * provided TicketBoothAreaModel.
@@ -49,6 +52,7 @@ export default class TicketBoothAreaController extends InteractableAreaControlle
     super(ticketBoothAreaModel.id);
     this._model = ticketBoothAreaModel;
     this._townController = _townController;
+    this._itemEquipped = undefined;
   }
 
   public isActive(): boolean {
@@ -69,6 +73,15 @@ export default class TicketBoothAreaController extends InteractableAreaControlle
    */
   public set items(items: BoothItem[] | undefined) {
     this.items = items;
+  }
+
+  public get itemEquipped(): BoothItemName | undefined {
+    return this._itemEquipped;
+  }
+
+  private _equipItem(itemName: BoothItemName | undefined) {
+    this._itemEquipped = itemName;
+    this.emit('itemEquipped', itemName);
   }
 
   public get friendlyName(): string {
@@ -124,6 +137,7 @@ export default class TicketBoothAreaController extends InteractableAreaControlle
       itemName: itemName,
       playerID: playerID,
     });
+    this._equipItem(itemName);
     console.log(`Equipped item: ${itemName}`);
   }
 }
