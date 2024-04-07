@@ -131,7 +131,7 @@ export default class TicketBoothAreaController extends InteractableAreaControlle
    * @param itemName The name of the item to equip
    * @param playerID The ID of the player equipping the item
    */
-  public async equipItem(itemName: BoothItemName, playerID: PlayerID) {
+  public async equipItem(itemName: BoothItemName | undefined, playerID: PlayerID) {
     await this._townController.sendInteractableCommand(this.id, {
       type: 'TicketBoothEquip',
       itemName: itemName,
