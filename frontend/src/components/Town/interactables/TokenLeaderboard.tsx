@@ -1,15 +1,10 @@
-import {
-    Badge,
-    Flex,
-    Text,
-} from '@chakra-ui/react';
+import { Badge, Flex, Text } from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react';
 import TicketBoothAreaController from '../../../classes/interactable/TicketBoothAreaController';
 import { useInteractableAreaController, usePlayers } from '../../../classes/TownController';
 import useTownController from '../../../hooks/useTownController';
 import { InteractableID } from '../../../types/CoveyTownSocket';
 import PlayerController from '../../../classes/PlayerController';
-
 
 /**
  * A generic component that renders a game area.
@@ -26,24 +21,28 @@ import PlayerController from '../../../classes/PlayerController';
  *
  */
 export function TokenLeaderboard(): JSX.Element {
-    const townController = useTownController();
+  const townController = useTownController();
 
-    const mapFunction = (player: PlayerController, index: number) => {
-        return (
-            <Flex key={index} justify='space-between' align='center' p={2} borderBottomWidth='1px'>
-                <Text>{player.userName}</Text>
-                <Badge>{player.tokens}</Badge>
-            </Flex>
-        );
-    }
-
-    const sortedPlayers = townController.players.sort(
-        (a, b) => b.tokens - a.tokens,
-    ).map(mapFunction);
-
+  const mapFunction = (player: PlayerController, index: number) => {
     return (
-        <>
-            {sortedPlayers}
-        </>
+      <Flex key={index} justify='space-between' align='center' p={2} borderBottomWidth='1px'>
+        <Text>{index + 1}</Text>
+        <Text>{player.userName}</Text>
+        <Badge>{player.tokens}</Badge>
+      </Flex>
     );
+  };
+
+  const sortedPlayers = townController.players.sort((a, b) => b.tokens - a.tokens).map(mapFunction);
+
+  return (
+    <>
+      <Flex justify='space-between' align='center' p={2} borderBottomWidth='1px'>
+        <Text fontWeight='bold'>Rank</Text>
+        <Text fontWeight='bold'>Player Name</Text>
+        <Text fontWeight='bold'>Tokens</Text>
+      </Flex>
+      {sortedPlayers}
+    </>
+  );
 }

@@ -1,12 +1,4 @@
-import {
-    Badge,
-    Box,
-    Button,
-    Flex,
-    Image,
-    Text,
-    useToast,
-} from '@chakra-ui/react';
+import { Badge, Box, Button, Flex, Image, List, ListItem, Text, useToast } from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react';
 import TicketBoothAreaController from '../../../classes/interactable/TicketBoothAreaController';
 import { useInteractableAreaController } from '../../../classes/TownController';
@@ -17,9 +9,9 @@ import { keyframes } from '@emotion/react';
 export const INVALID_GAME_AREA_TYPE_MESSAGE = 'Invalid game area type';
 
 const itemImages = {
-    BlueHat: './assets/hatPictures/BlueHat.png',
-    RedHat: './assets/hatPictures/redHat.png',
-    GreenHat: './assets/hatPictures/GreenHat.png',
+  BlueHat: './assets/hatPictures/BlueHat.png',
+  RedHat: './assets/hatPictures/redHat.png',
+  GreenHat: './assets/hatPictures/GreenHat.png',
 };
 
 /**
@@ -37,61 +29,70 @@ const itemImages = {
  *
  */
 export function Inventory({ interactableID }: { interactableID: InteractableID }): JSX.Element {
-    const ticketBoothAreaController = useInteractableAreaController(
-        interactableID,
-    ) as TicketBoothAreaController;
-    const townController = useTownController();
-    const [itemEquipped, setItemEquipped] = useState<BoothItemName | undefined>(ticketBoothAreaController.itemEquipped);
-    const toast = useToast();
+  const ticketBoothAreaController = useInteractableAreaController(
+    interactableID,
+  ) as TicketBoothAreaController;
+  const townController = useTownController();
+  const [itemEquipped, setItemEquipped] = useState<BoothItemName | undefined>(
+    ticketBoothAreaController.itemEquipped,
+  );
+  const toast = useToast();
 
-    const handleEquip = async (item: BoothItemName | undefined, playerID: PlayerID) => {
-        try {
-            await ticketBoothAreaController.equipItem(item, playerID);
-        } catch (e) {
-            toast({
-                title: 'Error equipping item',
-                description: (e as Error).toString(),
-                status: 'error',
-            });
-        }
+  const handleEquip = async (item: BoothItemName | undefined, playerID: PlayerID) => {
+    try {
+      await ticketBoothAreaController.equipItem(item, playerID);
+    } catch (e) {
+      toast({
+        title: 'Error equipping item',
+        description: (e as Error).toString(),
+        status: 'error',
+      });
     }
+  };
 
-    const equipPrize = (item: BoothItemName) => {
-        return (<Button mt={2} onClick={() => handleEquip(item, townController.ourPlayer.id)}>
-            Equip Prize
-        </Button>);
-    };
-    const unequipPrize = () => {
-        return (<Button mt={2} onClick={() => handleEquip(undefined, townController.ourPlayer.id)}>Unequip Item</Button>);
-    };
-
-    useEffect(() => {
-        ticketBoothAreaController.addListener('itemEquipped', setItemEquipped);
-        return () => {
-            ticketBoothAreaController.removeListener('itemEquipped', setItemEquipped);
-        };
-    }, [townController, ticketBoothAreaController]);
-
-
+  const equipPrize = (item: BoothItemName) => {
     return (
-        <>
-            <Flex align='center' justify='center' mt={2}>
-                <Text mr={2}>Item you have equipped:</Text>
-                <Badge colorScheme='green' p={1}>
-                    {itemEquipped ? itemEquipped : 'None'}
-                </Badge>
-            </Flex>
-            <Flex wrap='wrap' justify='space-around'>
-                {townController.ourPlayer.itemsOwned.map((item, index) => (
-                    <Box key={index} p={5} shadow='md' borderWidth='1px' m={4}>
-                        <Image boxSize='100px' src={itemImages[item]} alt={item} />
-                        <Text mt={2} textAlign='center'>
-                            {item}
-                        </Text>
-                        {itemEquipped !== item ? equipPrize(item) : unequipPrize()}
-                    </Box>
-                ))}
-            </Flex>
-        </>
+      <Button mt={2} onClick={() => handleEquip(item, townController.ourPlayer.id)}>
+        Equip Prize
+      </Button>
     );
+  };
+  const unequipPrize = () => {
+    return (
+      <Button mt={2} onClick={() => handleEquip(undefined, townController.ourPlayer.id)}>
+        Unequip Item
+      </Button>
+    );
+  };
+
+  useEffect(() => {
+    ticketBoothAreaController.addListener('itemEquipped', setItemEquipped);
+    return () => {
+      ticketBoothAreaController.removeListener('itemEquipped', setItemEquipped);
+    };
+  }, [townController, ticketBoothAreaController]);
+
+  return (
+    <>
+      <Flex align='center' justify='center' mt={2}>
+        <Text mr={2}>Item you have equipped:</Text>
+        <Badge colorScheme='green' p={1}>
+          {itemEquipped ? itemEquipped : 'None'}
+        </Badge>
+      </Flex>
+      <List spacing={3} style={{ margin: '20px' }}>
+        {townController.ourPlayer.itemsOwned.map((item, index) => (
+          <ListItem key={index} p={5} shadow='md' borderWidth='1px'>
+            <Flex direction='column' align='center' justify='center'>
+              <Image boxSize='100px' src={itemImages[item]} alt={item} />
+              <Text mt={2} fontSize='xl'>
+                {item}
+              </Text>
+              <Box mt={2}>{itemEquipped !== item ? equipPrize(item) : unequipPrize()}</Box>
+            </Flex>
+          </ListItem>
+        ))}
+      </List>
+    </>
+  );
 }

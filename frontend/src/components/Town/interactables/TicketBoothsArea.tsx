@@ -34,7 +34,6 @@ import { TokenLeaderboard } from './TokenLeaderboard';
  *
  */
 function TicketBoothsArea({ interactableID }: { interactableID: InteractableID }): JSX.Element {
-
   return (
     <>
       <Tabs isFitted variant='enclosed'>
@@ -51,7 +50,7 @@ function TicketBoothsArea({ interactableID }: { interactableID: InteractableID }
             <Inventory interactableID={interactableID} />
           </TabPanel>
           <TabPanel>
-            <TokenLeaderboard/>
+            <TokenLeaderboard />
           </TabPanel>
         </TabPanels>
       </Tabs>
