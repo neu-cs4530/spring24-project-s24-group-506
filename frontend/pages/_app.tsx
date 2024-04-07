@@ -1,4 +1,5 @@
 import './App.css';
+import './styles.css';
 import React from 'react';
 import dynamic from 'next/dynamic';
 

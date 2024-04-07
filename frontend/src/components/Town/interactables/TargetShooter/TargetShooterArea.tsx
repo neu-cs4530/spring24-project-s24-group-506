@@ -4,8 +4,8 @@ import PlayerController from '../../../../classes/PlayerController';
 import { useInteractableAreaController } from '../../../../classes/TownController';
 import useTownController from '../../../../hooks/useTownController';
 import { GameStatus, InteractableID } from '../../../../types/CoveyTownSocket';
-// import PongAreaController from '../../../../classes/interactable/TargetShooterAreaController';
-import PongDisplay from './TargetShooterDisplay';
+import TargetAreaController from '../../../../classes/interactable/TargetShooterAreaController';
+import TargetShooterDisplay from './TargetShooterDisplay';
 
 /**
  * The ConnectFourArea component renders the Connect Four game area.
@@ -44,12 +44,12 @@ import PongDisplay from './TargetShooterDisplay';
  *    - Our player lost: description 'You lost :('
  *
  */
-export default function PongArea({
+export default function TargetShooterArea({
   interactableID,
 }: {
   interactableID: InteractableID;
 }): JSX.Element {
-  const gameAreaController = useInteractableAreaController<PongAreaController>(interactableID);
+  const gameAreaController = useInteractableAreaController<TargetAreaController>(interactableID);
   const townController = useTownController();
 
   const [player1, setPlayer1] = useState<PlayerController | undefined>(gameAreaController.player1);
@@ -170,7 +170,7 @@ export default function PongArea({
         <ListItem>player1: {player1?.userName || '(No player yet!)'}</ListItem>
         <ListItem>player2: {player2?.userName || '(No player yet!)'}</ListItem>
       </List>
-      <PongDisplay gameAreaController={gameAreaController} />
+      <TargetShooterDisplay gameAreaController={gameAreaController} />
     </>
   );
 }

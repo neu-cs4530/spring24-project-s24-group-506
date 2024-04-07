@@ -3,6 +3,7 @@ import { BoundingBox, TownEmitter } from '../../types/CoveyTownSocket';
 import InteractableArea from '../InteractableArea';
 import ConnectFourGameArea from './ConnectFourGameArea';
 import TicTacToeGameArea from './TicTacToeGameArea';
+import TargetShooterGameArea from './TargetShooterGameArea';
 
 /**
  * Creates a new GameArea from a map object
@@ -26,6 +27,9 @@ export default function GameAreaFactory(
   }
   if (gameType === 'ConnectFour') {
     return new ConnectFourGameArea(name, rect, broadcastEmitter);
+  }
+  if (gameType === 'TargetShooter') {
+    return new TargetShooterGameArea(name, rect, broadcastEmitter);
   }
   throw new Error(`Unknown game area type ${mapObject.class}`);
 }

@@ -35,7 +35,7 @@ export type TargetShooterEvents = GameEventTypes & {
 /**
  * This class is responsible for managing the state of the Pong game, and for sending commands to the server
  */
-export default class PongAreaController extends GameAreaController<
+export default class TargetShooterAreaController extends GameAreaController<
   TargetShooterGameState,
   TargetShooterEvents
 > {
@@ -44,42 +44,22 @@ export default class PongAreaController extends GameAreaController<
     y: this._model.game?.state.currentTarget.y ?? 0,
   };
 
-  private _player1cursor: XY = {
-    x: this._model.game?.state.player1Cursor.x ?? 0,
-    y: this._model.game?.state.player1Cursor.y ?? 0,
-  };
-
-  private _player2cursor: XY = {
-    x: this._model.game?.state.player2Cursor.x ?? 0,
-    y: this._model.game?.state.player2Cursor.y ?? 0,
-  };
-
   private _player1score: TargetShooterScore = 0;
 
   private _player2score: TargetShooterScore = 0;
 
-  // returns the current position of the left paddle
-  get player1cursor(): XY {
-    return this._player1cursor;
-  }
-
-  // returns the current position of the right paddle
-  get player2cursor(): XY {
-    return this._player2cursor;
-  }
-
   // returns the current position of the ball
-  get ballPosition(): XY {
+  get targetPosition(): XY {
     return this._targetposition;
   }
 
   // returns the current score of the left player
-  get leftScore(): TargetShooterScore {
+  get player1Score(): TargetShooterScore {
     return this._player1score;
   }
 
   // returns the current score of the right player
-  get rightScore(): TargetShooterScore {
+  get player2Score(): TargetShooterScore {
     return this._player2score;
   }
 
@@ -180,16 +160,6 @@ export default class PongAreaController extends GameAreaController<
     super._updateFrom(newModel);
     const newGame = newModel.game;
     if (newGame) {
-      if (!_.isEqual(newGame.state.player1Cursor, this._player1cursor)) {
-        this._player1cursor = newGame.state.player1Cursor;
-        this.emit('player1CursorUpdated', this._player1cursor);
-      }
-
-      if (!_.isEqual(newGame.state.player2Cursor, this._player2cursor)) {
-        this._player2cursor = newGame.state.player2Cursor;
-        this.emit('player2CursorUpdated', this._player2cursor);
-      }
-
       if (!_.isEqual(newGame.state.currentTarget, this._targetposition)) {
         this._targetposition = newGame.state.currentTarget;
         this.emit('targetPositionUpdated', this._targetposition);
@@ -197,12 +167,12 @@ export default class PongAreaController extends GameAreaController<
 
       if (newGame.state.player1Score !== this._player1score) {
         this._player1score = newGame.state.player1Score;
-        this.emit('leftScoreUpdated', this._player1score);
+        this.emit('player1ScoreUpdated', this._player1score);
       }
 
       if (newGame.state.player2Score !== this._player2score) {
         this._player2score = newGame.state.player2Score;
-        this.emit('rightScoreUpdated', this._player2score);
+        this.emit('player2ScoreUpdated', this._player2score);
       }
     }
   }

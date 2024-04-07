@@ -4,6 +4,7 @@ import {
   TargetShooterPlayer,
   GameMove,
   PlayerID,
+  XY,
 } from '../../types/CoveyTownSocket';
 import InvalidParametersError, {
   GAME_FULL_MESSAGE,
@@ -15,8 +16,8 @@ import InvalidParametersError, {
 import Player from '../../lib/Player';
 import Game from './Game';
 
-export const SCREENWIDTH = 800;
-export const SCREENHEIGHT = 640;
+export const SCREENWIDTH = 400;
+export const SCREENHEIGHT = 320;
 
 /**
  * A ConnectFourGame is a Game that implements the rules of Connect Four.
@@ -37,11 +38,9 @@ export default class TargetShooterGame extends Game<TargetShooterGameState, Targ
   public constructor(priorGame?: TargetShooterGame) {
     super({
       status: 'WAITING_FOR_PLAYERS',
-      currentTarget: { x: 0, y: 0 },
+      currentTarget: { x: 100, y: 100 },
       player1Score: 0,
       player2Score: 0,
-      player1Cursor: { x: 0, y: 0 },
-      player2Cursor: { x: 0, y: 0 },
     });
     this._preferredPlayer1 = priorGame?.state.player1;
     this._preferredPlayer2 = priorGame?.state.player2;
@@ -221,44 +220,43 @@ export default class TargetShooterGame extends Game<TargetShooterGameState, Targ
     } else {
       throw new InvalidParametersError(PLAYER_NOT_IN_GAME_MESSAGE);
     }
-    if (gamePiece === 'player1') {
-      this._checkTargetCollision('player1');
-      newState.player1Cursor = move.move.position;
-    } else if (gamePiece === 'player2') {
-      this._checkTargetCollision('player2');
-      newState.player2Cursor = move.move.position;
-    }
+    this._checkTargetHit(gamePiece, move.move.position, newState);
     this.state = newState;
   }
 
-  private _checkTargetCollision(player: TargetShooterPlayer): void {
-    const cursorX = player === 'player1' ? this.state.player1Cursor.x : this.state.player2Cursor.x;
-    const cursorY = player === 'player1' ? this.state.player1Cursor.y : this.state.player2Cursor.y;
-
+  private _checkTargetHit(
+    player: TargetShooterPlayer,
+    position: XY,
+    newState: TargetShooterGameState,
+  ): void {
     const distance = Math.sqrt(
-      (this.state.currentTarget.x - cursorX) ** 2 + (this.state.currentTarget.y - cursorY) ** 2,
+      (newState.currentTarget.x - position.x) ** 2 + (newState.currentTarget.y - position.y) ** 2,
     );
     // arbitary value
     if (distance < 5) {
-      this._incrementScore(player);
-      this._spawnTarget();
+      this._incrementScore(player, newState);
+      this._spawnTarget(newState);
     }
   }
 
-  private _incrementScore(player: TargetShooterPlayer): void {
+  private _incrementScore(player: TargetShooterPlayer, newState: TargetShooterGameState): void {
     if (player === 'player1') {
-      this.state.player1Score++;
+      newState.player1Score++;
     } else {
-      this.state.player2Score++;
+      newState.player2Score++;
+    }
+    if (newState.player1Score === 5 || newState.player2Score === 5) {
+      newState.status = 'OVER';
+      newState.winner = this.state.player1Score === 5 ? this.state.player1 : this.state.player2;
     }
   }
 
-  private _spawnTarget(): void {
+  private _spawnTarget(newState: TargetShooterGameState): void {
     const newTargetPosition = {
       x: Math.random() * SCREENWIDTH,
       y: Math.random() * SCREENHEIGHT,
     };
-    this.state.currentTarget.x = newTargetPosition.x;
-    this.state.currentTarget.y = newTargetPosition.y;
+    newState.currentTarget.x = newTargetPosition.x;
+    newState.currentTarget.y = newTargetPosition.y;
   }
 }

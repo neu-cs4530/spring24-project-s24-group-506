@@ -126,7 +126,8 @@ function AppOrDebugApp(): JSX.Element {
   // } else {
   //   return <App />;
   // }
-  return <TargetShooterGame />;
+  return <DebugApp />;
+  // return <TargetShooterGame />;
 }
 
 export default function AppStateWrapper(): JSX.Element {
