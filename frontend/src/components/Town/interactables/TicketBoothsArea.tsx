@@ -1,53 +1,23 @@
 import {
-  Accordion,
-  AccordionButton,
-  AccordionIcon,
-  AccordionItem,
-  AccordionPanel,
-  Badge,
-  Box,
-  Button,
-  Flex,
-  Heading,
-  Image,
-  List,
-  ListItem,
   Modal,
   ModalBody,
   ModalCloseButton,
   ModalContent,
   ModalHeader,
   ModalOverlay,
-  Stack,
   Tab,
   TabList,
   TabPanel,
   TabPanels,
   Tabs,
-  Text,
-  useToast,
 } from '@chakra-ui/react';
-import React, { useCallback, useEffect, useState } from 'react';
-import TicketBoothAreaController from '../../../classes/interactable/TicketBoothAreaController';
-import PlayerController from '../../../classes/PlayerController';
-import { useInteractable, useInteractableAreaController } from '../../../classes/TownController';
+import React, { useCallback } from 'react';
+import { useInteractable } from '../../../classes/TownController';
 import useTownController from '../../../hooks/useTownController';
-import { BoothItem, BoothItemName, InteractableID, PlayerID } from '../../../types/CoveyTownSocket';
-import { css, keyframes } from '@emotion/react';
-
-export const INVALID_GAME_AREA_TYPE_MESSAGE = 'Invalid game area type';
-
-const itemImages = {
-  BlueHat: './assets/hatPictures/BlueHat.png',
-  RedHat: './assets/hatPictures/redHat.png',
-  GreenHat: './assets/hatPictures/GreenHat.png',
-};
-
-const flashing = keyframes`
-  0% { color: red; }
-  50% { color: green; }
-  100% { color: blue; }
-`;
+import { InteractableID } from '../../../types/CoveyTownSocket';
+import { TicketBoothStore } from './TicketBooth/TicketBoothStore';
+import { Inventory } from './Inventory';
+import { TokenLeaderboard } from './TokenLeaderboard';
 
 /**
  * A generic component that renders a game area.
@@ -64,77 +34,6 @@ const flashing = keyframes`
  *
  */
 function TicketBoothsArea({ interactableID }: { interactableID: InteractableID }): JSX.Element {
-  const ticketBoothAreaController = useInteractableAreaController(
-    interactableID,
-  ) as TicketBoothAreaController;
-  const townController = useTownController();
-  const [occupants, setOccupants] = useState<PlayerController[]>(
-    ticketBoothAreaController.occupants,
-  );
-  const [items, setItems] = useState<BoothItem[] | undefined>(ticketBoothAreaController.items);
-  const [itemEquipped, setItemEquipped] = useState<BoothItemName | undefined>(ticketBoothAreaController.itemEquipped);
-  const toast = useToast();
-
-  const handlePurchase = async (itemName: BoothItemName, playerID: PlayerID) => {
-    // Add your purchase logic here
-    try {
-      await ticketBoothAreaController.purchaseItem(itemName, playerID);
-    } catch (e) {
-      toast({
-        title: 'Error buying item',
-        description: (e as Error).toString(),
-        status: 'error',
-      });
-    }
-  };
-  const handleEquip = async (item: BoothItemName | undefined, playerID: PlayerID) => {
-    try {
-      await ticketBoothAreaController.equipItem(item, playerID);
-    } catch (e) {
-      toast({
-        title: 'Error equipping item',
-        description: (e as Error).toString(),
-        status: 'error',
-      });
-    }
-  }
-
-  const equipPrize = (item: BoothItemName) => {
-    return (<Button mt={2} onClick={() => handleEquip(item, townController.ourPlayer.id)}>
-  Equip Prize
-</Button>);};
-  const unequipPrize = () => {
-    return (<Button mt={2} onClick={() => handleEquip(undefined, townController.ourPlayer.id)}>Unequip Item</Button>);
-  };
-
-  const purchasePrize = (item: BoothItem) => {
-    const enoughTokens = townController.ourPlayer.tokens >= item.cost;
-    const ownItem = townController.ourPlayer.ownsItem(item.name);
-
-    let text = 'Purchase';
-    if (ownItem) text = 'Already own item';
-    else if (!enoughTokens) text = 'Not enough tokens';
-
-    return (
-      <Button
-        isDisabled={!enoughTokens || ownItem}
-        onClick={() => handlePurchase(item.name, townController.ourPlayer.id)}>
-        {text}
-      </Button>
-    );
-  }
-
-  useEffect(() => {
-    ticketBoothAreaController.addListener('occupantsChange', setOccupants);
-    ticketBoothAreaController.addListener('itemPurchased', setItems);
-    ticketBoothAreaController.addListener('itemEquipped', setItemEquipped);
-    return () => {
-      ticketBoothAreaController.removeListener('occupantsChange', setOccupants);
-      ticketBoothAreaController.removeListener('itemPurchased', setItems);
-      ticketBoothAreaController.removeListener('itemEquipped', setItemEquipped);
-    };
-  }, [townController, ticketBoothAreaController]);
-  
 
   return (
     <>
@@ -146,93 +45,13 @@ function TicketBoothsArea({ interactableID }: { interactableID: InteractableID }
         </TabList>
         <TabPanels>
           <TabPanel>
-            <Accordion allowToggle>
-              <AccordionItem>
-                <Heading as='h3'>
-                  <AccordionButton>
-                    <Box as='span' flex='1' textAlign='left'>
-                      Current occupants
-                      <AccordionIcon />
-                    </Box>
-                  </AccordionButton>
-                </Heading>
-                <AccordionPanel>
-                  <List aria-label='list of occupants in the game'>
-                    {occupants.map(player => {
-                      return <ListItem key={player.id}>{player.userName}</ListItem>;
-                    })}
-                  </List>
-                </AccordionPanel>
-              </AccordionItem>
-            </Accordion>
-            <Flex direction='column' align='center'>
-              <Heading
-                css={css`
-                  animation: ${flashing} 3s infinite;
-                `}>
-                TICKETBOOTH
-              </Heading>
-              <Flex align='center' justify='center' mb={4}>
-                <Text fontSize='2xl' fontWeight='bold' mr={2}>
-                  Your Tokens:
-                </Text>
-                <Badge p={1} fontSize='2xl'>
-                  {townController.ourPlayer.tokens}
-                </Badge>
-              </Flex>
-              <Stack spacing={4}>
-                {items?.map(boothItem => (
-                  <Box key={boothItem.name} p={5} shadow='md' borderWidth='1px'>
-                    <Flex align='center'>
-                      <Image
-                        boxSize='100px'
-                        src={itemImages[boothItem.name]}
-                        alt={boothItem.name}
-                        mr={4}
-                      />
-                      <Box>
-                        <Heading as='h2' size='md' mb={2}>
-                          {boothItem.name} - ${boothItem.cost}
-                        </Heading>
-                        <Text mb={2}>{boothItem.description}</Text>
-                        <Text mb={2}>Times Purchased: {boothItem.timesPurchased}</Text>
-                        {purchasePrize(boothItem)}
-                      </Box>
-                    </Flex>
-                  </Box>
-                ))}
-              </Stack>
-            </Flex>
+            <TicketBoothStore interactableID={interactableID} />
           </TabPanel>
           <TabPanel>
-            <Flex align='center' justify='center' mt={2}>
-              <Text mr={2}>Item you have equipped:</Text>
-              <Badge colorScheme='green' p={1}>
-                {itemEquipped ? itemEquipped : 'None'}
-              </Badge>
-            </Flex>
-            <Flex wrap='wrap' justify='space-around'>
-              {townController.ourPlayer.itemsOwned.map((item, index) => (
-                <Box key={index} p={5} shadow='md' borderWidth='1px' m={4}>
-                  <Image boxSize='100px' src={itemImages[item]} alt={item} />
-                  <Text mt={2} textAlign='center'>
-                    {item}
-                  </Text>
-                  {itemEquipped !== item ? equipPrize(item) : unequipPrize()}
-                </Box>
-              ))}
-            </Flex>
+            <Inventory interactableID={interactableID} />
           </TabPanel>
           <TabPanel>
-            {/* token leaderboard */}
-            {townController.players.sort(
-              (a, b) => b.tokens - a.tokens,
-            ).map((player, index) => (
-              <Flex key={index} justify='space-between' align='center' p={2} borderBottomWidth='1px'>
-                <Text>{player.userName}</Text>
-                <Badge>{player.tokens}</Badge>
-              </Flex>
-            ))}
+            <TokenLeaderboard/>
           </TabPanel>
         </TabPanels>
       </Tabs>
