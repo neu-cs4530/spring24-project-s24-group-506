@@ -107,6 +107,23 @@ function TicketBoothsArea({ interactableID }: { interactableID: InteractableID }
     return (<Button mt={2} onClick={() => handleEquip(undefined, townController.ourPlayer.id)}>Unequip Item</Button>);
   };
 
+  const purchasePrize = (item: BoothItem) => {
+    const enoughTokens = townController.ourPlayer.tokens >= item.cost;
+    const ownItem = townController.ourPlayer.ownsItem(item.name);
+
+    let text = 'Purchase';
+    if (ownItem) text = 'Already own item';
+    else if (!enoughTokens) text = 'Not enough tokens';
+
+    return (
+      <Button
+        isDisabled={!enoughTokens || ownItem}
+        onClick={() => handlePurchase(item.name, townController.ourPlayer.id)}>
+        {text}
+      </Button>
+    );
+  }
+
   useEffect(() => {
     ticketBoothAreaController.addListener('occupantsChange', setOccupants);
     ticketBoothAreaController.addListener('itemPurchased', setItems);
@@ -125,6 +142,7 @@ function TicketBoothsArea({ interactableID }: { interactableID: InteractableID }
         <TabList mb='1em'>
           <Tab>Store</Tab>
           <Tab>Inventory</Tab>
+          <Tab>Token Leaderboard</Tab>
         </TabList>
         <TabPanels>
           <TabPanel>
@@ -178,12 +196,7 @@ function TicketBoothsArea({ interactableID }: { interactableID: InteractableID }
                         </Heading>
                         <Text mb={2}>{boothItem.description}</Text>
                         <Text mb={2}>Times Purchased: {boothItem.timesPurchased}</Text>
-                        <Button
-                          onClick={() =>
-                            handlePurchase(boothItem.name, townController.ourPlayer.id)
-                          }>
-                          Purchase
-                        </Button>
+                        {purchasePrize(boothItem)}
                       </Box>
                     </Flex>
                   </Box>
@@ -209,6 +222,17 @@ function TicketBoothsArea({ interactableID }: { interactableID: InteractableID }
                 </Box>
               ))}
             </Flex>
+          </TabPanel>
+          <TabPanel>
+            {/* token leaderboard */}
+            {townController.players.sort(
+              (a, b) => b.tokens - a.tokens,
+            ).map((player, index) => (
+              <Flex key={index} justify='space-between' align='center' p={2} borderBottomWidth='1px'>
+                <Text>{player.userName}</Text>
+                <Badge>{player.tokens}</Badge>
+              </Flex>
+            ))}
           </TabPanel>
         </TabPanels>
       </Tabs>

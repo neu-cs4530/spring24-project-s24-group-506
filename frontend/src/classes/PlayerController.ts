@@ -140,4 +140,8 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
       modelPlayer.itemEquipped,
     );
   }
+
+  ownsItem(itemName: BoothItemName): boolean {
+    return this.itemsOwned.includes(itemName);
+  }
 }
