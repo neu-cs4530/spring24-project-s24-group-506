@@ -1,9 +1,6 @@
 import { Badge, Flex, Text } from '@chakra-ui/react';
-import React, { useEffect, useState } from 'react';
-import TicketBoothAreaController from '../../../classes/interactable/TicketBoothAreaController';
-import { useInteractableAreaController, usePlayers } from '../../../classes/TownController';
-import useTownController from '../../../hooks/useTownController';
-import { InteractableID } from '../../../types/CoveyTownSocket';
+import React from 'react';
+import { usePlayers } from '../../../classes/TownController';
 import PlayerController from '../../../classes/PlayerController';
 
 /**
@@ -33,7 +30,7 @@ export function TokenLeaderboard(): JSX.Element {
     );
   };
 
-  const sortedPlayers = players.sort((a, b) => b.tokens - a.tokens).map(mapFunction);
+  const sortedPlayers = players?.sort((a, b) => b.tokens - a.tokens).map(mapFunction);
 
   return (
     <>

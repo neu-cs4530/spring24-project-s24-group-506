@@ -1,10 +1,9 @@
 import { Badge, Box, Button, Flex, Image, List, ListItem, Text, useToast } from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react';
 import TicketBoothAreaController from '../../../classes/interactable/TicketBoothAreaController';
-import { useInteractableAreaController, usePlayers } from '../../../classes/TownController';
+import { useInteractableAreaController } from '../../../classes/TownController';
 import useTownController from '../../../hooks/useTownController';
 import { BoothItemName, InteractableID, PlayerID } from '../../../types/CoveyTownSocket';
-import { keyframes } from '@emotion/react';
 
 export const INVALID_GAME_AREA_TYPE_MESSAGE = 'Invalid game area type';
 
@@ -36,7 +35,9 @@ export function Inventory({ interactableID }: { interactableID: InteractableID }
   const [itemEquipped, setItemEquipped] = useState<BoothItemName | undefined>(
     ticketBoothAreaController.itemEquipped,
   );
-  const [itemsOwned, setItemsOwned] = useState<BoothItemName[]>(ticketBoothAreaController.itemsOwned);
+  const [itemsOwned, setItemsOwned] = useState<BoothItemName[]>(
+    ticketBoothAreaController.itemsOwned,
+  );
   const toast = useToast();
 
   const handleEquip = async (item: BoothItemName | undefined, playerID: PlayerID) => {

@@ -163,7 +163,6 @@ export default class TicketBoothArea extends InteractableArea {
       }
       areaChanged = true;
       player.equipItem(itemName);
-      console.log(`Player ${player.userName} equipped ${itemName}`);
       this._emitPlayerEquippedChanged(player);
       if (areaChanged) {
         this._emitAreaChanged();
