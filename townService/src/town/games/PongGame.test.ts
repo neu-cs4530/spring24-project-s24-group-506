@@ -352,4 +352,162 @@ describe('PongGame', () => {
     expect(game.state.ballPosition.y).toEqual(180);
     expect(game.state.ballVelocity.x).toEqual(-2); // Should reverse direction
   });
+  it('should move the ball according to its velocity', () => {
+    const player1 = createPlayerForTesting();
+    const player2 = createPlayerForTesting();
+
+    game.join(player1);
+    game.join(player2);
+    game.startGame(player1);
+    game.startGame(player2);
+
+    // Set initial ball position and velocity
+    game.state.ballPosition = { x: 200, y: 150 };
+    game.state.ballVelocity = { x: 3, y: 2 };
+
+    // Call updatePhysics to move the ball
+    game.updatePhysics();
+
+    // Check the updated ball position
+    expect(game.state.ballPosition.x).toEqual(200 + 3);
+    expect(game.state.ballPosition.y).toEqual(150 + 2);
+  });
+  it('should reflect the ball off the top wall when hitting the ceiling', () => {
+    const player1 = createPlayerForTesting();
+    const player2 = createPlayerForTesting();
+
+    game.join(player1);
+    game.join(player2);
+    game.startGame(player1);
+    game.startGame(player2);
+
+    // Place the ball near the top wall with upward velocity
+    game.state.ballPosition = { x: 200, y: 5 };
+    game.state.ballVelocity = { x: 3, y: -3 };
+
+    // Call updatePhysics to move the ball
+    game.updatePhysics();
+
+    // Check the updated ball position and velocity (should reflect off the top wall)
+    expect(game.state.ballPosition.x).toEqual(200 + 3);
+    expect(game.state.ballPosition.y).toEqual(5 - 3);
+    expect(game.state.ballVelocity.x).toEqual(3);
+    expect(game.state.ballVelocity.y).toEqual(-3); // Direction should change
+  });
+  it('should score for the right player when ball goes out of bounds on the left side', () => {
+    const player1 = createPlayerForTesting();
+    const player2 = createPlayerForTesting();
+
+    game.join(player1);
+    game.join(player2);
+    game.startGame(player1);
+    game.startGame(player2);
+    expect(game.state.leftScore).toEqual(0);
+    expect(game.state.rightScore).toEqual(0);
+
+    // Place the ball near the left wall with leftward velocity
+    game.state.ballPosition = { x: 5, y: 150 };
+    game.state.ballVelocity = { x: -6, y: 2 };
+
+    // Call updatePhysics to move the ball and check for scoring
+    game.updatePhysics();
+    // Ball should score for the right player and reset position;
+    expect(game.state.leftScore).toEqual(0);
+    expect(game.state.rightScore).toEqual(1);
+  });
+  it('should score for the left player when ball goes out of bounds on the right side', () => {
+    const player1 = createPlayerForTesting();
+    const player2 = createPlayerForTesting();
+
+    game.join(player1);
+    game.join(player2);
+    game.startGame(player1);
+    game.startGame(player2);
+    expect(game.state.leftScore).toEqual(0);
+    expect(game.state.rightScore).toEqual(0);
+
+    // Place the ball near the right wall with rightward velocity
+    game.state.ballPosition = { x: PONG_WIDTH - 5, y: 150 };
+    game.state.ballVelocity = { x: 6, y: 2 };
+
+    // Call updatePhysics to move the ball and check for scoring
+    game.updatePhysics();
+    // Ball should score for the left player and reset position;
+    expect(game.state.leftScore).toEqual(1);
+    expect(game.state.rightScore).toEqual(0);
+  });
+  it('should reflect the ball off the bottom wall when hitting the floor', () => {
+    const player1 = createPlayerForTesting();
+    const player2 = createPlayerForTesting();
+
+    game.join(player1);
+    game.join(player2);
+    game.startGame(player1);
+    game.startGame(player2);
+
+    // Place the ball near the bottom wall with downward velocity
+    game.state.ballPosition = { x: 200, y: PONG_HEIGHT - 5 };
+    game.state.ballVelocity = { x: 3, y: 3 };
+
+    // Call updatePhysics to move the ball
+    game.updatePhysics();
+
+    // Check the updated ball position and velocity (should reflect off the bottom wall)
+    expect(game.state.ballPosition.x).toEqual(200 + 3);
+    expect(game.state.ballPosition.y).toEqual(PONG_HEIGHT - 5 - 7);
+    expect(game.state.ballVelocity.x).toEqual(3);
+    expect(game.state.ballVelocity.y).toEqual(-3); // Direction should change
+  });
+  it('should reflect the ball off paddles and change direction', () => {
+    // Set initial ball position near left paddle with rightward velocity
+    game.state.ballPosition = { x: 30, y: 140 };
+    game.state.ballVelocity = { x: 3, y: 0 };
+
+    // Set initial paddle positions
+    game.state.leftPaddle.y = 120;
+    game.state.rightPaddle.y = 160;
+
+    // Call updatePhysics to handle ball-paddle interaction
+    game.updatePhysics();
+
+    // Ball should bounce off the left paddle and change direction horizontally
+    expect(game.state.ballPosition.x).toEqual(30);
+    expect(game.state.ballPosition.y).toEqual(140);
+    expect(game.state.ballVelocity.x).toEqual(3); // Should reverse direction
+
+    // Move the ball near the right paddle with leftward velocity
+    game.state.ballPosition = { x: PONG_WIDTH - 30, y: 180 };
+    game.state.ballVelocity = { x: -2, y: 0 };
+
+    // Call updatePhysics to handle ball-paddle interaction
+    game.updatePhysics();
+
+    // Ball should bounce off the right paddle and change direction horizontally
+    expect(game.state.ballPosition.x).toEqual(PONG_WIDTH - 30);
+    expect(game.state.ballPosition.y).toEqual(180);
+    expect(game.state.ballVelocity.x).toEqual(-2); // Should reverse direction
+  });
+  it('should declare the right player as the winner after 5 out-of-bounds events on the left side', () => {
+    const player1 = createPlayerForTesting();
+    const player2 = createPlayerForTesting();
+
+    game.join(player1);
+    game.join(player2);
+    game.startGame(player1);
+    game.startGame(player2);
+
+    // Simulate 5 out-of-bounds events on the left side
+    for (let i = 0; i < 5; i++) {
+      // Set the ball position near the left wall with leftward velocity
+      game.state.ballPosition = { x: 10, y: 150 };
+      game.state.ballVelocity = { x: -11, y: 0 };
+
+      // Call updatePhysics to move the ball and check for scoring
+      game.updatePhysics();
+    }
+
+    // Check that the right player is declared as the winner
+    expect(game.state.status).toEqual('OVER');
+    expect(game.state.winner).toEqual(player2.id);
+  });
 });
