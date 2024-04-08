@@ -15,6 +15,11 @@ import {
   ModalContent,
   ModalHeader,
   ModalOverlay,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
 } from '@chakra-ui/react';
 import React, { useCallback, useEffect, useState } from 'react';
 import { GenericGameAreaController } from '../../../classes/interactable/GameAreaController';
@@ -28,6 +33,7 @@ import GameAreaInteractable from './GameArea';
 import Leaderboard from './Leaderboard';
 import TicTacToeArea from './TicTacToe/TicTacToeArea';
 import PongArea from './Pong/PongArea';
+import { TokenLeaderboard } from './TokenLeaderboard';
 
 export const INVALID_GAME_AREA_TYPE_MESSAGE = 'Invalid game area type';
 
@@ -63,20 +69,15 @@ function GameArea({ interactableID }: { interactableID: InteractableID }): JSX.E
   }, [townController, gameAreaController]);
   return (
     <>
-      <Accordion allowToggle>
-        <AccordionItem>
-          <Heading as='h3'>
-            <AccordionButton>
-              <Box flex='1' textAlign='left'>
-                Leaderboard
-              </Box>
-              <AccordionIcon />
-            </AccordionButton>
-            <AccordionPanel>
-              <Leaderboard results={history} />
-            </AccordionPanel>
-          </Heading>
-        </AccordionItem>
+    <Tabs isFitted variant='enclosed'>
+      <TabList mb='1em'>
+        <Tab>Game</Tab>
+        <Tab>Area Leaderboard</Tab>
+        <Tab>Token Leaderboard</Tab>
+      </TabList>
+      <TabPanels>
+        <TabPanel>
+        <Accordion allowToggle>
         <AccordionItem>
           <Heading as='h3'>
             <AccordionButton>
@@ -122,6 +123,15 @@ function GameArea({ interactableID }: { interactableID: InteractableID }): JSX.E
           </div>
         </Box>
       </Flex>
+        </TabPanel>
+        <TabPanel>
+          <Leaderboard results={history} />
+        </TabPanel>
+        <TabPanel>
+          <TokenLeaderboard />
+        </TabPanel>
+      </TabPanels>
+      </Tabs>
     </>
   );
 }
