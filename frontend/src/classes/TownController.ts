@@ -82,6 +82,8 @@ export type TownEvents = {
    */
   playersChanged: (newPlayers: PlayerController[]) => void;
 
+  playersTokensChanged: (newPlayers: PlayerController[]) => void;
+
   /**
    * An event that indicates that a player has moved. This event is dispatched after updating the player's location -
    * the new location can be found on the PlayerController.
@@ -308,8 +310,8 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   }
 
   private set _players(newPlayers: PlayerController[]) {
-    this.emit('playersChanged', newPlayers);
     this._playersInternal = newPlayers;
+    this.emit('playersChanged', this._playersInternal);
   }
 
   public getPlayer(id: PlayerID) {
@@ -449,9 +451,28 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     });
 
     this._socket.on('playerTokensChanged', playerChanged => {
-      const playerToUpdate = this.players.find(eachPlayer => eachPlayer.id === playerChanged.id);
+      const newPlayers = [...this.players];
+      const playerToUpdate = newPlayers.find(eachPlayer => eachPlayer.id === playerChanged.id);
       if (playerToUpdate) {
         playerToUpdate.tokens = playerChanged.tokens;
+        this._players = newPlayers;
+        this.emit('playersChanged', this.players);
+      }
+    });
+
+    this._socket.on('playerItemsChanged', playerChanged => {
+      const playerToUpdate = this.players.find(eachPlayer => eachPlayer.id === playerChanged.id);
+      if (playerToUpdate) {
+        playerToUpdate.itemsOwned = playerChanged.itemsOwned;
+        this.emit('playersChanged', this.players);
+      }
+    });
+
+    this._socket.on('playerEquippedChanged', playerChanged => {
+      const playerToUpdate = this.players.find(eachPlayer => eachPlayer.id === playerChanged.id);
+      if (playerToUpdate) {
+        playerToUpdate.itemEquipped = playerChanged.itemEquipped;
+        this.emit('playersChanged', this.players);
       }
     });
 

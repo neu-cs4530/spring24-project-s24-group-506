@@ -21,6 +21,8 @@ export type TicketBoothAreaEvents = BaseInteractableEventMap & {
    * the value `undefined` to indicate that there is no video set.
    */
   itemPurchased: (items: BoothItem[] | undefined) => void;
+  itemEquipped: (itemName: BoothItemName | undefined) => void;
+  itemAddedToInventory: (itemsOwned: BoothItemName[]) => void;
 };
 
 /**
@@ -39,6 +41,10 @@ export default class TicketBoothAreaController extends InteractableAreaControlle
 
   private _townController: TownController;
 
+  private _itemEquipped: BoothItemName | undefined;
+
+  private _itemsOwned: BoothItemName[];
+
   /**
    * Constructs a new TicketBoothAreaController, initialized with the state of the
    * provided TicketBoothAreaModel.
@@ -49,6 +55,8 @@ export default class TicketBoothAreaController extends InteractableAreaControlle
     super(ticketBoothAreaModel.id);
     this._model = ticketBoothAreaModel;
     this._townController = _townController;
+    this._itemEquipped = undefined;
+    this._itemsOwned = [];
   }
 
   public isActive(): boolean {
@@ -69,6 +77,24 @@ export default class TicketBoothAreaController extends InteractableAreaControlle
    */
   public set items(items: BoothItem[] | undefined) {
     this.items = items;
+  }
+
+  public get itemEquipped(): BoothItemName | undefined {
+    return this._itemEquipped;
+  }
+
+  public get itemsOwned(): BoothItemName[] {
+    return this._itemsOwned;
+  }
+
+  private _equipItem(itemName: BoothItemName | undefined) {
+    this._itemEquipped = itemName;
+    this.emit('itemEquipped', itemName);
+  }
+
+  private _addItemToInventory(itemName: BoothItemName) {
+    this._itemsOwned = [...this._itemsOwned, itemName];
+    this.emit('itemAddedToInventory', this.itemsOwned);
   }
 
   public get friendlyName(): string {
@@ -110,6 +136,22 @@ export default class TicketBoothAreaController extends InteractableAreaControlle
       itemName: itemName,
       playerID: playerID,
     });
+    this._addItemToInventory(itemName);
     console.log(`Purchased item: ${itemName}`);
+  }
+
+  /**
+   * Sends a request to the server to equip an item from the ticket booth.
+   * @param itemName The name of the item to equip
+   * @param playerID The ID of the player equipping the item
+   */
+  public async equipItem(itemName: BoothItemName | undefined, playerID: PlayerID) {
+    await this._townController.sendInteractableCommand(this.id, {
+      type: 'TicketBoothEquip',
+      itemName: itemName,
+      playerID: playerID,
+    });
+    this._equipItem(itemName);
+    console.log(`Equipped item: ${itemName}`);
   }
 }

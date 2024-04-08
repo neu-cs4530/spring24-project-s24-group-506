@@ -53,8 +53,8 @@ export default function PongDisplay({ gameAreaController }: PongGameProps): JSX.
   const [rightScore, setRightScore] = useState<PongScore>(gameAreaController.rightScore);
   const [leftPaddle, setLeftPaddle] = useState<XY>(gameAreaController.leftPaddle);
   const [rightPaddle, setRightPaddle] = useState<XY>(gameAreaController.rightPaddle);
-  const iPressed = useRef(false);
-  const oPressed = useRef(false);
+  const rPressed = useRef(false);
+  const fPressed = useRef(false);
 
   const toast = useToast();
 
@@ -85,11 +85,11 @@ export default function PongDisplay({ gameAreaController }: PongGameProps): JSX.
 
   useEffect(() => {
     const handleKeyDown = async (event: KeyboardEvent) => {
-      if (event.key === 'i' && gameAreaController.isPlayer) {
+      if (event.key === 'r' && gameAreaController.isPlayer) {
         // Handle 'i' key press
-        if (!iPressed.current && gameAreaController.status === 'IN_PROGRESS') {
-          iPressed.current = true;
-          console.log("Key 'i' pressed");
+        if (!rPressed.current && gameAreaController.status === 'IN_PROGRESS') {
+          rPressed.current = true;
+          console.log("Key 'r' pressed");
           if (gameAreaController.status !== 'IN_PROGRESS') return;
           try {
             await gameAreaController.makeMove('Up');
@@ -101,11 +101,11 @@ export default function PongDisplay({ gameAreaController }: PongGameProps): JSX.
             });
           }
         }
-      } else if (event.key === 'o' && gameAreaController.isPlayer) {
+      } else if (event.key === 'f' && gameAreaController.isPlayer) {
         // Handle 'o' key press
-        if (!oPressed.current && gameAreaController.status === 'IN_PROGRESS') {
-          oPressed.current = true;
-          console.log("Key 'o' pressed");
+        if (!fPressed.current && gameAreaController.status === 'IN_PROGRESS') {
+          fPressed.current = true;
+          console.log("Key 'f' pressed");
           if (gameAreaController.status !== 'IN_PROGRESS') return;
           try {
             await gameAreaController.makeMove('Down');
@@ -121,10 +121,10 @@ export default function PongDisplay({ gameAreaController }: PongGameProps): JSX.
     };
 
     const handleKeyUp = async (event: KeyboardEvent) => {
-      if (event.key === 'i' && gameAreaController.isPlayer) {
+      if (event.key === 'r' && gameAreaController.isPlayer) {
         // Handle 'i' key release
-        if (iPressed.current) {
-          iPressed.current = false;
+        if (rPressed.current) {
+          rPressed.current = false;
           try {
             await gameAreaController.makeMove('Still');
           } catch (e) {
@@ -135,11 +135,11 @@ export default function PongDisplay({ gameAreaController }: PongGameProps): JSX.
             });
           }
         }
-        console.log("Key 'i' released");
-      } else if (event.key === 'o' && gameAreaController.isPlayer) {
+        console.log("Key 'r' released");
+      } else if (event.key === 'f' && gameAreaController.isPlayer) {
         // Handle 'o' key release
-        if (oPressed.current) {
-          oPressed.current = false;
+        if (fPressed.current) {
+          fPressed.current = false;
           try {
             await gameAreaController.makeMove('Still');
           } catch (e) {
@@ -150,7 +150,7 @@ export default function PongDisplay({ gameAreaController }: PongGameProps): JSX.
             });
           }
         }
-        console.log("Key 'o' released");
+        console.log("Key 'f' released");
       }
     };
 
