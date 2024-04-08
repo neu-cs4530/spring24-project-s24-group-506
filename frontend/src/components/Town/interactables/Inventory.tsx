@@ -1,7 +1,7 @@
 import { Badge, Box, Button, Flex, Image, List, ListItem, Text, useToast } from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react';
 import TicketBoothAreaController from '../../../classes/interactable/TicketBoothAreaController';
-import { useInteractableAreaController } from '../../../classes/TownController';
+import { useInteractableAreaController, usePlayers } from '../../../classes/TownController';
 import useTownController from '../../../hooks/useTownController';
 import { BoothItemName, InteractableID, PlayerID } from '../../../types/CoveyTownSocket';
 import { keyframes } from '@emotion/react';
@@ -36,6 +36,7 @@ export function Inventory({ interactableID }: { interactableID: InteractableID }
   const [itemEquipped, setItemEquipped] = useState<BoothItemName | undefined>(
     ticketBoothAreaController.itemEquipped,
   );
+  const [itemsOwned, setItemsOwned] = useState<BoothItemName[]>(ticketBoothAreaController.itemsOwned);
   const toast = useToast();
 
   const handleEquip = async (item: BoothItemName | undefined, playerID: PlayerID) => {
@@ -67,8 +68,10 @@ export function Inventory({ interactableID }: { interactableID: InteractableID }
 
   useEffect(() => {
     ticketBoothAreaController.addListener('itemEquipped', setItemEquipped);
+    ticketBoothAreaController.addListener('itemAddedToInventory', setItemsOwned);
     return () => {
       ticketBoothAreaController.removeListener('itemEquipped', setItemEquipped);
+      ticketBoothAreaController.removeListener('itemAddedToInventory', setItemsOwned);
     };
   }, [townController, ticketBoothAreaController]);
 
@@ -81,7 +84,7 @@ export function Inventory({ interactableID }: { interactableID: InteractableID }
         </Badge>
       </Flex>
       <List spacing={3} style={{ margin: '20px' }}>
-        {townController.ourPlayer.itemsOwned.map((item, index) => (
+        {itemsOwned.map((item, index) => (
           <ListItem key={index} p={5} shadow='md' borderWidth='1px'>
             <Flex direction='column' align='center' justify='center'>
               <Image boxSize='100px' src={itemImages[item]} alt={item} />

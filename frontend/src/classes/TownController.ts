@@ -310,9 +310,8 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   }
 
   private set _players(newPlayers: PlayerController[]) {
-    this.emit('playersChanged', newPlayers);
-    this.emit('playersTokensChanged', newPlayers);
     this._playersInternal = newPlayers;
+    this.emit('playersChanged', this._playersInternal);
   }
 
   public getPlayer(id: PlayerID) {
@@ -457,7 +456,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
       if (playerToUpdate) {
         playerToUpdate.tokens = playerChanged.tokens;
         this._players = newPlayers;
-        this.emit('playersTokensChanged', this.players);
+        this.emit('playersChanged', this.players);
       }
     });
 
@@ -465,6 +464,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
       const playerToUpdate = this.players.find(eachPlayer => eachPlayer.id === playerChanged.id);
       if (playerToUpdate) {
         playerToUpdate.itemsOwned = playerChanged.itemsOwned;
+        this.emit('playersChanged', this.players);
       }
     });
 
@@ -472,6 +472,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
       const playerToUpdate = this.players.find(eachPlayer => eachPlayer.id === playerChanged.id);
       if (playerToUpdate) {
         playerToUpdate.itemEquipped = playerChanged.itemEquipped;
+        this.emit('playersChanged', this.players);
       }
     });
 
