@@ -196,7 +196,7 @@ describe('PongGameArea', () => {
 
       expect(() =>
         gameArea.handleCommand(
-          { type: 'GameMove', move: { col: 0, row: 0, gamePiece: 'X' }, gameID: nanoid() },
+          { type: 'GameMove', move: { gamePiece: 'Left', direction: 'Down' }, gameID: nanoid() },
           left,
         ),
       ).toThrowError(GAME_NOT_IN_PROGRESS_MESSAGE);
