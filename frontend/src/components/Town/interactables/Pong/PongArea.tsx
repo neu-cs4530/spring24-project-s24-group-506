@@ -182,11 +182,11 @@ export default function PongArea({
     <>
       {gameStatusText}
       <Box position='relative'>
-        <Box aria-label='list of players in the game' className='player-list'>
+        <Box aria-label='left-player' className='player-list'>
           <span className='left-player'>{leftPlayer?.userName || '(No player yet!)'}</span>
         </Box>
         <PongDisplay gameAreaController={gameAreaController} />
-        <Box aria-label='list of players in the game' className='player-list'>
+        <Box aria-label='right-player' className='player-list'>
           <span className='left-player'></span>
           <span className='right-player'>{rightPlayer?.userName || '(No player yet!)'}</span>
         </Box>
