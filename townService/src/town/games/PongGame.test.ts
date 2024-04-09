@@ -4,13 +4,7 @@ import {
   PLAYER_ALREADY_IN_GAME_MESSAGE,
 } from '../../lib/InvalidParametersError';
 import { createPlayerForTesting } from '../../TestUtils';
-import PongGame, {
-  PADDLE_MOVE_SPEED,
-  PONG_PADDLE_WIDTH,
-  PONG_HEIGHT,
-  PONG_BALL_STARTING_SPEED,
-  PONG_WIDTH,
-} from './PongGame';
+import PongGame, { PONG_HEIGHT, PONG_WIDTH } from './PongGame';
 
 describe('PongGame', () => {
   let game: PongGame;
@@ -509,5 +503,45 @@ describe('PongGame', () => {
     // Check that the right player is declared as the winner
     expect(game.state.status).toEqual('OVER');
     expect(game.state.winner).toEqual(player2.id);
+  });
+  it('should declare the left player as the winner after 5 out-of-bounds events on the right side', () => {
+    const player1 = createPlayerForTesting();
+    const player2 = createPlayerForTesting();
+
+    game.join(player1);
+    game.join(player2);
+    game.startGame(player1);
+    game.startGame(player2);
+
+    // Simulate 5 out-of-bounds events on the right side
+    for (let i = 0; i < 5; i++) {
+      // Set the ball position near the right wall with rightward velocity
+      game.state.ballPosition = { x: PONG_WIDTH - 10, y: 150 };
+      game.state.ballVelocity = { x: 11, y: 0 };
+
+      // Call updatePhysics to move the ball and check for scoring
+      game.updatePhysics();
+    }
+
+    // Check that the left player is declared as the winner
+    expect(game.state.status).toEqual('OVER');
+    expect(game.state.winner).toEqual(player1.id);
+  });
+  it('Checks if the ball bounces once hitting a paddle', () => {
+    const player1 = createPlayerForTesting();
+    const player2 = createPlayerForTesting();
+
+    game.join(player1);
+    game.join(player2);
+    game.startGame(player1);
+    game.startGame(player2);
+    game.state.ballPosition = { x: 30, y: 140 };
+    game.state.ballVelocity = { x: 3, y: 0 };
+    game.state.leftPaddle.y = 120;
+    game.state.rightPaddle.y = 160;
+    game.updatePhysics();
+    expect(game.state.ballPosition.x).toEqual(33);
+    expect(game.state.ballPosition.y).toEqual(140);
+    expect(game.state.ballVelocity.x).toEqual(3);
   });
 });
