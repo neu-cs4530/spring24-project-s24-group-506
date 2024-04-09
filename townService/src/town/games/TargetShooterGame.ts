@@ -19,6 +19,7 @@ import Game from './Game';
 export const SCREENWIDTH = 400;
 export const SCREENHEIGHT = 320;
 export const MARGIN = 40;
+export const TARGET_SIZE = 40;
 
 /**
  * A ConnectFourGame is a Game that implements the rules of Connect Four.
@@ -235,7 +236,7 @@ export default class TargetShooterGame extends Game<TargetShooterGameState, Targ
     const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
 
     // arbitary value
-    if (distance < 20) {
+    if (distance < TARGET_SIZE / 2) {
       this._incrementScore(player, newState);
       this._spawnTarget(newState);
     }
