@@ -183,9 +183,6 @@ export interface TargetShooterGameState extends WinnableGameState{
   player1Score: TargetShooterScore;
   player2Score: TargetShooterScore;
 
-  // player1Cursor: XY;
-  // player2Cursor: XY;
-
   currentTarget: XY;
 
   player1?: PlayerID;
@@ -195,16 +192,7 @@ export interface TargetShooterGameState extends WinnableGameState{
   player2Ready?: boolean;
 }
 
-export type MouseClickEvent = {
-  player: PlayerID;
-  position: XY;
-};
 
-
-// not sure if i need this
-export interface TargetShootingEventHandler {
-  handleEvent(event: MouseClickEvent): void;
-}
 
 /**
  * Type for the result of a game

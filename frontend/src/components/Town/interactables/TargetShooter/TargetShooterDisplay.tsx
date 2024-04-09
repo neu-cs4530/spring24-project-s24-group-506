@@ -79,18 +79,15 @@ export default function TargetShooterDisplay({
       const relativeX = clientX - rect.left;
       const relativeY = clientY - rect.top;
 
-      // subtract the size of the target from relativeX and relativeY to get the center of the target
-      // get the size of the target from the controller
       const target = gameAreaController.targetSize;
-
-      // const target = 20;
-      //   const targetX = targetPosition.x;
-      //   const targetY = targetPosition.y;
-      //   const targetCenterX = targetX + target / 2;
-      //   const targetCenterY = targetY + target / 2;
 
       const targetCenterX = relativeX - target / 2;
       const targetCenterY = relativeY - target / 2;
+
+      // console log click position
+      console.log(`Clicked at ${targetCenterX}, ${targetCenterY}`);
+      // console log target position
+      console.log(`Target at ${targetPosition.x}, ${targetPosition.y}`);
 
       try {
         await gameAreaController.makeMove({ x: targetCenterX, y: targetCenterY });
