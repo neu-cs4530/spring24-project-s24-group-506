@@ -23,13 +23,12 @@ export const PONG_PADDLE_WIDTH = 16;
 export const PONG_PADDLE_HEIGHT = 64;
 export const PONG_BALL_SIZE = 12;
 export const PONG_BALL_STARTING_SPEED = 2;
+export const TARGET_SIZE = 40;
 
 export type TargetShooterEvents = GameEventTypes & {
   targetPositionUpdated: (position: XY) => void;
   leftScoreUpdated: (score: TargetShooterScore) => void;
   rightScoreUpdated: (score: TargetShooterScore) => void;
-  player1CursorUpdated: (position: XY) => void;
-  player2CursorUpdated: (position: XY) => void;
 };
 
 /**
@@ -61,6 +60,10 @@ export default class TargetShooterAreaController extends GameAreaController<
   // returns the current score of the right player
   get player2Score(): TargetShooterScore {
     return this._player2score;
+  }
+
+  get targetSize(): number {
+    return TARGET_SIZE;
   }
 
   /**

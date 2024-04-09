@@ -26,15 +26,6 @@ const Target = ({ position }: { position: XY }) => {
   return <div className='target' style={style}></div>;
 };
 
-const Cursor = ({ position }: { position: XY }) => {
-  const style = {
-    left: position.x,
-    top: position.y,
-  };
-
-  return <div className='cursor' style={style}></div>;
-};
-
 /**
  * A component that renders the ConnectFour state
  *
@@ -87,9 +78,22 @@ export default function TargetShooterDisplay({
     if (gameAreaController.status === 'IN_PROGRESS' && rect) {
       const relativeX = clientX - rect.left;
       const relativeY = clientY - rect.top;
-      console.log(relativeX, relativeY);
+
+      // subtract the size of the target from relativeX and relativeY to get the center of the target
+      // get the size of the target from the controller
+      const target = gameAreaController.targetSize;
+
+      // const target = 20;
+      //   const targetX = targetPosition.x;
+      //   const targetY = targetPosition.y;
+      //   const targetCenterX = targetX + target / 2;
+      //   const targetCenterY = targetY + target / 2;
+
+      const targetCenterX = relativeX - target / 2;
+      const targetCenterY = relativeY - target / 2;
+
       try {
-        await gameAreaController.makeMove({ x: relativeX, y: relativeY });
+        await gameAreaController.makeMove({ x: targetCenterX, y: targetCenterY });
       } catch (e) {
         toast({
           title: 'Error making move',
@@ -105,10 +109,7 @@ export default function TargetShooterDisplay({
       <h1>targetShooter</h1>
       <h2>Player 1 Score: {player1Score}</h2>
       <h2>Player 2 Score: {player2Score}</h2>
-      <h2>Target Position: {JSON.stringify(targetPosition)}</h2>
       <div className='gamecontainer' id='targetshoot' onClick={handleMouseClick}>
-        {/* <Cursor position={player1Cursor} />
-        <Cursor position={player2Cursor} /> */}
         <Target position={targetPosition} />
       </div>
     </div>

@@ -18,6 +18,7 @@ import Game from './Game';
 
 export const SCREENWIDTH = 400;
 export const SCREENHEIGHT = 320;
+export const MARGIN = 40;
 
 /**
  * A ConnectFourGame is a Game that implements the rules of Connect Four.
@@ -229,11 +230,12 @@ export default class TargetShooterGame extends Game<TargetShooterGameState, Targ
     position: XY,
     newState: TargetShooterGameState,
   ): void {
-    const distance = Math.sqrt(
-      (newState.currentTarget.x - position.x) ** 2 + (newState.currentTarget.y - position.y) ** 2,
-    );
+    const deltaX = newState.currentTarget.x - position.x;
+    const deltaY = newState.currentTarget.y - position.y;
+    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
     // arbitary value
-    if (distance < 5) {
+    if (distance < 20) {
       this._incrementScore(player, newState);
       this._spawnTarget(newState);
     }
@@ -247,14 +249,16 @@ export default class TargetShooterGame extends Game<TargetShooterGameState, Targ
     }
     if (newState.player1Score === 5 || newState.player2Score === 5) {
       newState.status = 'OVER';
-      newState.winner = this.state.player1Score === 5 ? this.state.player1 : this.state.player2;
+      newState.winner = newState.player1Score === 5 ? newState.player1 : newState.player2;
     }
   }
 
   private _spawnTarget(newState: TargetShooterGameState): void {
+    // tighten the boundaries of the targets spawned
+
     const newTargetPosition = {
-      x: Math.random() * SCREENWIDTH,
-      y: Math.random() * SCREENHEIGHT,
+      x: Math.random() * (SCREENWIDTH - 2 * MARGIN) + MARGIN,
+      y: Math.random() * (SCREENHEIGHT - 2 * MARGIN) + MARGIN,
     };
     newState.currentTarget.x = newTargetPosition.x;
     newState.currentTarget.y = newTargetPosition.y;

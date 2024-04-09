@@ -13,13 +13,6 @@
     transform: translateX(-50%);
     width: 2px; /* Adjust thickness as needed */
     height: 100%;
-    background: repeating-linear-gradient(
-      to bottom,
-      white,
-      white 4px, /* Adjust spacing as needed */
-      transparent 4px,
-      transparent 8px
-    );
   }
 
   .target-shooter-border {
@@ -51,21 +44,14 @@
   .score-player2 {
     right: 20px;
   }
-  
-  .cursor {
-    width: 20px;
-    height: 20px;
-    position: absolute;
-    border-radius: 50%;
-    border: 2px solid red;
-    outline: red;
-  }
+
   
   .target {
-    width: 20px;
-    height: 20px;
+    width: 40px;
+    height: 40px;
     position: absolute;
-    background-color: red;
+    /* background: radial-gradient(circle, red 20%, white 20%, white 40%, red 40%, red 80%, white 80%); */
+    background: radial-gradient(circle, red 20%, white 20%, white 40%, red 40%, red 80%, white 80%);
     border-radius: 50%;
   }
 
