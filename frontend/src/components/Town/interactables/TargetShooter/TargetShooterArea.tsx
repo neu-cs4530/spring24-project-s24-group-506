@@ -1,9 +1,23 @@
-import { Box, Button, ButtonGroup, Center, Heading, List, ListItem, Text, VStack, useToast } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  ButtonGroup,
+  Center,
+  List,
+  ListItem,
+  Text,
+  VStack,
+  useToast,
+} from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react';
 import PlayerController from '../../../../classes/PlayerController';
 import { useInteractableAreaController } from '../../../../classes/TownController';
 import useTownController from '../../../../hooks/useTownController';
-import { GameStatus, InteractableID, TargetShooterDifficulty } from '../../../../types/CoveyTownSocket';
+import {
+  GameStatus,
+  InteractableID,
+  TargetShooterDifficulty,
+} from '../../../../types/CoveyTownSocket';
 import TargetAreaController from '../../../../classes/interactable/TargetShooterAreaController';
 import TargetShooterDisplay from './TargetShooterDisplay';
 
@@ -57,7 +71,9 @@ export default function TargetShooterArea({
   const [joiningGame, setJoiningGame] = useState(false);
 
   const [gameStatus, setGameStatus] = useState<GameStatus>(gameAreaController.status);
-  const [difficulty, setDifficulty] = useState<TargetShooterDifficulty>(gameAreaController.difficulty);
+  const [difficulty, setDifficulty] = useState<TargetShooterDifficulty>(
+    gameAreaController.difficulty,
+  );
   const toast = useToast();
   useEffect(() => {
     const updateGameState = () => {
@@ -169,21 +185,20 @@ export default function TargetShooterArea({
 
   const difficultyButton = (btnDifficulty: TargetShooterDifficulty) => {
     return (
-      <Button size='sm'
+      <Button
+        size='sm'
         disabled={gameAreaController.status === 'IN_PROGRESS' || difficulty === btnDifficulty}
         onClick={async () => {
           try {
             await gameAreaController.changeDifficulty(btnDifficulty);
-          }
-          catch (e) {
+          } catch (e) {
             toast({
               title: 'Error changing difficulty',
               description: (e as Error).toString(),
               status: 'error',
             });
           }
-        }}
-      >
+        }}>
         {btnDifficulty}
       </Button>
     );
@@ -206,9 +221,13 @@ export default function TargetShooterArea({
       </List>
       <Center marginTop={2} marginBottom={2}>
         <VStack>
-        <Text size='md' as='b'>Difficulty</Text>
-        <Box>{difficultyButtons}</Box>
-        <Text fontSize='large' as='b'>Shoot the targets faster than your opponent</Text>
+          <Text size='md' as='b'>
+            Difficulty
+          </Text>
+          <Box>{difficultyButtons}</Box>
+          <Text fontSize='large' as='b'>
+            Shoot the targets faster than your opponent
+          </Text>
         </VStack>
       </Center>
       <TargetShooterDisplay gameAreaController={gameAreaController} />

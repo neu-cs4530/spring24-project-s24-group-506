@@ -260,9 +260,6 @@ export default class TargetShooterAreaController extends GameAreaController<
     if (!instanceID || this._model.game?.state.status !== 'IN_PROGRESS') {
       throw new Error(NO_GAME_IN_PROGRESS_ERROR);
     }
-
-    const currentScore = this.gamePiece === 'player1' ? this._player1score : this._player2score;
-
     const gamePiece = this.gamePiece;
     const move: TargetShooterMove = {
       gamePiece,

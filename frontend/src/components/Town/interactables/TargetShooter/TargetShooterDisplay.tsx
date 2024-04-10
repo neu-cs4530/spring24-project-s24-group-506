@@ -1,24 +1,13 @@
-import ConnectFourAreaController, {
-  ConnectFourCell,
-} from '../../../../classes/interactable/ConnectFourAreaController';
-import { Button, ButtonGroup, chakra, Container, Flex, useToast, Text } from '@chakra-ui/react';
-import React, { useEffect, useRef, useState } from 'react';
-import {
-  ConnectFourColIndex,
-  TargetShooterAccuracy,
-  TargetShooterDifficulty,
-  TargetShooterGameState,
-  TargetShooterPlayer,
-  TargetShooterScore,
-  XY,
-} from '../../../../types/CoveyTownSocket';
+import { Flex, useToast, Text } from '@chakra-ui/react';
+import React, { useEffect, useState } from 'react';
+import { TargetShooterAccuracy, TargetShooterScore, XY } from '../../../../types/CoveyTownSocket';
 import TargetShooterAreaController from '../../../../classes/interactable/TargetShooterAreaController';
 
 export type TargetShooterProps = {
   gameAreaController: TargetShooterAreaController;
 };
 
-const Target = ({ position, size }: { position: XY, size: number }) => {
+const Target = ({ position, size }: { position: XY; size: number }) => {
   const style = {
     left: position.x,
     top: position.y,
@@ -62,8 +51,12 @@ export default function TargetShooterDisplay({
     gameAreaController.player2Score,
   );
   const [targetSize, setTargetSize] = useState<number>(gameAreaController.targetSize);
-  const [player1Accuracy, setPlayer1Accuracy] = useState<TargetShooterAccuracy>(gameAreaController.player1Accuracy);
-  const [player2Accuracy, setPlayer2Accuracy] = useState<TargetShooterAccuracy>(gameAreaController.player2Accuracy);
+  const [player1Accuracy, setPlayer1Accuracy] = useState<TargetShooterAccuracy>(
+    gameAreaController.player1Accuracy,
+  );
+  const [player2Accuracy, setPlayer2Accuracy] = useState<TargetShooterAccuracy>(
+    gameAreaController.player2Accuracy,
+  );
   const toast = useToast();
 
   useEffect(() => {
@@ -113,19 +106,22 @@ export default function TargetShooterDisplay({
     }
   };
 
-  const player1AccuracyPercent = (player1Accuracy.shots === 0 ? 0 : (player1Accuracy.hits / player1Accuracy.shots) * 100);
-  const player2AccuracyPercent = (player2Accuracy.shots === 0 ? 0 : (player2Accuracy.hits / player2Accuracy.shots) * 100);
+  const player1AccuracyPercent =
+    player1Accuracy.shots === 0 ? 0 : (player1Accuracy.hits / player1Accuracy.shots) * 100;
+  const player2AccuracyPercent =
+    player2Accuracy.shots === 0 ? 0 : (player2Accuracy.hits / player2Accuracy.shots) * 100;
 
-  const p1red = 255 - (player1AccuracyPercent * 2.55);
+  const p1red = 255 - player1AccuracyPercent * 2.55;
   const p1green = player1AccuracyPercent * 2.55;
   const p1rgb = `rgb(${p1red}, ${p1green}, ${0})`;
-  const p2red = 255 - (player2AccuracyPercent * 2.55);
+  const p2red = 255 - player2AccuracyPercent * 2.55;
   const p2green = player2AccuracyPercent * 2.55;
   const p2rgb = `rgb(${p2red}, ${p2green}, ${0})`;
 
-  const player1AccuracyText = player1Accuracy.shots === 0 ? '0.00%' : `${player1AccuracyPercent.toFixed(2)}%`;
-  const player2AccuracyText = player2Accuracy.shots === 0 ? '0.00%' : `${player2AccuracyPercent.toFixed(2)}%`;
-
+  const player1AccuracyText =
+    player1Accuracy.shots === 0 ? '0.00%' : `${player1AccuracyPercent.toFixed(2)}%`;
+  const player2AccuracyText =
+    player2Accuracy.shots === 0 ? '0.00%' : `${player2AccuracyPercent.toFixed(2)}%`;
 
   return (
     <div>
@@ -133,7 +129,7 @@ export default function TargetShooterDisplay({
         <Text>Player 1 Score: {player1Score}</Text>
         <Text>Player 2 Score: {player2Score}</Text>
       </Flex>
-      
+
       <div className='gamecontainer' id='targetshoot' onClick={handleMouseClick}>
         <Target position={targetPosition} size={targetSize} />
       </div>

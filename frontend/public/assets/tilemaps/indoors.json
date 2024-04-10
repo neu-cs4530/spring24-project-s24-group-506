@@ -579,7 +579,7 @@
                         {
                          "name":"type",
                          "type":"string",
-                         "value":"TargetShooter"
+                         "value":"ConnectFour"
                         }],
                  "rotation":0,
                  "type":"GameArea",

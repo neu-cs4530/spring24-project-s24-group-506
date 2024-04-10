@@ -237,7 +237,9 @@ export default class TargetShooterGame extends Game<TargetShooterGameState, Targ
   public changeDifficulty(difficulty: TargetShooterDifficulty): void {
     const newState = { ...this.state };
     if (!(newState.status === 'WAITING_FOR_PLAYERS' || newState.status === 'WAITING_TO_START')) {
-      throw new InvalidParametersError('Cannot change difficulty while game is in progress or over');
+      throw new InvalidParametersError(
+        'Cannot change difficulty while game is in progress or over',
+      );
     }
     if (difficulty === newState.difficulty) {
       return;
