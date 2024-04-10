@@ -63,20 +63,12 @@ export default class TicketBoothAreaController extends InteractableAreaControlle
     return this._model.items !== undefined;
   }
 
-  /**
-   * The URL of the video assigned to this viewing area, or undefined if there is not one.
-   */
   public get items() {
     return this._model.items;
   }
 
-  /**
-   * The URL of the video assigned to this viewing area, or undefined if there is not one.
-   *
-   * Changing this value will emit a 'videoChange' event to listeners
-   */
   public set items(items: BoothItem[] | undefined) {
-    this.items = items;
+    this._model.items = items;
   }
 
   public get itemEquipped(): BoothItemName | undefined {
@@ -113,8 +105,6 @@ export default class TicketBoothAreaController extends InteractableAreaControlle
   }
 
   /**
-   * Applies updates to this viewing area controller's model, setting the fields
-   * isPlaying, elapsedTimeSec and video from the updatedModel
    *
    * @param updatedModel
    */
