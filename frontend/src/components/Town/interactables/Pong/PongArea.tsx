@@ -196,7 +196,9 @@ export default function PongArea({
         <Box aria-label='left-player' className='player-list'>
           <span className='left-player'>{leftPlayer?.userName || '(No player yet!)'}</span>
         </Box>
-        <PongDisplay gameAreaController={gameAreaController} />
+        <Center>
+          <PongDisplay gameAreaController={gameAreaController} />
+        </Center>
         <Box aria-label='right-player' className='player-list'>
           <span className='left-player'></span>
           <span className='right-player'>{rightPlayer?.userName || '(No player yet!)'}</span>

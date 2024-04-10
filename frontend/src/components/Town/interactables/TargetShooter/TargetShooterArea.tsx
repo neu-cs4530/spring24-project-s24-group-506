@@ -90,12 +90,12 @@ export default function TargetShooterArea({
           status: 'info',
         });
       } else if (winner === townController.ourPlayer) {
-        gameAreaController.addToken(10);
         toast({
           title: 'Game over',
           description: 'You won!',
           status: 'success',
         });
+        gameAreaController.addToken(10);
       } else if (gameAreaController.isPlayer) {
         toast({
           title: 'Game over',
@@ -239,7 +239,9 @@ export default function TargetShooterArea({
           )}
         </VStack>
       </Center>
-      <TargetShooterDisplay gameAreaController={gameAreaController} />
+      <Center>
+        <TargetShooterDisplay gameAreaController={gameAreaController} />
+      </Center>
     </>
   );
 }

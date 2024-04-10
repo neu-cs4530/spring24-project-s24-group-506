@@ -114,6 +114,7 @@ function GameArea({ interactableID }: { interactableID: InteractableID }): JSX.E
               <Box
                 style={{
                   height: '400px',
+                  width: '300px',
                   overflowY: 'scroll',
                 }}>
                 <div
@@ -156,7 +157,7 @@ export default function GameAreaWrapper(): JSX.Element {
   }, [townController, gameArea]);
   if (gameArea) {
     return (
-      <Modal isOpen={true} onClose={closeModal} closeOnOverlayClick={false} size='xl'>
+      <Modal isOpen={true} onClose={closeModal} closeOnOverlayClick={false} size='2xl'>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>{gameArea.name}</ModalHeader>

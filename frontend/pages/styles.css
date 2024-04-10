@@ -32,8 +32,8 @@
   .pong-border {
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
+    width: 402px;
+    height: 322px;
     border: 2px solid gray;
     box-sizing: border-box;
   }

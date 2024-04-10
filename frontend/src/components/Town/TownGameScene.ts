@@ -63,6 +63,8 @@ export default class TownGameScene extends Phaser.Scene {
 
   private _onGameReadyListeners: Callback[] = [];
 
+  private _tokenText: Phaser.GameObjects.Text | undefined;
+
   /**
    * Layers that the player can collide with.
    */
@@ -328,6 +330,8 @@ export default class TownGameScene extends Phaser.Scene {
         }
       }
     }
+
+    this._tokenText?.setText(`Tokens: ${this.coveyTownController.ourPlayer.tokens}`);
   }
 
   private _map?: Phaser.Tilemaps.Tilemap;
@@ -535,6 +539,19 @@ export default class TownGameScene extends Phaser.Scene {
     // Help text that has a "fixed" position on the screen
     this.add
       .text(16, 16, `Arrow keys to move`, {
+        font: '18px monospace',
+        color: '#000000',
+        padding: {
+          x: 20,
+          y: 10,
+        },
+        backgroundColor: '#ffffff',
+      })
+      .setScrollFactor(0)
+      .setDepth(30);
+
+    this._tokenText = this.add
+      .text(650, 16, `Tokens: ${this.coveyTownController.ourPlayer.tokens}`, {
         font: '18px monospace',
         color: '#000000',
         padding: {
