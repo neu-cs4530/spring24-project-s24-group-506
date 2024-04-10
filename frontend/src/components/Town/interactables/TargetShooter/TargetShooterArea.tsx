@@ -90,6 +90,7 @@ export default function TargetShooterArea({
           status: 'info',
         });
       } else if (winner === townController.ourPlayer) {
+        gameAreaController.addToken(10);
         toast({
           title: 'Game over',
           description: 'You won!',

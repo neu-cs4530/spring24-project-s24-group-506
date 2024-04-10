@@ -31,7 +31,7 @@ import { css, keyframes } from '@emotion/react';
 
 const itemImages = {
   BlueHat: './assets/hatPictures/BlueHat.png',
-  RedHat: './assets/hatPictures/redHat.png',
+  RedHat: './assets/hatPictures/RedHat.png',
   GreenHat: './assets/hatPictures/GreenHat.png',
 };
 
