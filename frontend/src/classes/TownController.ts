@@ -30,6 +30,7 @@ import {
   isConnectFourArea,
   isConversationArea,
   isPongArea,
+  isTargetShooterArea,
   isTicTacToeArea,
   isViewingArea,
   isTicketBoothArea,
@@ -47,6 +48,7 @@ import PlayerController from './PlayerController';
 import TicketBoothAreaController from './interactable/TicketBoothAreaController';
 import TicketBoothArea from '../components/Town/interactables/TicketBoothArea';
 import PongAreaController from './interactable/PongAreaController';
+import TargetShooterAreaController from './interactable/TargetShooterAreaController';
 
 const CALCULATE_NEARBY_PLAYERS_DELAY_MS = 300;
 const SOCKET_COMMAND_TIMEOUT_MS = 5000;
@@ -310,9 +312,8 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   }
 
   private set _players(newPlayers: PlayerController[]) {
-    this.emit('playersChanged', newPlayers);
-    this.emit('playersTokensChanged', newPlayers);
     this._playersInternal = newPlayers;
+    this.emit('playersChanged', this._playersInternal);
   }
 
   public getPlayer(id: PlayerID) {
@@ -457,7 +458,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
       if (playerToUpdate) {
         playerToUpdate.tokens = playerChanged.tokens;
         this._players = newPlayers;
-        this.emit('playersTokensChanged', this.players);
+        this.emit('playersChanged', this.players);
       }
     });
 
@@ -465,6 +466,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
       const playerToUpdate = this.players.find(eachPlayer => eachPlayer.id === playerChanged.id);
       if (playerToUpdate) {
         playerToUpdate.itemsOwned = playerChanged.itemsOwned;
+        this.emit('playersChanged', this.players);
       }
     });
 
@@ -472,6 +474,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
       const playerToUpdate = this.players.find(eachPlayer => eachPlayer.id === playerChanged.id);
       if (playerToUpdate) {
         playerToUpdate.itemEquipped = playerChanged.itemEquipped;
+        this.emit('playersChanged', this.players);
       }
     });
 
@@ -677,6 +680,10 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
           } else if (isPongArea(eachInteractable)) {
             this._interactableControllers.push(
               new PongAreaController(eachInteractable.id, eachInteractable, this),
+            );
+          } else if (isTargetShooterArea(eachInteractable)) {
+            this._interactableControllers.push(
+              new TargetShooterAreaController(eachInteractable.id, eachInteractable, this),
             );
           }
         });

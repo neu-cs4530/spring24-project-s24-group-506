@@ -5,11 +5,13 @@ export const MOVEMENT_SPEED = 175;
 
 export type PlayerEvents = {
   movement: (newLocation: PlayerLocation) => void;
+  itemEquipped: (newItemEquipped: BoothItemName | undefined) => void;
 };
 
 export type PlayerGameObjects = {
   sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
   label: Phaser.GameObjects.Text;
+  hat: Phaser.GameObjects.Image | undefined;
   locationManagedByGameScene: boolean /* For the local player, the game scene will calculate the current location, and we should NOT apply updates when we receive events */;
 };
 export default class PlayerController extends (EventEmitter as new () => TypedEmitter<PlayerEvents>) {
@@ -84,6 +86,7 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
 
   set itemEquipped(value: BoothItemName | undefined) {
     this._itemEquipped = value;
+    this.emit('itemEquipped', value);
   }
 
   toPlayerModel(): PlayerModel {
@@ -99,7 +102,7 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
 
   private _updateGameComponentLocation() {
     if (this.gameObjects && !this.gameObjects.locationManagedByGameScene) {
-      const { sprite, label } = this.gameObjects;
+      const { sprite, label, hat } = this.gameObjects;
       if (!sprite.anims) return;
       sprite.setX(this.location.x);
       sprite.setY(this.location.y);
@@ -127,6 +130,7 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
       }
       label.setX(sprite.body.x);
       label.setY(sprite.body.y - 20);
+      hat?.setX(sprite.body.x + 16).setY(sprite.body.y);
     }
   }
 

@@ -7,6 +7,7 @@ import {
   ConnectFourGameState,
   TicketBoothArea,
   PongGameState,
+  TargetShooterGameState,
 } from './CoveyTownSocket';
 
 /**
@@ -40,4 +41,10 @@ export function isTicketBoothArea(interactable: Interactable): interactable is T
 
 export function isPongArea(interactable: Interactable): interactable is GameArea<PongGameState> {
   return interactable.type === 'PongArea';
+}
+
+export function isTargetShooterArea(
+  interactable: Interactable,
+): interactable is GameArea<TargetShooterGameState> {
+  return interactable.type === 'TargetShooterArea';
 }

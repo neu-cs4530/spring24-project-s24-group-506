@@ -1,11 +1,25 @@
-import { Box, Button, Center, Stack, Text, useToast } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  ButtonGroup,
+  Center,
+  List,
+  ListItem,
+  Text,
+  VStack,
+  useToast,
+} from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react';
 import PlayerController from '../../../../classes/PlayerController';
 import { useInteractableAreaController } from '../../../../classes/TownController';
 import useTownController from '../../../../hooks/useTownController';
-import { GameStatus, InteractableID } from '../../../../types/CoveyTownSocket';
-import PongAreaController from '../../../../classes/interactable/PongAreaController';
-import PongDisplay from './PongDisplay';
+import {
+  GameStatus,
+  InteractableID,
+  TargetShooterDifficulty,
+} from '../../../../types/CoveyTownSocket';
+import TargetAreaController from '../../../../classes/interactable/TargetShooterAreaController';
+import TargetShooterDisplay from './TargetShooterDisplay';
 
 /**
  * The ConnectFourArea component renders the Connect Four game area.
@@ -44,31 +58,30 @@ import PongDisplay from './PongDisplay';
  *    - Our player lost: description 'You lost :('
  *
  */
-export default function PongArea({
+export default function TargetShooterArea({
   interactableID,
 }: {
   interactableID: InteractableID;
 }): JSX.Element {
-  const gameAreaController = useInteractableAreaController<PongAreaController>(interactableID);
+  const gameAreaController = useInteractableAreaController<TargetAreaController>(interactableID);
   const townController = useTownController();
 
-  const [leftPlayer, setLeftPlayer] = useState<PlayerController | undefined>(
-    gameAreaController.leftPlayer,
-  );
-  const [rightPlayer, setRightPlayer] = useState<PlayerController | undefined>(
-    gameAreaController.rightPlayer,
-  );
+  const [player1, setPlayer1] = useState<PlayerController | undefined>(gameAreaController.player1);
+  const [player2, setPlayer2] = useState<PlayerController | undefined>(gameAreaController.player2);
   const [joiningGame, setJoiningGame] = useState(false);
 
   const [gameStatus, setGameStatus] = useState<GameStatus>(gameAreaController.status);
+  const [difficulty, setDifficulty] = useState<TargetShooterDifficulty>(
+    gameAreaController.difficulty,
+  );
   const toast = useToast();
   useEffect(() => {
     const updateGameState = () => {
-      setLeftPlayer(gameAreaController.leftPlayer);
-      setRightPlayer(gameAreaController.rightPlayer);
+      setPlayer1(gameAreaController.player1);
+      setPlayer2(gameAreaController.player2);
       setGameStatus(gameAreaController.status || 'WAITING_TO_START');
     };
-    const onGameEnd = async () => {
+    const onGameEnd = () => {
       const winner = gameAreaController.winner;
       if (!winner) {
         toast({
@@ -77,12 +90,12 @@ export default function PongArea({
           status: 'info',
         });
       } else if (winner === townController.ourPlayer) {
+        gameAreaController.addToken(10);
         toast({
           title: 'Game over',
           description: 'You won!',
           status: 'success',
         });
-        gameAreaController.addToken(20);
       } else if (gameAreaController.isPlayer) {
         toast({
           title: 'Game over',
@@ -99,24 +112,24 @@ export default function PongArea({
     };
     gameAreaController.addListener('gameUpdated', updateGameState);
     gameAreaController.addListener('gameEnd', onGameEnd);
+    gameAreaController.addListener('difficultyUpdated', setDifficulty);
     return () => {
       gameAreaController.removeListener('gameUpdated', updateGameState);
       gameAreaController.removeListener('gameEnd', onGameEnd);
+      gameAreaController.removeListener('difficultyUpdated', setDifficulty);
     };
   }, [townController, gameAreaController, toast]);
   let gameStatusText = <></>;
   if (gameStatus === 'IN_PROGRESS') {
     gameStatusText = (
-      <Stack direction='column' marginTop='3' marginBottom='4'>
-        <Center className='status-text'>Game in progress</Center>
-        {townController.ourPlayer === gameAreaController.rightPlayer ? (
-          <Center className='player-status'>(You&#39;re on the right)</Center>
-        ) : townController.ourPlayer === gameAreaController.leftPlayer ? (
-          <Center className='player-status'>(You&#39;re on the left)</Center>
-        ) : (
-          <Center className='player-status'>You are observing</Center>
-        )}
-      </Stack>
+      <>
+        Game in progress{' '}
+        {townController.ourPlayer === gameAreaController.player1
+          ? "(You're player 1)"
+          : townController.ourPlayer === gameAreaController.player2
+          ? "(You're player 2)"
+          : 'You are observing'}
+      </>
     );
   } else if (gameStatus == 'WAITING_TO_START') {
     const startGameButton = (
@@ -139,17 +152,10 @@ export default function PongArea({
         Start Game
       </Button>
     );
-    gameStatusText = (
-      <Stack direction='column' marginTop='3' marginBottom='2'>
-        <Center className='status-text'>Waiting for players to press start. </Center>
-        <Center>{startGameButton}</Center>
-      </Stack>
-    );
+    gameStatusText = <b>Waiting for players to press start. {startGameButton}</b>;
   } else {
     const joinGameButton = (
       <Button
-        colorScheme='gray'
-        size='sm'
         onClick={async () => {
           setJoiningGame(true);
           try {
@@ -172,36 +178,68 @@ export default function PongArea({
     if (gameStatus === 'OVER') gameStatusStr = 'over';
     else if (gameStatus === 'WAITING_FOR_PLAYERS') gameStatusStr = 'waiting for players to join';
     gameStatusText = (
-      <Stack direction='column' marginTop='3' marginBottom='2'>
-        <Center className='status-text'>Game {gameStatusStr} </Center>
-        <Center>{joinGameButton}</Center>
-      </Stack>
+      <b>
+        Game {gameStatusStr}. {joinGameButton}
+      </b>
     );
   }
+
+  const difficultyButton = (btnDifficulty: TargetShooterDifficulty) => {
+    return (
+      <Button
+        size='sm'
+        disabled={gameAreaController.status === 'IN_PROGRESS' || difficulty === btnDifficulty}
+        onClick={async () => {
+          try {
+            await gameAreaController.changeDifficulty(btnDifficulty);
+          } catch (e) {
+            toast({
+              title: 'Error changing difficulty',
+              description: (e as Error).toString(),
+              status: 'error',
+            });
+          }
+        }}>
+        {btnDifficulty}
+      </Button>
+    );
+  };
+
+  const difficultyButtons = (
+    <ButtonGroup isAttached>
+      {difficultyButton('Easy')}
+      {difficultyButton('Medium')}
+      {difficultyButton('Hard')}
+    </ButtonGroup>
+  );
+
   return (
     <>
       {gameStatusText}
-      <Center>&#39;r&#39; to move paddle up, &#39;f&#39; to move paddle down.</Center>
-      {gameAreaController.status !== 'IN_PROGRESS' ? (
-        <Center>
-          <Text align={'center'} as='b'>
-            Get the ball past the opponent&#39;s paddle to score. Each time the ball hits a paddle,
-            it speeds up a bit. Score 5 points to win!
+      <List aria-label='list of players in the game'>
+        <ListItem>player1: {player1?.userName || '(No player yet!)'}</ListItem>
+        <ListItem>player2: {player2?.userName || '(No player yet!)'}</ListItem>
+      </List>
+      <Center marginTop={2} marginBottom={2}>
+        <VStack>
+          <Text size='md' as='b'>
+            Difficulty
           </Text>
-        </Center>
-      ) : (
-        <></>
-      )}
-      <Box position='relative'>
-        <Box aria-label='left-player' className='player-list'>
-          <span className='left-player'>{leftPlayer?.userName || '(No player yet!)'}</span>
-        </Box>
-        <PongDisplay gameAreaController={gameAreaController} />
-        <Box aria-label='right-player' className='player-list'>
-          <span className='left-player'></span>
-          <span className='right-player'>{rightPlayer?.userName || '(No player yet!)'}</span>
-        </Box>
-      </Box>
+          <Box>{difficultyButtons}</Box>
+          <Text fontSize='large' as='b' align='center'></Text>
+          {gameAreaController.status !== 'IN_PROGRESS' ? (
+            <Center>
+              <Text align={'center'} as='b'>
+                Shoot the targets faster than your opponent by clicking on them. Score 10 points to
+                win!
+              </Text>
+            </Center>
+          ) : (
+            <></>
+          )}
+        </VStack>
+      </Center>
+      <TargetShooterDisplay gameAreaController={gameAreaController} />
     </>
   );
 }

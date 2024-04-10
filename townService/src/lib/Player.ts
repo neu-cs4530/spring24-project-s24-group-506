@@ -45,7 +45,7 @@ export default class Player {
     this._id = nanoid();
     this._sessionToken = nanoid();
     this.townEmitter = townEmitter;
-    this._tokens = 100;
+    this._tokens = 0;
     this._itemsOwned = [];
     this._itemEquipped = undefined;
   }
@@ -62,28 +62,28 @@ export default class Player {
     return this._tokens;
   }
 
-  get itemsOwned(): BoothItemName[] {
-    return this._itemsOwned;
-  }
-
-  get itemEquipped(): BoothItemName | undefined {
-    return this._itemEquipped;
-  }
-
   set tokens(value: number) {
     this._tokens = value;
+  }
+
+  get itemsOwned(): BoothItemName[] {
+    return this._itemsOwned;
   }
 
   set itemsOwned(value: BoothItemName[]) {
     this._itemsOwned = value;
   }
 
-  set videoToken(value: string | undefined) {
-    this._videoToken = value;
+  get itemEquipped(): BoothItemName | undefined {
+    return this._itemEquipped;
   }
 
   set itemEquipped(value: BoothItemName | undefined) {
     this._itemEquipped = value;
+  }
+
+  set videoToken(value: string | undefined) {
+    this._videoToken = value;
   }
 
   get videoToken(): string | undefined {

@@ -130,6 +130,10 @@ export default class TownGameScene extends Phaser.Scene {
       '16_Grocery_store_32x32',
       this._resourcePathPrefix + '/assets/tilesets/16_Grocery_store_32x32.png',
     );
+    this.load.image('BlueHat', this._resourcePathPrefix + '/assets/hatPictures/BlueHat.png');
+    this.load.image('RedHat', this._resourcePathPrefix + '/assets/hatPictures/RedHat.png');
+    this.load.image('GreenHat', this._resourcePathPrefix + '/assets/hatPictures/GreenHat.png');
+
     this.load.tilemapTiledJSON('map', this._resourcePathPrefix + '/assets/tilemaps/indoors.json');
     this.load.atlas(
       'atlas',
@@ -149,15 +153,40 @@ export default class TownGameScene extends Phaser.Scene {
 
     disconnectedPlayers.forEach(disconnectedPlayer => {
       if (disconnectedPlayer.gameObjects) {
-        const { sprite, label } = disconnectedPlayer.gameObjects;
+        const { sprite, label, hat } = disconnectedPlayer.gameObjects;
         if (sprite && label) {
           sprite.destroy();
           label.destroy();
+        }
+        if (hat) {
+          hat.destroy();
         }
       }
     });
     // Remove disconnected players from list
     this._players = players;
+
+    // check if the player has a hat and if so, add it to the player
+    players.forEach(player => {
+      if (player.gameObjects && player.itemEquipped) {
+        if (!player.gameObjects.hat) {
+          player.gameObjects.hat = this.add
+            .image(
+              player.gameObjects.sprite.body.x + 16,
+              player.gameObjects.sprite.body.y,
+              player.itemEquipped,
+            )
+            .setDepth(6);
+        } else if (player.gameObjects.hat.texture.key !== player.itemEquipped) {
+          player.gameObjects.hat.setTexture(player.itemEquipped);
+        }
+      } else if (player.gameObjects && !player.itemEquipped) {
+        if (player.gameObjects.hat) {
+          player.gameObjects.hat.destroy();
+          player.gameObjects.hat = undefined;
+        }
+      }
+    });
   }
 
   getNewMovementDirection() {
@@ -251,6 +280,8 @@ export default class TownGameScene extends Phaser.Scene {
       const isMoving = primaryDirection !== undefined;
       gameObjects.label.setX(body.x);
       gameObjects.label.setY(body.y - 20);
+      gameObjects.hat?.setX(body.x + 16);
+      gameObjects.hat?.setY(body.y);
       const x = gameObjects.sprite.getBounds().centerX;
       const y = gameObjects.sprite.getBounds().centerY;
       //Move the sprite
@@ -290,6 +321,10 @@ export default class TownGameScene extends Phaser.Scene {
         if (player.gameObjects?.label && player.gameObjects?.sprite.body) {
           player.gameObjects.label.setX(player.gameObjects.sprite.body.x);
           player.gameObjects.label.setY(player.gameObjects.sprite.body.y - 20);
+        }
+        if (player.gameObjects?.hat && player.gameObjects?.sprite.body) {
+          player.gameObjects.hat.setX(player.gameObjects.sprite.body.x + 16);
+          player.gameObjects.hat.setY(player.gameObjects.sprite.body.y);
         }
       }
     }
@@ -430,6 +465,7 @@ export default class TownGameScene extends Phaser.Scene {
     this.coveyTownController.ourPlayer.gameObjects = {
       sprite,
       label,
+      hat: undefined,
       locationManagedByGameScene: true,
     };
 
@@ -538,6 +574,7 @@ export default class TownGameScene extends Phaser.Scene {
       player.gameObjects = {
         sprite,
         label,
+        hat: undefined,
         locationManagedByGameScene: false,
       };
       this._collidingLayers.forEach(layer => this.physics.add.collider(sprite, layer));
