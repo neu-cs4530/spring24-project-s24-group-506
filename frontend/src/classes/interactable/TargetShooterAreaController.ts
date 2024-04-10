@@ -40,13 +40,13 @@ export default class TargetShooterAreaController extends GameAreaController<
   TargetShooterEvents
 > {
   private _targetposition: XY = {
-    x: this._model.game?.state.currentTarget.x ?? 0,
-    y: this._model.game?.state.currentTarget.y ?? 0,
+    x: 0,
+    y: 0,
   };
 
-  private _difficulty: TargetShooterDifficulty = this._model.game?.state.difficulty ?? 'Easy';
+  private _difficulty: TargetShooterDifficulty = 'Easy';
 
-  private _targetSize: number = this._model.game?.state.targetSize ?? 40;
+  private _targetSize: number = 40;
 
   private _player1score: TargetShooterScore = 0;
 
