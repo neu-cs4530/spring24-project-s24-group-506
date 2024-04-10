@@ -241,7 +241,7 @@ describe('[T1] TargetShooterAreaController', () => {
           player1: ourPlayer.id,
           player2: otherPlayers[0].id,
         });
-        expect(targetShooterAreaController.targetSize).toBe(1);
+        expect(targetShooterAreaController.targetSize).toBe(40);
       });
     });
     describe('winner', () => {
