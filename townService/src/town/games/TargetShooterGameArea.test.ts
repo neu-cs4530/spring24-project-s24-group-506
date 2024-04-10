@@ -50,6 +50,10 @@ class TestingGame extends Game<TargetShooterGameState, TargetShooterMove> {
       currentTarget: { x: 100, y: 100 },
       player1Score: 0,
       player2Score: 0,
+      difficulty: "Easy",
+      targetSize: 40,
+      player1Accuracy: { shots: 0, hits: 0 },
+      player2Accuracy: { shots: 0, hits: 0 },
     });
   }
 }

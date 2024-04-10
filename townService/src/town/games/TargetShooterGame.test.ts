@@ -193,79 +193,7 @@ describe('TargetShooterGame', () => {
     expect(game.state.currentTarget).not.toEqual({ x: 100, y: 100 });
   });
 
-  // check that the game is over after 5 points
-  it('Should check the game is over after 5 points player 1', () => {
-    const player1 = createPlayerForTesting();
-    const player2 = createPlayerForTesting();
-
-    // generate random number within the range of +- 15 of the target position
-    const positionX = Math.floor(Math.random() * 31 + 85);
-    const positionY = Math.floor(Math.random() * 31 + 85);
-
-    game.join(player1);
-    game.join(player2);
-    game.startGame(player1);
-    game.startGame(player2);
-    expect(game.state.currentTarget).toEqual({ x: 100, y: 100 });
-    // move 1
-    game.applyMove({
-      gameID: game.id,
-      playerID: player1.id,
-      // give the range within 15 of the target position
-      move: { gamePiece: 'player1', position: { x: positionX, y: positionY } },
-    });
-    expect(game.state.player1Score).toEqual(1);
-    expect(game.state.player2Score).toEqual(0);
-    expect(game.state.currentTarget).not.toEqual({ x: 100, y: 100 });
-    // move 2
-    game.applyMove({
-      gameID: game.id,
-      playerID: player1.id,
-      move: {
-        gamePiece: 'player1',
-        position: { x: game.state.currentTarget.x, y: game.state.currentTarget.y },
-      },
-    });
-    expect(game.state.player1Score).toEqual(2);
-    expect(game.state.player2Score).toEqual(0);
-    // move 3
-    game.applyMove({
-      gameID: game.id,
-      playerID: player1.id,
-      move: {
-        gamePiece: 'player1',
-        position: { x: game.state.currentTarget.x, y: game.state.currentTarget.y },
-      },
-    });
-    expect(game.state.player1Score).toEqual(3);
-    expect(game.state.player2Score).toEqual(0);
-    // move 4
-    game.applyMove({
-      gameID: game.id,
-      playerID: player1.id,
-      move: {
-        gamePiece: 'player1',
-        position: { x: game.state.currentTarget.x, y: game.state.currentTarget.y },
-      },
-    });
-    expect(game.state.player1Score).toEqual(4);
-    expect(game.state.player2Score).toEqual(0);
-    // move 5
-    game.applyMove({
-      gameID: game.id,
-      playerID: player1.id,
-      move: {
-        gamePiece: 'player1',
-        position: { x: game.state.currentTarget.x, y: game.state.currentTarget.y },
-      },
-    });
-    expect(game.state.player1Score).toEqual(5);
-    expect(game.state.player2Score).toEqual(0);
-    expect(game.state.status).toEqual('OVER');
-    expect(game.state.winner).toEqual(player1.id);
-  });
-
-  it('Should check the game is over after 5 points, player 2', () => {
+  it('Should check the game is over after 10 points', () => {
     const player1 = createPlayerForTesting();
     const player2 = createPlayerForTesting();
 
@@ -327,6 +255,56 @@ describe('TargetShooterGame', () => {
       },
     });
     expect(game.state.player2Score).toEqual(5);
+    // move 6
+    game.applyMove({
+      gameID: game.id,
+      playerID: player2.id,
+      move: {
+        gamePiece: 'player2',
+        position: { x: game.state.currentTarget.x, y: game.state.currentTarget.y },
+      },
+    });
+    expect(game.state.player2Score).toEqual(6);
+    // move 7
+    game.applyMove({
+      gameID: game.id,
+      playerID: player2.id,
+      move: {
+        gamePiece: 'player2',
+        position: { x: game.state.currentTarget.x, y: game.state.currentTarget.y },
+      },
+    });
+    expect(game.state.player2Score).toEqual(7);
+    // move 8
+    game.applyMove({
+      gameID: game.id,
+      playerID: player2.id,
+      move: {
+        gamePiece: 'player2',
+        position: { x: game.state.currentTarget.x, y: game.state.currentTarget.y },
+      },
+    });
+    expect(game.state.player2Score).toEqual(8);
+    // move 9
+    game.applyMove({
+      gameID: game.id,
+      playerID: player2.id,
+      move: {
+        gamePiece: 'player2',
+        position: { x: game.state.currentTarget.x, y: game.state.currentTarget.y },
+      },
+    });
+    expect(game.state.player2Score).toEqual(9);
+    // move 10
+    game.applyMove({
+      gameID: game.id,
+      playerID: player2.id,
+      move: {
+        gamePiece: 'player2',
+        position: { x: game.state.currentTarget.x, y: game.state.currentTarget.y },
+      },
+    });
+    expect(game.state.player2Score).toEqual(10);
     expect(game.state.status).toEqual('OVER');
     expect(game.state.winner).toEqual(player2.id);
   });
