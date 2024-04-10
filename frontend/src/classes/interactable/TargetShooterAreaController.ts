@@ -46,7 +46,7 @@ export default class TargetShooterAreaController extends GameAreaController<
 
   private _difficulty: TargetShooterDifficulty = 'Easy';
 
-  private _targetSize: number = 40;
+  private _targetSize = 40;
 
   private _player1score: TargetShooterScore = 0;
 
