@@ -68,7 +68,7 @@ export default function PongArea({
       setRightPlayer(gameAreaController.rightPlayer);
       setGameStatus(gameAreaController.status || 'WAITING_TO_START');
     };
-    const onGameEnd = () => {
+    const onGameEnd = async () => {
       const winner = gameAreaController.winner;
       if (!winner) {
         toast({
@@ -77,7 +77,7 @@ export default function PongArea({
           status: 'info',
         });
       } else if (winner === townController.ourPlayer) {
-        gameAreaController.addToken(20);
+        await gameAreaController.addToken(20);
         toast({
           title: 'Game over',
           description: 'You won!',
