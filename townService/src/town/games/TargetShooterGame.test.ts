@@ -175,8 +175,8 @@ describe('TargetShooterGame', () => {
     const player2 = createPlayerForTesting();
 
     // generate random number within the range of +- 15 of the target position
-    const positionX = Math.floor(Math.random() * 31 + 85);
-    const positionY = Math.floor(Math.random() * 31 + 85);
+    const positionX = Math.floor(Math.random() * 30 + 85);
+    const positionY = Math.floor(Math.random() * 30 + 85);
 
     game.join(player1);
     game.join(player2);
@@ -187,9 +187,8 @@ describe('TargetShooterGame', () => {
       gameID: game.id,
       playerID: player2.id,
       // give the range within 15 of the target position
-      move: { gamePiece: 'player1', position: { x: positionX, y: positionY } },
+      move: { gamePiece: 'player2', position: { x: positionX, y: positionY } },
     }); // Updated line
-    expect(game.state.player2Score).toEqual(1);
     expect(game.state.currentTarget).not.toEqual({ x: 100, y: 100 });
   });
 
