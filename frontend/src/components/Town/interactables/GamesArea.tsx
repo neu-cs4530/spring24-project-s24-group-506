@@ -34,6 +34,7 @@ import Leaderboard from './Leaderboard';
 import TicTacToeArea from './TicTacToe/TicTacToeArea';
 import PongArea from './Pong/PongArea';
 import { TokenLeaderboard } from './TokenLeaderboard';
+import TargetShooterArea from './TargetShooter/TargetShooterArea';
 
 export const INVALID_GAME_AREA_TYPE_MESSAGE = 'Invalid game area type';
 
@@ -104,6 +105,8 @@ function GameArea({ interactableID }: { interactableID: InteractableID }): JSX.E
                   <TicTacToeArea interactableID={interactableID} />
                 ) : gameAreaController.toInteractableAreaModel().type === 'PongArea' ? (
                   <PongArea interactableID={interactableID} />
+                ) : gameAreaController.toInteractableAreaModel().type === 'TargetShooterArea' ? (
+                  <TargetShooterArea interactableID={interactableID} />
                 ) : (
                   <>{INVALID_GAME_AREA_TYPE_MESSAGE}</>
                 )}

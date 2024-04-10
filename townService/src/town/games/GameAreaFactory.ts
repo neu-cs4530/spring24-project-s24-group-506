@@ -4,6 +4,7 @@ import InteractableArea from '../InteractableArea';
 import ConnectFourGameArea from './ConnectFourGameArea';
 import TicTacToeGameArea from './TicTacToeGameArea';
 import PongGameArea from './PongGameArea';
+import TargetShooterGameArea from './TargetShooterGameArea';
 
 /**
  * Creates a new GameArea from a map object
@@ -30,6 +31,9 @@ export default function GameAreaFactory(
   }
   if (gameType === 'Pong') {
     return new PongGameArea(name, rect, broadcastEmitter);
+  }
+  if (gameType === 'TargetShooter') {
+    return new TargetShooterGameArea(name, rect, broadcastEmitter);
   }
   throw new Error(`Unknown game area type ${mapObject.class}`);
 }

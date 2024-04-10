@@ -31,6 +31,15 @@
     box-sizing: border-box;
   }
 
+  .target-shooter-border {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 2px solid gray;
+    box-sizing: border-box;
+  }
+
   @font-face {
     font-family: 'Press Start 2P';
     src: url('../public/assets/Press_Start_2P/PressStart2P-Regular.ttf');
@@ -64,6 +73,21 @@
     height: 12px;
     position: absolute;
     background-color: white;
+  }
+
+  .score-player1 {
+    left: 20px;
+  }
+  
+  .score-player2 {
+    right: 20px;
+  }
+  
+  .target {
+    position: absolute;
+    /* background: radial-gradient(circle, red 20%, white 20%, white 40%, red 40%, red 80%, white 80%); */
+    background: radial-gradient(circle, red 20%, white 20%, white 40%, red 40%, red 80%, white 80%);
+    border-radius: 50%;
   }
 
   .status-text {
