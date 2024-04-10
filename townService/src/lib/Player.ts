@@ -45,7 +45,7 @@ export default class Player {
     this._id = nanoid();
     this._sessionToken = nanoid();
     this.townEmitter = townEmitter;
-    this._tokens = 100;
+    this._tokens = 0;
     this._itemsOwned = [];
     this._itemEquipped = undefined;
   }
