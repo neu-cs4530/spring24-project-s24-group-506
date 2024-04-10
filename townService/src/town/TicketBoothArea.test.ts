@@ -107,116 +107,158 @@ describe('TicketBoothArea', () => {
       expect(val.occupantsByID).toEqual([]);
     });
   });
-});
-describe('Purchase command', () => {
-  const testAreaBox = { x: 100, y: 100, width: 100, height: 100 };
-  let testArea: TicketBoothArea;
-  const townEmitter = mock<TownEmitter>();
-  const id = nanoid();
-  let newPlayer: Player;
-
-  beforeEach(() => {
-    mockClear(townEmitter);
-    testArea = new TicketBoothArea({ items: [], id, occupants: [] }, testAreaBox, townEmitter);
-    newPlayer = createPlayerForTesting();
-    testArea.add(newPlayer);
-    testArea.updateModel({
-      items: [
-        {
-          name: 'BlueHat',
-          cost: 10,
-          timesPurchased: 0,
-          description: 'This is a blue hat that is cheap',
-        },
-      ],
-      type: 'TicketBoothArea',
-      id: nanoid(),
-      occupants: [newPlayer.id],
+  describe('Purchase command', () => {
+    it('Throws an error if the command is invalid', () => {
+      expect(() => testArea.handleCommand({ type: 'JoinGame' })).toThrowError('Invalid command');
     });
-  });
-  it('Throws an error if the command is not TicketBoothPurchase', () => {
-    expect(() => testArea.handleCommand({ type: 'JoinGame' })).toThrowError('Invalid command');
-  });
-  it('Throws an error if items list is undefined', () => {
-    testArea.updateModel({
-      items: undefined,
-      type: 'TicketBoothArea',
-      id: nanoid(),
-      occupants: [newPlayer.id],
+    beforeEach(() => {
+      testArea.updateModel({
+        items: [
+          {
+            name: 'BlueHat',
+            cost: 10,
+            timesPurchased: 0,
+            description: 'This is a blue hat that is cheap',
+          },
+        ],
+        type: 'TicketBoothArea',
+        id: nanoid(),
+        occupants: [newPlayer.id],
+      });
     });
-    expect(() =>
+    it('Throws an error if items list is undefined', () => {
+      testArea.updateModel({
+        items: undefined,
+        type: 'TicketBoothArea',
+        id: nanoid(),
+        occupants: [newPlayer.id],
+      });
+      expect(() =>
+        testArea.handleCommand({
+          type: 'TicketBoothPurchase',
+          itemName: 'BlueHat',
+          playerID: newPlayer.id,
+        }),
+      ).toThrowError('No items available for purchase');
+    });
+    it('Throws an error if the player from the command is not found in the occupants list', () => {
+      expect(() =>
+        testArea.handleCommand({
+          type: 'TicketBoothPurchase',
+          itemName: 'BlueHat',
+          playerID: 'not a real player id',
+        }),
+      ).toThrowError('Player not found');
+    });
+    it('Throws an error if the player does not have enough tokens', () => {
+      expect(() =>
+        testArea.handleCommand({
+          type: 'TicketBoothPurchase',
+          itemName: 'BlueHat',
+          playerID: newPlayer.id,
+        }),
+      ).toThrowError('Player does not have enough tokens');
+    });
+    it('Throws an error if the player already owns the item', () => {
+      newPlayer.addTokens(100);
       testArea.handleCommand({
         type: 'TicketBoothPurchase',
         itemName: 'BlueHat',
         playerID: newPlayer.id,
-      }),
-    ).toThrowError('No items available for purchase');
-  });
-  it('Throws an error if the player from the command is not found in the occupants list', () => {
-    expect(() =>
-      testArea.handleCommand({
-        type: 'TicketBoothPurchase',
-        itemName: 'BlueHat',
-        playerID: 'not a real player id',
-      }),
-    ).toThrowError('Player not found');
-  });
-  it('Throws an error if the player does not have enough tokens', () => {
-    expect(() =>
+      });
+      expect(() =>
+        testArea.handleCommand({
+          type: 'TicketBoothPurchase',
+          itemName: 'BlueHat',
+          playerID: newPlayer.id,
+        }),
+      ).toThrowError('Player already owns this item');
+    });
+    it('Purchases the item and emits the updated player tokens and items as well as update the list of Booth Items', () => {
+      newPlayer.addTokens(10);
       testArea.handleCommand({
         type: 'TicketBoothPurchase',
         itemName: 'BlueHat',
         playerID: newPlayer.id,
-      }),
-    ).toThrowError('Player does not have enough tokens');
-  });
-  it('Throws an error if the player already owns the item', () => {
-    newPlayer.addTokens(100);
-    testArea.handleCommand({
-      type: 'TicketBoothPurchase',
-      itemName: 'BlueHat',
-      playerID: newPlayer.id,
-    });
-    expect(() =>
-      testArea.handleCommand({
-        type: 'TicketBoothPurchase',
-        itemName: 'BlueHat',
-        playerID: newPlayer.id,
-      }),
-    ).toThrowError('Player already owns this item');
-  });
-  it('Purchases the item and emits the updated player tokens and items as well as update the list of Booth Items', () => {
-    newPlayer.addTokens(10);
-    testArea.handleCommand({
-      type: 'TicketBoothPurchase',
-      itemName: 'BlueHat',
-      playerID: newPlayer.id,
-    });
-    expect(testArea.items).toEqual([
-      {
-        name: 'BlueHat',
-        cost: 10,
-        timesPurchased: 1,
-        description: 'This is a blue hat that is cheap',
-      },
-    ]);
-    expect(newPlayer.tokens).toStrictEqual(0);
-    expect(newPlayer.itemsOwned).toEqual(['BlueHat']);
-    expect(townEmitter.emit).toHaveBeenCalledWith('playerTokensChanged', newPlayer.toPlayerModel());
-    expect(townEmitter.emit).toHaveBeenCalledWith('playerItemsChanged', newPlayer.toPlayerModel());
-    const lastEmittedUpdate = getLastEmittedEvent(townEmitter, 'interactableUpdate');
-    expect(lastEmittedUpdate).toEqual({
-      id,
-      items: [
+      });
+      expect(testArea.items).toEqual([
         {
           name: 'BlueHat',
           cost: 10,
           timesPurchased: 1,
           description: 'This is a blue hat that is cheap',
         },
-      ],
-      occupants: [newPlayer.id],
-      type: 'TicketBoothArea',
+      ]);
+      expect(newPlayer.tokens).toStrictEqual(0);
+      expect(newPlayer.itemsOwned).toEqual(['BlueHat']);
+      expect(townEmitter.emit).toHaveBeenCalledWith(
+        'playerTokensChanged',
+        newPlayer.toPlayerModel(),
+      );
+      expect(townEmitter.emit).toHaveBeenCalledWith(
+        'playerItemsChanged',
+        newPlayer.toPlayerModel(),
+      );
+      const lastEmittedUpdate = getLastEmittedEvent(townEmitter, 'interactableUpdate');
+      expect(lastEmittedUpdate).toEqual({
+        id,
+        items: [
+          {
+            name: 'BlueHat',
+            cost: 10,
+            timesPurchased: 1,
+            description: 'This is a blue hat that is cheap',
+          },
+        ],
+        occupants: [newPlayer.id],
+        type: 'TicketBoothArea',
+      });
+    });
+  });
+  describe('Equip command', () => {
+    it('Throws an error if the player is not found in the occupants list', () => {
+      expect(() =>
+        testArea.handleCommand({
+          type: 'TicketBoothEquip',
+          itemName: 'BlueHat',
+          playerID: 'not a real player id',
+        }),
+      ).toThrowError('Player not found');
+    });
+    it('Throws an error if the player does not own the item', () => {
+      expect(() =>
+        testArea.handleCommand({
+          type: 'TicketBoothEquip',
+          itemName: 'BlueHat',
+          playerID: newPlayer.id,
+        }),
+      ).toThrowError('Player does not own this item');
+    });
+    it('Throws an error if the player already has the item equipped', () => {
+      newPlayer.addItem('BlueHat');
+      newPlayer.equipItem('BlueHat');
+      expect(() =>
+        testArea.handleCommand({
+          type: 'TicketBoothEquip',
+          itemName: 'BlueHat',
+          playerID: newPlayer.id,
+        }),
+      ).toThrowError('Player already has this item equipped');
+    });
+    it('Equips the item and emits the updated player items', () => {
+      newPlayer.addItem('BlueHat');
+      testArea.handleCommand({
+        type: 'TicketBoothEquip',
+        itemName: 'BlueHat',
+        playerID: newPlayer.id,
+      });
+      expect(newPlayer.itemEquipped).toEqual('BlueHat');
+      expect(townEmitter.emit).toHaveBeenCalledWith(
+        'playerEquippedChanged',
+        newPlayer.toPlayerModel(),
+      );
+      const lastEmittedUpdate = getLastEmittedEvent(townEmitter, 'interactableUpdate');
+      expect(lastEmittedUpdate).toEqual(testArea.toModel());
     });
   });
 });
