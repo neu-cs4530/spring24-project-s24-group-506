@@ -33,7 +33,7 @@ export type TargetShooterEvents = GameEventTypes & {
 };
 
 /**
- * This class is responsible for managing the state of the Pong game, and for sending commands to the server
+ * This class is responsible for managing the state of the Target Shooter game, and for sending commands to the server
  */
 export default class TargetShooterAreaController extends GameAreaController<
   TargetShooterGameState,
@@ -62,33 +62,37 @@ export default class TargetShooterAreaController extends GameAreaController<
     shots: 0,
   };
 
-  // returns the current position of the ball
+  // returns the current position of the target
   get targetPosition(): XY {
     return this._targetposition;
   }
 
-  // returns the current score of the left player
+  // returns the current score of player1
   get player1Score(): TargetShooterScore {
     return this._player1score;
   }
 
-  // returns the current score of the right player
+  // returns the current score of player2
   get player2Score(): TargetShooterScore {
     return this._player2score;
   }
 
+  // returns the accuracy of player1
   get player1Accuracy(): TargetShooterAccuracy {
     return this._player1Acccuracy;
   }
 
+  // returns the accuracy of player2
   get player2Accuracy(): TargetShooterAccuracy {
     return this._player2Acccuracy;
   }
 
+  // returns what level of difficulty was selected
   get difficulty(): TargetShooterDifficulty {
     return this._difficulty;
   }
 
+  // returns the size of the target
   get targetSize(): number {
     return this._targetSize;
   }
@@ -134,7 +138,7 @@ export default class TargetShooterAreaController extends GameAreaController<
   }
 
   /**
-   * Returns the color of the current player's game piece
+   * Returns the player of the current player's game piece
    * @throws an error with message PLAYER_NOT_IN_GAME_ERROR if the current player is not in the game
    */
   get gamePiece(): TargetShooterPlayer {
@@ -179,11 +183,13 @@ export default class TargetShooterAreaController extends GameAreaController<
    * Calls super._updateFrom, which updates the occupants of this game area and other
    * common properties (including this._model)
    *
-   * If the opposite paddle has changed, emits an oppositePaddleUpdated event with the new paddle location
-   * If the our paddle has changed, emits an ourPaddleUpdated event with the new paddle location
-   * If the ball position has changed, emits a ballPositionUpdated event with the new ball position
-   * If the left score has changed, emits a leftScoreUpdated event with the new left score
-   * If the right score has changed, emits a rightScoreUpdated event with the new right score
+   * If the target position has changed, emits an targetPositionUpdated event with the new target location
+   * If the player1 score has changed, emits an player1Score event with the new player 1 score
+   * If the player2 score has changed, emits an player2Score event with the new player 2 score
+   * If the difficulty has changed, emits a difficultyUpdated event with the new difficulty
+   * If the target size has changed, emits a targetSizeUpdated event with the new target size
+   * If the player1 accuracy has changed, emits a player1AccuracyUpdated event with the new player1 accuracy
+   * If the player2 accuracy has changed, emits a player1AccuracyUpdated event with the new player2 accuracy
    *
    */
   protected _updateFrom(newModel: GameArea<TargetShooterGameState>): void {
@@ -251,9 +257,8 @@ export default class TargetShooterAreaController extends GameAreaController<
    * Does not check if the move is valid.
    *
    * @throws an error with message NO_GAME_IN_PROGRESS_ERROR if there is no game in progress
-   * @throws an error with message COLUMN_FULL_MESSAGE if the column is full
    *
-   * @param col Column to place the game piece in
+   * @param position XY where the player's position is
    */
   public async makeMove(position: XY): Promise<void> {
     const instanceID = this._instanceID;

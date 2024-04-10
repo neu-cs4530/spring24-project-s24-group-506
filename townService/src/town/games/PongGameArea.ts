@@ -15,7 +15,7 @@ import PongGame from './PongGame';
 import GameArea from './GameArea';
 
 /**
- * The PongGameArea class is responsible for managing the state of a single game area for Connect Four.
+ * The PongGameArea class is responsible for managing the state of a single game area for Pong Game.
  * Responsibilty for managing the state of the game itself is delegated to the PongGame class.
  *
  * @see PongGame

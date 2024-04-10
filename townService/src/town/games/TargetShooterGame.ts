@@ -24,8 +24,7 @@ export const MEDIUM_TARGET_SIZE = 30;
 export const HARD_TARGET_SIZE = 20;
 
 /**
- * A ConnectFourGame is a Game that implements the rules of Connect Four.
- * @see https://en.wikipedia.org/wiki/Connect_Four
+ * A TargetShooterGame is a Game that implements the rules of Target Shooter.
  */
 export default class TargetShooterGame extends Game<TargetShooterGameState, TargetShooterMove> {
   private _preferredPlayer1?: PlayerID;
@@ -35,9 +34,9 @@ export default class TargetShooterGame extends Game<TargetShooterGameState, Targ
   /**
    * Creates a new ConnectFourGame.
    * @param priorGame If provided, the new game will be created such that if either player
-   * from the prior game joins, they will be the same color. When the game begins, the default
-   * first player is red, but if either player from the prior game joins the new game
-   * (and clicks "start"), the first player will be the other color.
+   * from the prior game joins, they will be the same player. When the game begins, the default
+   * first player is player1, but if either player from the prior game joins the new game
+   * (and clicks "start"), the first player will be the other player.
    */
   public constructor(priorGame?: TargetShooterGame) {
     super({
@@ -61,10 +60,10 @@ export default class TargetShooterGame extends Game<TargetShooterGameState, Targ
    *
    * If both players are ready, the game will start.
    *
-   * The first player (red or yellow) is determined as follows:
-   *   - If neither player was in the last game in this area (or there was no prior game), the first player is red.
-   *   - If at least one player was in the last game in this area, then the first player will be the other color from last game.
-   *   - If a player from the last game *left* the game and then joined this one, they will be treated as a new player (not given the same color by preference).   *
+   * The first player (player1 or player2) is determined as follows:
+   *   - If neither player was in the last game in this area (or there was no prior game), the first player is player1.
+   *   - If at least one player was in the last game in this area, then the first player will be the other player from last game.
+   *   - If a player from the last game *left* the game and then joined this one, they will be treated as a new player (not given the same player by preference).   *
    *
    * @throws InvalidParametersError if the player is not in the game (PLAYER_NOT_IN_GAME_MESSAGE)
    * @throws InvalidParametersError if the game is not in the WAITING_TO_START state (GAME_NOT_STARTABLE_MESSAGE)
@@ -93,9 +92,9 @@ export default class TargetShooterGame extends Game<TargetShooterGameState, Targ
 
   /**
    * Joins a player to the game.
-   * - Assigns the player to a color (red or yellow). If the player was in the prior game, then attempts
-   * to reuse the same color if it is not in use. Otherwise, assigns the player to the first
-   * available color (red, then yellow).
+   * - Assigns the player to a player (player1 or player2). If the player was in the prior game, then attempts
+   * to reuse the same player if it is not in use. Otherwise, assigns the player to the first
+   * available player (player1, then player2).
    * - If both players are now assigned, updates the game status to WAITING_TO_START.
    *
    * @throws InvalidParametersError if the player is already in the game (PLAYER_ALREADY_IN_GAME_MESSAGE)
@@ -197,7 +196,7 @@ export default class TargetShooterGame extends Game<TargetShooterGameState, Targ
 
   /**
    * Applies a move to the game.
-   * Uses the player's ID to determine which color they are playing as (ignores move.gamePiece).
+   * Uses the player's ID to determine which player they are playing as (ignores move.gamePiece).
    *
    * Validates the move, and if it is valid, applies it to the game state.
    *
@@ -208,8 +207,6 @@ export default class TargetShooterGame extends Game<TargetShooterGameState, Targ
    *
    * @throws InvalidParametersError if the game is not in progress (GAME_NOT_IN_PROGRESS_MESSAGE)
    * @throws InvalidParametersError if the player is not in the game (PLAYER_NOT_IN_GAME_MESSAGE)
-   * @throws INvalidParametersError if the move is not the player's turn (MOVE_NOT_YOUR_TURN_MESSAGE)
-   * @throws InvalidParametersError if the move is invalid per the rules of Connect Four (BOARD_POSITION_NOT_VALID_MESSAGE)
    *
    */
 
@@ -255,6 +252,7 @@ export default class TargetShooterGame extends Game<TargetShooterGameState, Targ
     this.state = newState;
   }
 
+  // checks if player clicks within the boundaries of the target
   private _checkTargetHit(
     player: TargetShooterPlayer,
     position: XY,
@@ -271,6 +269,8 @@ export default class TargetShooterGame extends Game<TargetShooterGameState, Targ
     }
   }
 
+  // increases the score to the corresponding player once they click on a target and checks if they have reached the max score
+  // sets game to over and declares winner once max score is reached
   private _incrementScore(player: TargetShooterPlayer, newState: TargetShooterGameState): void {
     if (player === 'player1') {
       newState.player1Score++;
@@ -285,6 +285,7 @@ export default class TargetShooterGame extends Game<TargetShooterGameState, Targ
     }
   }
 
+  // spawns a new target within the boundaries of the screen once the previous target has been clicked
   private _spawnTarget(newState: TargetShooterGameState): void {
     // tighten the boundaries of the targets spawned
 

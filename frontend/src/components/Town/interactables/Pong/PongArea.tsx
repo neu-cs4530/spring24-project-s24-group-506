@@ -8,12 +8,12 @@ import PongAreaController from '../../../../classes/interactable/PongAreaControl
 import PongDisplay from './PongDisplay';
 
 /**
- * The ConnectFourArea component renders the Connect Four game area.
+ * The PongArea component renders the Pong game area.
  * It renders the current state of the area, optionally allowing the player to join the game.
  *
  * It uses Chakra-UI components (does not use other GUI widgets)
  *
- * It uses the ConnectFourAreaController to get the current state of the game.
+ * It uses the PongAreaController to get the current state of the game.
  * It listens for the 'gameUpdated' and 'gameEnd' events on the controller, and re-renders accordingly.
  * It subscribes to these events when the component mounts, and unsubscribes when the component unmounts. It also unsubscribes when the gameAreaController changes.
  *
@@ -36,7 +36,6 @@ import PongDisplay from './PongDisplay';
  *    - Before calling startGame method, the button is disabled and has the property isLoading set to true, and is re-enabled when the method call completes
  *    - If the method call fails, a toast is displayed with the error message as the description of the toast (and status 'error')
  *    - Once the game starts, the button dissapears
- * - The ConnectFourBoard component, which is passed the current gameAreaController as a prop (@see ConnectFourBoard.tsx)
  *
  * - When the game ends, a toast is displayed with the result of the game:
  *    - Tie: description 'Game ended in a tie'
