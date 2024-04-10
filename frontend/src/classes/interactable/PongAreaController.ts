@@ -119,7 +119,7 @@ export default class PongAreaController extends GameAreaController<PongGameState
   }
 
   /**
-   * Returns the color of the current player's game piece
+   * Returns the side of the current player's game piece
    * @throws an error with message PLAYER_NOT_IN_GAME_ERROR if the current player is not in the game
    */
   get gamePiece(): PongPlayer {
@@ -221,14 +221,12 @@ export default class PongAreaController extends GameAreaController<PongGameState
   }
 
   /**
-   * Sends a request to the server to place the current player's game piece in the given column.
-   * Calculates the row to place the game piece in based on the current state of the board.
+   * Sends a request to the server to move the paddle up or down.
    * Does not check if the move is valid.
    *
    * @throws an error with message NO_GAME_IN_PROGRESS_ERROR if there is no game in progress
-   * @throws an error with message COLUMN_FULL_MESSAGE if the column is full
    *
-   * @param col Column to place the game piece in
+   * @param direction Direction user moves the Paddle
    */
   public async makeMove(direction: PongPaddleDirection): Promise<void> {
     const instanceID = this._instanceID;

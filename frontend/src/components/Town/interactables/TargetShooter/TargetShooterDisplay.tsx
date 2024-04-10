@@ -19,24 +19,15 @@ const Target = ({ position, size }: { position: XY; size: number }) => {
 };
 
 /**
- * A component that renders the ConnectFour state
+ * A component that renders the TargetShooter state
  *
- * Renders the ConnectFour state as a "StyledConnectFourstate", which consists of "StyledConnectFourSquare"s
- * (one for each cell in the state, starting from the top left and going left to right, top to bottom).
+ * The state is re-rendered whenever the state changes, and each target is re-rendered whenever the target position changes
+ * The state is re-rendered whenever the difficulty is changed
+ * 
  *
- * Each StyledConnectFourSquare has an aria-label property that describes the cell's position in the state,
- * formatted as `Cell ${rowIndex},${colIndex} (Red|Yellow|Empty)`.
- *
- * The background color of each StyledConnectFourSquare is determined by the value of the cell in the state, either
- * 'red', 'yellow', or '' (an empty for an empty square).
- *
- * The state is re-rendered whenever the state changes, and each cell is re-rendered whenever the value
- * of that cell changes.
- *
- * If the current player is in the game, then each StyledConnectFourSquare is clickable, and clicking
- * on it will make a move in that column. If there is an error making the move, then a toast will be
- * displayed with the error message as the description of the toast. If it is not the current player's
- * turn, then the StyledConnectFourSquare will be disabled.
+ * If the current player is in the game, then each Target is clickable, and clicking
+ * on it will make a move in the game and spawn a new target. If there is an error making the move, then a toast will be
+ * displayed with the error message as the description of the toast.
  *
  * @param gameAreaController the controller for the ConnectFour game
  */

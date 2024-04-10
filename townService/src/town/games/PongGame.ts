@@ -25,7 +25,6 @@ export const PONG_BALL_STARTING_SPEED = 4;
 
 /**
  * A PongGame is a Game that implements the rules of Pong.
- * @see https://en.wikipedia.org/wiki/Connect_Four
  */
 export default class PongGame extends Game<PongGameState, PongMove> {
   private _preferredLeftPlayer?: PlayerID;
@@ -37,9 +36,9 @@ export default class PongGame extends Game<PongGameState, PongMove> {
   /**
    * Creates a new PongGame.
    * @param priorGame If provided, the new game will be created such that if either player
-   * from the prior game joins, they will be the same color. When the game begins, the default
+   * from the prior game joins, they will be the same side. When the game begins, the default
    * first player is leftPlayer, but if either player from the prior game joins the new game
-   * (and clicks "start"), the first player will be the other color.
+   * (and clicks "start"), the first player will be the other player.
    */
   public constructor(priorGame?: PongGame) {
     super({
@@ -72,8 +71,8 @@ export default class PongGame extends Game<PongGameState, PongMove> {
    *
    * The first player (leftPlayer or rightPlayer) is determined as follows:
    *   - If neither player was in the last game in this area (or there was no prior game), the first player is leftPlayer.
-   *   - If at least one player was in the last game in this area, then the first player will be the other color from last game.
-   *   - If a player from the last game *left* the game and then joined this one, they will be treated as a new player (not given the same color by preference).   *
+   *   - If at least one player was in the last game in this area, then the first player will be the other side from last game.
+   *   - If a player from the last game *left* the game and then joined this one, they will be treated as a new player (not given the same side by preference).   *
    *
    * @throws InvalidParametersError if the player is not in the game (PLAYER_NOT_IN_GAME_MESSAGE)
    * @throws InvalidParametersError if the game is not in the WAITING_TO_START state (GAME_NOT_STARTABLE_MESSAGE)
@@ -104,9 +103,9 @@ export default class PongGame extends Game<PongGameState, PongMove> {
 
   /**
    * Joins a player to the game.
-   * - Assigns the player to a color (leftPlayer or rightPlayer). If the player was in the prior game, then attempts
-   * to reuse the same color if it is not in use. Otherwise, assigns the player to the first
-   * available color (leftPlayer, then rightPlayer).
+   * - Assigns the player to a side (leftPlayer or rightPlayer). If the player was in the prior game, then attempts
+   * to reuse the same side if it is not in use. Otherwise, assigns the player to the first
+   * available side (leftPlayer, then rightPlayer).
    * - If both players are now assigned, updates the game status to WAITING_TO_START.
    *
    * @throws InvalidParametersError if the player is already in the game (PLAYER_ALREADY_IN_GAME_MESSAGE)
@@ -212,7 +211,7 @@ export default class PongGame extends Game<PongGameState, PongMove> {
 
   /**
    * Applies a move to the game.
-   * Uses the player's ID to determine which color they are playing as (ignores move.gamePiece).
+   * Uses the player's ID to determine which paddle they are playing as (ignores move.gamePiece).
    *
    * Validates the move, and if it is valid, applies it to the game state.
    *
@@ -223,8 +222,6 @@ export default class PongGame extends Game<PongGameState, PongMove> {
    *
    * @throws InvalidParametersError if the game is not in progress (GAME_NOT_IN_PROGRESS_MESSAGE)
    * @throws InvalidParametersError if the player is not in the game (PLAYER_NOT_IN_GAME_MESSAGE)
-   * @throws INvalidParametersError if the move is not the player's turn (MOVE_NOT_YOUR_TURN_MESSAGE)
-   * @throws InvalidParametersError if the move is invalid per the rules of Pong (BOARD_POSITION_NOT_VALID_MESSAGE)
    *
    */
   public applyMove(move: GameMove<PongMove>): void {

@@ -15,8 +15,8 @@ import GameArea from './GameArea';
 import TargetShooterGame from './TargetShooterGame';
 
 /**
- * The ConnectFourGameArea class is responsible for managing the state of a single game area for Connect Four.
- * Responsibilty for managing the state of the game itself is delegated to the ConnectFourGame class.
+ * The TargetShooterGameArea class is responsible for managing the state of a single game area for Target Shooter Game.
+ * Responsibilty for managing the state of the game itself is delegated to the TargetShooterGame class.
  *
  * @see TargetShooterGame
  * @see GameArea
