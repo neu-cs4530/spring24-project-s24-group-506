@@ -45,7 +45,7 @@ const flashing = keyframes`
  *
  * It uses Chakra-UI components (does not use other GUI widgets)
  *
- * It uses the TicketBoothAreaController corresponding to the provided interactableID to get 
+ * It uses the TicketBoothAreaController corresponding to the provided interactableID to get
  * the current state of the store. (@see useInteractableAreaController)
  *
  * TESTED MANUALLY

@@ -31,7 +31,7 @@ const Ball = ({ position }: { position: XY }) => {
  * Renders the Pong state
  *
  * The state is re-rendered whenever the state changes
- * 
+ *
  * TESTED MANUALLY
  *
  * @param gameAreaController the controller for the Pong game

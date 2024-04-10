@@ -285,7 +285,7 @@ export default class TargetShooterGame extends Game<TargetShooterGameState, Targ
     }
   }
 
-  // spawns a new target within the boundaries of the screen once the previous target has been clicked 
+  // spawns a new target within the boundaries of the screen once the previous target has been clicked
   private _spawnTarget(newState: TargetShooterGameState): void {
     // tighten the boundaries of the targets spawned
 

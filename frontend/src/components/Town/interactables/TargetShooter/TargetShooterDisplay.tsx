@@ -23,12 +23,12 @@ const Target = ({ position, size }: { position: XY; size: number }) => {
  *
  * The state is re-rendered whenever the state changes, and each target is re-rendered whenever the target position changes
  * The state is re-rendered whenever the difficulty is changed
- * 
+ *
  *
  * If the current player is in the game, then each Target is clickable, and clicking
  * on it will make a move in the game and spawn a new target. If there is an error making the move, then a toast will be
  * displayed with the error message as the description of the toast.
- * 
+ *
  * TESTED MANUALLY
  *
  * @param gameAreaController the controller for the ConnectFour game
