@@ -77,12 +77,12 @@ export default function PongArea({
           status: 'info',
         });
       } else if (winner === townController.ourPlayer) {
-        gameAreaController.addToken(20);
         toast({
           title: 'Game over',
           description: 'You won!',
           status: 'success',
         });
+        gameAreaController.addToken(20);
       } else if (gameAreaController.isPlayer) {
         toast({
           title: 'Game over',
