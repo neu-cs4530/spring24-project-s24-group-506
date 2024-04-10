@@ -22,12 +22,12 @@ import TargetAreaController from '../../../../classes/interactable/TargetShooter
 import TargetShooterDisplay from './TargetShooterDisplay';
 
 /**
- * The TargetShooteArea component renders the Target Shooter game area.
+ * The TargetShooterArea component renders the Target Shooter game area.
  * It renders the current state of the area, optionally allowing the player to join the game.
  *
  * It uses Chakra-UI components (does not use other GUI widgets)
  *
- * It uses the ConnectFourAreaController to get the current state of the game.
+ * It uses the TargetShooterAreaController to get the current state of the game.
  * It listens for the 'gameUpdated' and 'gameEnd' events on the controller, and re-renders accordingly.
  * It subscribes to these events when the component mounts, and unsubscribes when the component unmounts. It also unsubscribes when the gameAreaController changes.
  *

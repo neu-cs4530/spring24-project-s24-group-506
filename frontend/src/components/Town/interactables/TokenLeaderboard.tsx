@@ -4,17 +4,12 @@ import { usePlayers } from '../../../classes/TownController';
 import PlayerController from '../../../classes/PlayerController';
 
 /**
- * A generic component that renders a game area.
+ * A generic component that renders a token leaderboard.
  *
  * It uses Chakra-UI components (does not use other GUI widgets)
  *
- * It uses the TicketBoothAreaController corresponding to the provided interactableID to get the current state of the game. (@see useInteractableAreaController)
+ * It uses the UsePlayers hook to get the current players of the game. (@see usePlayers)
  *
- * It renders the following:
- *  - A leaderboard of the game results
- *  - A list of occupants' usernames (in a list with the aria-label 'list of occupants in the game')
- *  - The game area component (either ConnectFourArea or TicTacToeArea). If the game area is NOT a ConnectFourArea or TicTacToeArea, then the message INVALID_GAME_AREA_TYPE_MESSAGE appears within the component
- *  - A chat channel for the game area (@see ChatChannel.tsx), with the property interactableID set to the interactableID of the game area
  *
  */
 export function TokenLeaderboard(): JSX.Element {

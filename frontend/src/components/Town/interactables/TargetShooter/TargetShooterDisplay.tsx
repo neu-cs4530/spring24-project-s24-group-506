@@ -28,6 +28,8 @@ const Target = ({ position, size }: { position: XY; size: number }) => {
  * If the current player is in the game, then each Target is clickable, and clicking
  * on it will make a move in the game and spawn a new target. If there is an error making the move, then a toast will be
  * displayed with the error message as the description of the toast.
+ * 
+ * TESTED MANUALLY
  *
  * @param gameAreaController the controller for the ConnectFour game
  */
