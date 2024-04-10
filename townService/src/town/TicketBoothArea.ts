@@ -108,7 +108,6 @@ export default class TicketBoothArea extends InteractableArea {
 
   /**
    * Handles a purchase command from a player
-   * @param player The player who is attempting to make a purchase
    * @param command The purchase command
    * @returns An object containing the result of the purchase
    */
