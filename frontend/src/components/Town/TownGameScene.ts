@@ -130,18 +130,9 @@ export default class TownGameScene extends Phaser.Scene {
       '16_Grocery_store_32x32',
       this._resourcePathPrefix + '/assets/tilesets/16_Grocery_store_32x32.png',
     );
-    this.load.image(
-      'BlueHat',
-      this._resourcePathPrefix + '/assets/hatPictures/BlueHat.png',
-    );
-    this.load.image(
-      'RedHat',
-      this._resourcePathPrefix + '/assets/hatPictures/RedHat.png',
-    )
-    this.load.image(
-      'GreenHat',
-      this._resourcePathPrefix + '/assets/hatPictures/GreenHat.png',
-    )
+    this.load.image('BlueHat', this._resourcePathPrefix + '/assets/hatPictures/BlueHat.png');
+    this.load.image('RedHat', this._resourcePathPrefix + '/assets/hatPictures/RedHat.png');
+    this.load.image('GreenHat', this._resourcePathPrefix + '/assets/hatPictures/GreenHat.png');
 
     this.load.tilemapTiledJSON('map', this._resourcePathPrefix + '/assets/tilemaps/indoors.json');
     this.load.atlas(
@@ -179,8 +170,13 @@ export default class TownGameScene extends Phaser.Scene {
     players.forEach(player => {
       if (player.gameObjects && player.itemEquipped) {
         if (!player.gameObjects.hat) {
-          player.gameObjects.hat = this.add.image(player.gameObjects.sprite.body.x + 16, 
-            player.gameObjects.sprite.body.y, player.itemEquipped).setDepth(6);
+          player.gameObjects.hat = this.add
+            .image(
+              player.gameObjects.sprite.body.x + 16,
+              player.gameObjects.sprite.body.y,
+              player.itemEquipped,
+            )
+            .setDepth(6);
         } else if (player.gameObjects.hat.texture.key !== player.itemEquipped) {
           player.gameObjects.hat.setTexture(player.itemEquipped);
         }
