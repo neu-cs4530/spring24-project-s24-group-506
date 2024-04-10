@@ -319,7 +319,7 @@ export type TicketBoothPurchase = {
   player: PlayerID;
 }
 
-export type InteractableCommand =  TicketBoothPurchaseCommand | AddTokenCommand | ViewingAreaUpdateCommand | JoinGameCommand | GameMoveCommand<TicTacToeMove> | GameMoveCommand<ConnectFourMove> | GameMoveCommand<PongMove>| GameMove<TargetShooterMove> | StartUpdatePhysicsCommand | StopUpdatePhysicsCommand | UpdatePongScoreCommand | StartGameCommand | LeaveGameCommand | TicketBoothEquipCommand | ChangeDifficultyCommand;
+export type InteractableCommand =  TicketBoothPurchaseCommand | AddTokenCommand | ViewingAreaUpdateCommand | JoinGameCommand | GameMoveCommand<TicTacToeMove> | GameMoveCommand<ConnectFourMove> | GameMoveCommand<PongMove>| GameMoveCommand<TargetShooterMove> | StartUpdatePhysicsCommand | StopUpdatePhysicsCommand | UpdatePongScoreCommand | StartGameCommand | LeaveGameCommand | TicketBoothEquipCommand | ChangeDifficultyCommand;
 export interface ViewingAreaUpdateCommand  {
   type: 'ViewingAreaUpdate';
   update: ViewingArea;
