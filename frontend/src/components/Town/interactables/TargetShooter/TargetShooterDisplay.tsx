@@ -130,7 +130,7 @@ export default function TargetShooterDisplay({
         <Text>Player 2 Score: {player2Score}</Text>
       </Flex>
 
-      <div className='gamecontainer' id='targetshoot' onClick={handleMouseClick}>
+      <div className='target-container' id='targetshoot' onClick={handleMouseClick}>
         <Target position={targetPosition} size={targetSize} />
       </div>
 

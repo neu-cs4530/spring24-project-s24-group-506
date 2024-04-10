@@ -22,6 +22,13 @@
     );
   }
 
+  .target-container {
+    width: 400px;
+    height: 320px;
+    position: relative;
+    background-color: black;
+  }
+
   .pong-border {
     top: 0;
     left: 0;

@@ -205,7 +205,7 @@ export default function TargetShooterArea({
   };
 
   const difficultyButtons = (
-    <ButtonGroup isAttached marginBottom={2}>
+    <ButtonGroup isAttached>
       {difficultyButton('Easy')}
       {difficultyButton('Medium')}
       {difficultyButton('Hard')}
@@ -225,9 +225,17 @@ export default function TargetShooterArea({
             Difficulty
           </Text>
           <Box>{difficultyButtons}</Box>
-          <Text fontSize='large' as='b'>
-            Shoot the targets faster than your opponent
-          </Text>
+          <Text fontSize='large' as='b' align='center'></Text>
+          {gameAreaController.status !== 'IN_PROGRESS' ? (
+            <Center>
+              <Text align={'center'} as='b'>
+                Shoot the targets faster than your opponent by clicking on them. Score 10 points to
+                win!
+              </Text>
+            </Center>
+          ) : (
+            <></>
+          )}
         </VStack>
       </Center>
       <TargetShooterDisplay gameAreaController={gameAreaController} />

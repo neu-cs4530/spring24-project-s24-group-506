@@ -1,4 +1,4 @@
-import { Box, Button, Center, Stack, useToast } from '@chakra-ui/react';
+import { Box, Button, Center, Stack, Text, useToast } from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react';
 import PlayerController from '../../../../classes/PlayerController';
 import { useInteractableAreaController } from '../../../../classes/TownController';
@@ -140,7 +140,7 @@ export default function PongArea({
       </Button>
     );
     gameStatusText = (
-      <Stack direction='column' marginTop='3' marginBottom='4'>
+      <Stack direction='column' marginTop='3' marginBottom='2'>
         <Center className='status-text'>Waiting for players to press start. </Center>
         <Center>{startGameButton}</Center>
       </Stack>
@@ -172,7 +172,7 @@ export default function PongArea({
     if (gameStatus === 'OVER') gameStatusStr = 'over';
     else if (gameStatus === 'WAITING_FOR_PLAYERS') gameStatusStr = 'waiting for players to join';
     gameStatusText = (
-      <Stack direction='column' marginTop='3' marginBottom='4'>
+      <Stack direction='column' marginTop='3' marginBottom='2'>
         <Center className='status-text'>Game {gameStatusStr} </Center>
         <Center>{joinGameButton}</Center>
       </Stack>
@@ -181,6 +181,17 @@ export default function PongArea({
   return (
     <>
       {gameStatusText}
+      <Center>&#39;r&#39; to move paddle up, &#39;f&#39; to move paddle down.</Center>
+      {gameAreaController.status !== 'IN_PROGRESS' ? (
+        <Center>
+          <Text align={'center'} as='b'>
+            Get the ball past the opponent&#39;s paddle to score. Each time the ball hits a paddle,
+            it speeds up a bit. Score 5 points to win!
+          </Text>
+        </Center>
+      ) : (
+        <></>
+      )}
       <Box position='relative'>
         <Box aria-label='list of players in the game' className='player-list'>
           <span className='left-player'>{leftPlayer?.userName || '(No player yet!)'}</span>
