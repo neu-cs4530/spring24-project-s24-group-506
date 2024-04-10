@@ -5,6 +5,7 @@ import {
   GameMove,
   PlayerID,
   XY,
+  TargetShooterDifficulty,
 } from '../../types/CoveyTownSocket';
 import InvalidParametersError, {
   GAME_FULL_MESSAGE,
@@ -18,8 +19,9 @@ import Game from './Game';
 
 export const SCREENWIDTH = 400;
 export const SCREENHEIGHT = 320;
-export const MARGIN = 40;
-export const TARGET_SIZE = 40;
+export const EASY_TARGET_SIZE = 40;
+export const MEDIUM_TARGET_SIZE = 30;
+export const HARD_TARGET_SIZE = 20;
 
 /**
  * A ConnectFourGame is a Game that implements the rules of Connect Four.
@@ -43,6 +45,10 @@ export default class TargetShooterGame extends Game<TargetShooterGameState, Targ
       currentTarget: { x: 100, y: 100 },
       player1Score: 0,
       player2Score: 0,
+      difficulty: 'Easy',
+      targetSize: 40,
+      player1Accuracy: { hits: 0, shots: 0 },
+      player2Accuracy: { hits: 0, shots: 0 },
     });
     this._preferredPlayer1 = priorGame?.state.player1;
     this._preferredPlayer2 = priorGame?.state.player2;
@@ -217,12 +223,33 @@ export default class TargetShooterGame extends Game<TargetShooterGameState, Targ
 
     if (move.playerID === this.state.player1) {
       gamePiece = 'player1';
+      newState.player1Accuracy.shots++;
     } else if (move.playerID === this.state.player2) {
       gamePiece = 'player2';
+      newState.player2Accuracy.shots++;
     } else {
       throw new InvalidParametersError(PLAYER_NOT_IN_GAME_MESSAGE);
     }
     this._checkTargetHit(gamePiece, move.move.position, newState);
+    this.state = newState;
+  }
+
+  public changeDifficulty(difficulty: TargetShooterDifficulty): void {
+    const newState = { ...this.state };
+    if (!(newState.status === 'WAITING_FOR_PLAYERS' || newState.status === 'WAITING_TO_START')) {
+      throw new InvalidParametersError('Cannot change difficulty while game is in progress or over');
+    }
+    if (difficulty === newState.difficulty) {
+      return;
+    }
+    newState.difficulty = difficulty;
+    if (difficulty === 'Easy') {
+      newState.targetSize = EASY_TARGET_SIZE;
+    } else if (difficulty === 'Medium') {
+      newState.targetSize = MEDIUM_TARGET_SIZE;
+    } else {
+      newState.targetSize = HARD_TARGET_SIZE;
+    }
     this.state = newState;
   }
 
@@ -236,7 +263,7 @@ export default class TargetShooterGame extends Game<TargetShooterGameState, Targ
     const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
 
     // arbitary value
-    if (distance < TARGET_SIZE / 2) {
+    if (distance < newState.targetSize / 2) {
       this._incrementScore(player, newState);
       this._spawnTarget(newState);
     }
@@ -245,12 +272,14 @@ export default class TargetShooterGame extends Game<TargetShooterGameState, Targ
   private _incrementScore(player: TargetShooterPlayer, newState: TargetShooterGameState): void {
     if (player === 'player1') {
       newState.player1Score++;
+      newState.player1Accuracy.hits++;
     } else {
       newState.player2Score++;
+      newState.player2Accuracy.hits++;
     }
-    if (newState.player1Score === 5 || newState.player2Score === 5) {
+    if (newState.player1Score === 10 || newState.player2Score === 10) {
       newState.status = 'OVER';
-      newState.winner = newState.player1Score === 5 ? newState.player1 : newState.player2;
+      newState.winner = newState.player1Score === 10 ? newState.player1 : newState.player2;
     }
   }
 
@@ -258,8 +287,8 @@ export default class TargetShooterGame extends Game<TargetShooterGameState, Targ
     // tighten the boundaries of the targets spawned
 
     const newTargetPosition = {
-      x: Math.random() * (SCREENWIDTH - 2 * MARGIN) + MARGIN,
-      y: Math.random() * (SCREENHEIGHT - 2 * MARGIN) + MARGIN,
+      x: Math.random() * (SCREENWIDTH - 2 * newState.targetSize) + newState.targetSize,
+      y: Math.random() * (SCREENHEIGHT - 2 * newState.targetSize) + newState.targetSize,
     };
     newState.currentTarget.x = newTargetPosition.x;
     newState.currentTarget.y = newTargetPosition.y;

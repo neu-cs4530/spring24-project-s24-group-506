@@ -166,7 +166,9 @@ export type GameInstanceID = string;
 
 export type TargetShooterPlayer = 'player1' | 'player2';
 
-export type TargetShooterScore = 0 | 1 | 2 | 3 | 4 | 5;
+export type TargetShooterScore = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
+
+export type TargetShooterDifficulty = 'Easy' | 'Medium' | 'Hard';
 
 export type TargetShooterScoreUpdate = {
   gamePiece: TargetShooterPlayer;
@@ -176,6 +178,11 @@ export type TargetShooterScoreUpdate = {
 export type TargetShooterMove = {
   gamePiece: TargetShooterPlayer;
   position: XY;
+}
+
+export type TargetShooterAccuracy = {
+  hits: number;
+  shots: number;
 }
 
 
@@ -190,6 +197,12 @@ export interface TargetShooterGameState extends WinnableGameState{
 
   player1Ready?: boolean;
   player2Ready?: boolean;
+
+  difficulty: TargetShooterDifficulty;
+  targetSize: number;
+
+  player1Accuracy: TargetShooterAccuracy;
+  player2Accuracy: TargetShooterAccuracy;
 }
 
 
@@ -246,7 +259,7 @@ interface InteractableCommandBase {
   type: string;
 }
 
-export type InteractableCommand =  ViewingAreaUpdateCommand | JoinGameCommand | GameMoveCommand<TicTacToeMove> | GameMoveCommand<ConnectFourMove> | GameMoveCommand<TargetShooterMove> | StartGameCommand | LeaveGameCommand;
+export type InteractableCommand =  ViewingAreaUpdateCommand | JoinGameCommand | GameMoveCommand<TicTacToeMove> | GameMoveCommand<ConnectFourMove> | GameMoveCommand<TargetShooterMove> | StartGameCommand | LeaveGameCommand | ChangeDifficultyCommand;
 export interface ViewingAreaUpdateCommand  {
   type: 'ViewingAreaUpdate';
   update: ViewingArea;
@@ -267,6 +280,12 @@ export interface GameMoveCommand<MoveType> {
   gameID: GameInstanceID;
   move: MoveType;
 }
+export interface ChangeDifficultyCommand {
+  type: 'ChangeDifficulty';
+  gameID: GameInstanceID;
+  difficulty: TargetShooterDifficulty;
+}
+
 export type InteractableCommandReturnType<CommandType extends InteractableCommand> = 
   CommandType extends JoinGameCommand ? { gameID: string}:
   CommandType extends ViewingAreaUpdateCommand ? undefined :

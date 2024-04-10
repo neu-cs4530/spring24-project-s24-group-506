@@ -97,6 +97,21 @@ export default class TargetShooterGameArea extends GameArea<TargetShooterGame> {
       this._stateUpdated(game.toModel());
       return undefined as InteractableCommandReturnType<CommandType>;
     }
+    if (command.type === 'ChangeDifficulty') {
+      const game = this._game;
+      if (!game) {
+        throw new InvalidParametersError(GAME_NOT_IN_PROGRESS_MESSAGE);
+      }
+      if (this._game?.id !== command.gameID) {
+        throw new InvalidParametersError(GAME_ID_MISSMATCH_MESSAGE);
+      }
+      if (player.id !== game.state.player1 && player.id !== game.state.player2) {
+        throw new InvalidParametersError('Only players can change difficulty');
+      }
+      game.changeDifficulty(command.difficulty);
+      this._stateUpdated(game.toModel());
+      return undefined as InteractableCommandReturnType<CommandType>;
+    }
     if (command.type === 'JoinGame') {
       let game = this._game;
       if (!game || game.state.status === 'OVER') {

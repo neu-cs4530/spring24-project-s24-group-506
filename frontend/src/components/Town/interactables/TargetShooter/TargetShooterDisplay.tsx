@@ -1,26 +1,29 @@
 import ConnectFourAreaController, {
   ConnectFourCell,
 } from '../../../../classes/interactable/ConnectFourAreaController';
-import { Button, chakra, Container, useToast } from '@chakra-ui/react';
+import { Button, ButtonGroup, chakra, Container, Flex, useToast, Text } from '@chakra-ui/react';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   ConnectFourColIndex,
+  TargetShooterAccuracy,
+  TargetShooterDifficulty,
   TargetShooterGameState,
   TargetShooterPlayer,
   TargetShooterScore,
   XY,
 } from '../../../../types/CoveyTownSocket';
 import TargetShooterAreaController from '../../../../classes/interactable/TargetShooterAreaController';
-import { on } from 'events';
 
 export type TargetShooterProps = {
   gameAreaController: TargetShooterAreaController;
 };
 
-const Target = ({ position }: { position: XY }) => {
+const Target = ({ position, size }: { position: XY, size: number }) => {
   const style = {
     left: position.x,
     top: position.y,
+    width: size,
+    height: size,
   };
 
   return <div className='target' style={style}></div>;
@@ -58,16 +61,25 @@ export default function TargetShooterDisplay({
   const [player2Score, setPlayer2Score] = useState<TargetShooterScore>(
     gameAreaController.player2Score,
   );
+  const [targetSize, setTargetSize] = useState<number>(gameAreaController.targetSize);
+  const [player1Accuracy, setPlayer1Accuracy] = useState<TargetShooterAccuracy>(gameAreaController.player1Accuracy);
+  const [player2Accuracy, setPlayer2Accuracy] = useState<TargetShooterAccuracy>(gameAreaController.player2Accuracy);
   const toast = useToast();
 
   useEffect(() => {
     gameAreaController.addListener('targetPositionUpdated', setTargetPosition);
     gameAreaController.addListener('player1ScoreUpdated', setPlayer1Score);
     gameAreaController.addListener('player2ScoreUpdated', setPlayer2Score);
+    gameAreaController.addListener('targetSizeUpdated', setTargetSize);
+    gameAreaController.addListener('player1AccuracyUpdated', setPlayer1Accuracy);
+    gameAreaController.addListener('player2AccuracyUpdated', setPlayer2Accuracy);
     return () => {
       gameAreaController.removeListener('targetPositionUpdated', setTargetPosition);
       gameAreaController.removeListener('player1ScoreUpdated', setPlayer1Score);
       gameAreaController.removeListener('player2ScoreUpdated', setPlayer2Score);
+      gameAreaController.removeListener('targetSizeUpdated', setTargetSize);
+      gameAreaController.removeListener('player1AccuracyUpdated', setPlayer1Accuracy);
+      gameAreaController.removeListener('player2AccuracyUpdated', setPlayer2Accuracy);
     };
   }, [gameAreaController]);
 
@@ -101,14 +113,35 @@ export default function TargetShooterDisplay({
     }
   };
 
+  const player1AccuracyPercent = (player1Accuracy.shots === 0 ? 0 : (player1Accuracy.hits / player1Accuracy.shots) * 100);
+  const player2AccuracyPercent = (player2Accuracy.shots === 0 ? 0 : (player2Accuracy.hits / player2Accuracy.shots) * 100);
+
+  const p1red = 255 - (player1AccuracyPercent * 2.55);
+  const p1green = player1AccuracyPercent * 2.55;
+  const p1rgb = `rgb(${p1red}, ${p1green}, ${0})`;
+  const p2red = 255 - (player2AccuracyPercent * 2.55);
+  const p2green = player2AccuracyPercent * 2.55;
+  const p2rgb = `rgb(${p2red}, ${p2green}, ${0})`;
+
+  const player1AccuracyText = player1Accuracy.shots === 0 ? '0.00%' : `${player1AccuracyPercent.toFixed(2)}%`;
+  const player2AccuracyText = player2Accuracy.shots === 0 ? '0.00%' : `${player2AccuracyPercent.toFixed(2)}%`;
+
+
   return (
     <div>
-      <h1>targetShooter</h1>
-      <h2>Player 1 Score: {player1Score}</h2>
-      <h2>Player 2 Score: {player2Score}</h2>
+      <Flex justifyContent={'space-between'}>
+        <Text>Player 1 Score: {player1Score}</Text>
+        <Text>Player 2 Score: {player2Score}</Text>
+      </Flex>
+      
       <div className='gamecontainer' id='targetshoot' onClick={handleMouseClick}>
-        <Target position={targetPosition} />
+        <Target position={targetPosition} size={targetSize} />
       </div>
+
+      <Flex justifyContent={'space-between'}>
+        <Text color={p1rgb}>Player 1 Accuracy: {player1AccuracyText}</Text>
+        <Text color={p2rgb}>Player 2 Accuracy: {player2AccuracyText}</Text>
+      </Flex>
     </div>
   );
 }

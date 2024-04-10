@@ -1,9 +1,9 @@
-import { Button, List, ListItem, useToast } from '@chakra-ui/react';
+import { Box, Button, ButtonGroup, Center, Heading, List, ListItem, Text, VStack, useToast } from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react';
 import PlayerController from '../../../../classes/PlayerController';
 import { useInteractableAreaController } from '../../../../classes/TownController';
 import useTownController from '../../../../hooks/useTownController';
-import { GameStatus, InteractableID } from '../../../../types/CoveyTownSocket';
+import { GameStatus, InteractableID, TargetShooterDifficulty } from '../../../../types/CoveyTownSocket';
 import TargetAreaController from '../../../../classes/interactable/TargetShooterAreaController';
 import TargetShooterDisplay from './TargetShooterDisplay';
 
@@ -57,6 +57,7 @@ export default function TargetShooterArea({
   const [joiningGame, setJoiningGame] = useState(false);
 
   const [gameStatus, setGameStatus] = useState<GameStatus>(gameAreaController.status);
+  const [difficulty, setDifficulty] = useState<TargetShooterDifficulty>(gameAreaController.difficulty);
   const toast = useToast();
   useEffect(() => {
     const updateGameState = () => {
@@ -94,9 +95,11 @@ export default function TargetShooterArea({
     };
     gameAreaController.addListener('gameUpdated', updateGameState);
     gameAreaController.addListener('gameEnd', onGameEnd);
+    gameAreaController.addListener('difficultyUpdated', setDifficulty);
     return () => {
       gameAreaController.removeListener('gameUpdated', updateGameState);
       gameAreaController.removeListener('gameEnd', onGameEnd);
+      gameAreaController.removeListener('difficultyUpdated', setDifficulty);
     };
   }, [townController, gameAreaController, toast]);
   let gameStatusText = <></>;
@@ -163,6 +166,37 @@ export default function TargetShooterArea({
       </b>
     );
   }
+
+  const difficultyButton = (btnDifficulty: TargetShooterDifficulty) => {
+    return (
+      <Button size='sm'
+        disabled={gameAreaController.status === 'IN_PROGRESS' || difficulty === btnDifficulty}
+        onClick={async () => {
+          try {
+            await gameAreaController.changeDifficulty(btnDifficulty);
+          }
+          catch (e) {
+            toast({
+              title: 'Error changing difficulty',
+              description: (e as Error).toString(),
+              status: 'error',
+            });
+          }
+        }}
+      >
+        {btnDifficulty}
+      </Button>
+    );
+  };
+
+  const difficultyButtons = (
+    <ButtonGroup isAttached marginBottom={2}>
+      {difficultyButton('Easy')}
+      {difficultyButton('Medium')}
+      {difficultyButton('Hard')}
+    </ButtonGroup>
+  );
+
   return (
     <>
       {gameStatusText}
@@ -170,6 +204,13 @@ export default function TargetShooterArea({
         <ListItem>player1: {player1?.userName || '(No player yet!)'}</ListItem>
         <ListItem>player2: {player2?.userName || '(No player yet!)'}</ListItem>
       </List>
+      <Center marginTop={2} marginBottom={2}>
+        <VStack>
+        <Text size='md' as='b'>Difficulty</Text>
+        <Box>{difficultyButtons}</Box>
+        <Text fontSize='large' as='b'>Shoot the targets faster than your opponent</Text>
+        </VStack>
+      </Center>
       <TargetShooterDisplay gameAreaController={gameAreaController} />
     </>
   );

@@ -2,6 +2,8 @@ import _ from 'lodash';
 import {
   GameArea,
   GameStatus,
+  TargetShooterAccuracy,
+  TargetShooterDifficulty,
   TargetShooterGameState,
   TargetShooterMove,
   TargetShooterPlayer,
@@ -16,19 +18,18 @@ import GameAreaController, {
   PLAYER_NOT_IN_GAME_ERROR,
 } from './GameAreaController';
 
-export const PADDLE_MOVE_SPEED = 8;
-export const PONG_WIDTH = 400;
-export const PONG_HEIGHT = 320;
-export const PONG_PADDLE_WIDTH = 16;
-export const PONG_PADDLE_HEIGHT = 64;
-export const PONG_BALL_SIZE = 12;
-export const PONG_BALL_STARTING_SPEED = 2;
-export const TARGET_SIZE = 40;
+const EASY_TARGET_SIZE = 40;
+const MEDIUM_TARGET_SIZE = 30;
+const HARD_TARGET_SIZE = 20;
 
 export type TargetShooterEvents = GameEventTypes & {
   targetPositionUpdated: (position: XY) => void;
   leftScoreUpdated: (score: TargetShooterScore) => void;
   rightScoreUpdated: (score: TargetShooterScore) => void;
+  difficultyUpdated: (difficulty: TargetShooterDifficulty) => void;
+  targetSizeUpdated: (size: number) => void;
+  player1AccuracyUpdated: (accuracy: TargetShooterAccuracy) => void;
+  player2AccuracyUpdated: (accuracy: TargetShooterAccuracy) => void;
 };
 
 /**
@@ -43,9 +44,23 @@ export default class TargetShooterAreaController extends GameAreaController<
     y: this._model.game?.state.currentTarget.y ?? 0,
   };
 
+  private _difficulty: TargetShooterDifficulty = this._model.game?.state.difficulty ?? 'Easy';
+
+  private _targetSize: number = this._model.game?.state.targetSize ?? 40;
+
   private _player1score: TargetShooterScore = 0;
 
   private _player2score: TargetShooterScore = 0;
+
+  private _player1Acccuracy: TargetShooterAccuracy = {
+    hits: 0,
+    shots: 0,
+  };
+
+  private _player2Acccuracy: TargetShooterAccuracy = {
+    hits: 0,
+    shots: 0,
+  };
 
   // returns the current position of the ball
   get targetPosition(): XY {
@@ -62,8 +77,20 @@ export default class TargetShooterAreaController extends GameAreaController<
     return this._player2score;
   }
 
+  get player1Accuracy(): TargetShooterAccuracy {
+    return this._player1Acccuracy;
+  }
+
+  get player2Accuracy(): TargetShooterAccuracy {
+    return this._player2Acccuracy;
+  }
+
+  get difficulty(): TargetShooterDifficulty {
+    return this._difficulty;
+  }
+
   get targetSize(): number {
-    return TARGET_SIZE;
+    return this._targetSize;
   }
 
   /**
@@ -177,6 +204,26 @@ export default class TargetShooterAreaController extends GameAreaController<
         this._player2score = newGame.state.player2Score;
         this.emit('player2ScoreUpdated', this._player2score);
       }
+
+      if (newGame.state.difficulty !== this._difficulty) {
+        this._difficulty = newGame.state.difficulty;
+        this.emit('difficultyUpdated', this._difficulty);
+      }
+
+      if (newGame.state.targetSize !== this._targetSize) {
+        this._targetSize = newGame.state.targetSize;
+        this.emit('targetSizeUpdated', this._targetSize);
+      }
+
+      if (!_.isEqual(newGame.state.player1Accuracy, this._player1Acccuracy)) {
+        this._player1Acccuracy = newGame.state.player1Accuracy;
+        this.emit('player1AccuracyUpdated', this._player1Acccuracy);
+      }
+
+      if (!_.isEqual(newGame.state.player2Accuracy, this._player2Acccuracy)) {
+        this._player2Acccuracy = newGame.state.player2Accuracy;
+        this.emit('player2AccuracyUpdated', this._player2Acccuracy);
+      }
     }
   }
 
@@ -214,6 +261,8 @@ export default class TargetShooterAreaController extends GameAreaController<
       throw new Error(NO_GAME_IN_PROGRESS_ERROR);
     }
 
+    const currentScore = this.gamePiece === 'player1' ? this._player1score : this._player2score;
+
     const gamePiece = this.gamePiece;
     const move: TargetShooterMove = {
       gamePiece,
@@ -224,5 +273,34 @@ export default class TargetShooterAreaController extends GameAreaController<
       gameID: instanceID,
       move,
     });
+  }
+
+  private _getTargetSize(difficulty: TargetShooterDifficulty): number {
+    switch (difficulty) {
+      case 'Easy':
+        return EASY_TARGET_SIZE;
+      case 'Medium':
+        return MEDIUM_TARGET_SIZE;
+      case 'Hard':
+        return HARD_TARGET_SIZE;
+      default:
+        return EASY_TARGET_SIZE;
+    }
+  }
+
+  public async changeDifficulty(difficulty: TargetShooterDifficulty): Promise<void> {
+    const instanceID = this._instanceID;
+    if (!instanceID) {
+      throw new Error('No game');
+    }
+    await this._townController.sendInteractableCommand(this.id, {
+      gameID: instanceID,
+      type: 'ChangeDifficulty',
+      difficulty,
+    });
+    this._difficulty = difficulty;
+    this._targetSize = this._getTargetSize(difficulty);
+    this.emit('difficultyUpdated', this._difficulty);
+    this.emit('targetSizeUpdated', this._targetSize);
   }
 }

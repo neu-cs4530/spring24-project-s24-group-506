@@ -47,8 +47,6 @@
 
   
   .target {
-    width: 40px;
-    height: 40px;
     position: absolute;
     /* background: radial-gradient(circle, red 20%, white 20%, white 40%, red 40%, red 80%, white 80%); */
     background: radial-gradient(circle, red 20%, white 20%, white 40%, red 40%, red 80%, white 80%);
