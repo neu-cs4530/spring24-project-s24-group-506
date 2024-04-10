@@ -77,12 +77,12 @@ export default function PongArea({
           status: 'info',
         });
       } else if (winner === townController.ourPlayer) {
-        await gameAreaController.addToken(20);
         toast({
           title: 'Game over',
           description: 'You won!',
           status: 'success',
         });
+        gameAreaController.addToken(20);
       } else if (gameAreaController.isPlayer) {
         toast({
           title: 'Game over',
@@ -193,11 +193,11 @@ export default function PongArea({
         <></>
       )}
       <Box position='relative'>
-        <Box aria-label='list of players in the game' className='player-list'>
+        <Box aria-label='left-player' className='player-list'>
           <span className='left-player'>{leftPlayer?.userName || '(No player yet!)'}</span>
         </Box>
         <PongDisplay gameAreaController={gameAreaController} />
-        <Box aria-label='list of players in the game' className='player-list'>
+        <Box aria-label='right-player' className='player-list'>
           <span className='left-player'></span>
           <span className='right-player'>{rightPlayer?.userName || '(No player yet!)'}</span>
         </Box>
